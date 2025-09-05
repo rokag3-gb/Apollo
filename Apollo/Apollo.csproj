@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <PublishAot>true</PublishAot>
+    <!-- 필요 시 크기/성능 최적화 옵션들 -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
+    <StripSymbols>true</StripSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cronos" Version="0.11.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Enrichers.CallerInfo" Version="1.0.6" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Apollo.Core\Apollo.Core.csproj" />
+  </ItemGroup>
+
+  <!-- 게시 시에만 빌드 번호 업데이트 스크립트 실행 -->
+  <Target Name="BumpBuild" BeforeTargets="Publish">
+    <Message Text="$(MSBuildProjectName) 프로젝트 게시 전 Target 내부로 진입하여 BumpBuild 실행하기 직전." Importance="high" />
+    <Message Text="프로젝트 디렉토리: $(MSBuildProjectDirectory)" Importance="high" />
+    <Message Text="스크립트 경로: $(MSBuildProjectDirectory)/bump-build.sh" Importance="high" />
+    
+    <!-- Windows: PowerShell 7 이상 -->
+    <Exec Command="pwsh -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\bump-build.ps1&quot;" Condition=" '$(OS)' == 'Windows_NT' " />
+    
+    <!-- Linux/WSL -->
+    <Exec Command="bash &quot;$(MSBuildProjectDirectory)/bump-build.sh&quot;" Condition=" '$(OS)' != 'Windows_NT' " />
+  </Target>
+
+</Project>
