@@ -1,7 +1,7 @@
 
-# AirBridge
+# Apollo
 
-AirBridge는 다양한 소스(로컬, Azure Blob 등)에서 파일을 주기적으로 동기화하고, 알림(예: Lark, Email, SMS)을 전송하는 .NET 8 기반의 확장 가능한 콘솔 애플리케이션입니다.
+Apollo는 다양한 소스(로컬, Azure Blob 등)에서 파일을 주기적으로 동기화하고, 알림(예: Lark, Email, SMS)을 전송하는 .NET 8 기반의 확장 가능한 콘솔 애플리케이션입니다.
 Cronos 라이브러리를 활용하여 크론 스케줄링을 정밀하게 지원하며, YAML 기반의 설정과 DI(의존성 주입) 구조로 유연한 확장성을 제공합니다.
 
 ---
@@ -42,13 +42,13 @@ dotnet add package Cronos --version 0.11.0
 
 
 ```
-AirBridge.sln
-├── AirBridge/                # 메인 실행 프로젝트
+Apollo.sln
+├── Apollo/                # 메인 실행 프로젝트
 │   ├── Program.cs            # 진입점, DI/호스트 구성
 │   ├── Scheduler/
 │   │   ├── CronPollingService.cs  # 크론 스케줄러 서비스
 │   └── ...
-├── AirBridge.Core/           # 핵심 라이브러리
+├── Apollo.Core/           # 핵심 라이브러리
 │   ├── Yaml/                 # 설정 로더 및 모델
 │   ├── Notification/         # 알림 채널/팩토리/서비스
 │   ├── SFTP/                 # Azure Blob SFTP 연동
@@ -56,22 +56,22 @@ AirBridge.sln
 │   ├── FileWatcher/          # 파일 감시 구현체
 │   ├── Model/                # 데이터 모델
 │   └── ...
-└── AirBridge.Awaker/         # (예정) 감시 및 자동 재시작 콘솔 앱
+└── Apollo.Awaker/         # (예정) 감시 및 자동 재시작 콘솔 앱
     └── ...
 ```
 
 ---
 
-## AirBridge.Awaker (예정)
+## Apollo.Awaker (예정)
 
-**AirBridge.Awaker**는 AirBridge 프로세스의 상태를 감시하고, 프로세스가 없거나 응답이 없을 경우 자동으로 AirBridge를 재실행하는 별도의 콘솔 응용 프로그램입니다.
+**Apollo.Awaker**는 Apollo 프로세스의 상태를 감시하고, 프로세스가 없거나 응답이 없을 경우 자동으로 Apollo를 재실행하는 별도의 콘솔 응용 프로그램입니다.
 
 - 독립 실행형 감시/재시작 도구 (Windows 서비스 또는 데몬 형태로도 확장 가능)
-- AirBridge의 안정적 운영을 위한 헬스체크 및 자동 복구 역할
+- Apollo의 안정적 운영을 위한 헬스체크 및 자동 복구 역할
 - 향후 다양한 감시 정책(프로세스, 포트, 응답 등) 및 알림 연동도 확장 가능
 
 > **예정된 구조**
-> - AirBridge.Awaker/
+> - Apollo.Awaker/
 >   - Program.cs (감시/재시작 로직)
 >   - ...
 
@@ -79,7 +79,7 @@ AirBridge.sln
 
 ---
 
-## 설정 예시 (`BaseDirectory + /AirBridgeConfig.yaml`)
+## 설정 예시 (`BaseDirectory + /ApolloConfig.yaml`)
 
 ```yaml
 schedule:
@@ -106,7 +106,7 @@ target:
 
 ## 작동 방식
 
-1. YAML 설정 로드: 실행 시 `AirBridgeConfig.yaml`을 읽어 전체 동작을 설정합니다.
+1. YAML 설정 로드: 실행 시 `ApolloConfig.yaml`을 읽어 전체 동작을 설정합니다.
 2. DI/호스트 구성: .NET Generic Host로 서비스 등록 및 DI 구성
 3. 스케줄링: `CronPollingService`가 Cronos로 스케줄을 파싱, 주기적으로 작업 실행 -> `FileWatcher`
 4. 파일 감시: `FileWatcher`가 설정된 폴더를 near-realtime으로 감시하여 파일 변경 감지
@@ -117,7 +117,7 @@ target:
 
 ## 파일 감시 기능
 
-AirBridge는 `FileWatcher` 구현체에서 로컬 폴더의 파일 변경을 near-realtime으로 감시하고 검사합니다. Linux(RHEL) / Windows 를 모두 커버합니다.
+Apollo는 `FileWatcher` 구현체에서 로컬 폴더의 파일 변경을 near-realtime으로 감시하고 검사합니다. Linux(RHEL) / Windows 를 모두 커버합니다.
 
 ### 주요 특징
 
