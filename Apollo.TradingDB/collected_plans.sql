@@ -35,6 +35,9 @@ from    sys.all_sql_modules
 where   object_id > 0
 and     object_name(object_id) like 'up_%';
 
+sp_helptext up_s_query_admin_audit_event_summary
+
+
 ------------------------------------------------------------------
 
 CREATE OR ALTER PROC batch_t_collected_plans
