@@ -30,8 +30,10 @@ select * from collected_plans;
 sp_columns collected_plans
 
 select  *
+        --'drop proc ' + object_name(object_id) + ';'
 from    sys.all_sql_modules
 where   object_id > 0
+and     object_name(object_id) like 'up_%';
 
 ------------------------------------------------------------------
 

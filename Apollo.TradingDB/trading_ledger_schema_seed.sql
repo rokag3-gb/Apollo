@@ -434,18 +434,20 @@ CREATE TABLE dbo.sys_api_client (
   rate_limit  INT NOT NULL DEFAULT 1000
 );
 
-CREATE TABLE dbo.sys_audit_log (
-  audit_id     BIGINT IDENTITY(1,1) PRIMARY KEY,
-  ts           DATETIME2(3) NOT NULL DEFAULT SYSUTCDATETIME(),
-  actor        NVARCHAR(64) NOT NULL,  -- user:xxx / client:yyy
-  action       NVARCHAR(64) NOT NULL,
-  target_table NVARCHAR(64) NOT NULL,
-  target_pk    NVARCHAR(128) NULL,
-  before_json  NVARCHAR(MAX) NULL,
-  after_json   NVARCHAR(MAX) NULL,
-  ip           NVARCHAR(64) NULL
+CREATE TABLE dbo.sys_audit_log
+(
+    log_id      bigint IDENTITY(1,1) PRIMARY KEY,   -- 로그 고유 ID
+    event_type  nvarchar(100)    NOT NULL,          -- 이벤트 종류 (PROC.~, ORDER.NEW 등)
+    ref_id      bigint           NULL,              -- 참조 ID (계좌, 주문, 체결 등 관련 키)
+    details     nvarchar(max)    NULL,              -- 상세 내용 (파라미터 dump 등)
+    created_at  datetime2(3)     NOT NULL DEFAULT SYSUTCDATETIME(), -- 생성 시각
+    created_by  nvarchar(100)    NOT NULL           -- 실행자 (user/system/batch 등)
 );
-CREATE INDEX IX_sys_audit_ts ON dbo.sys_audit_log(ts);
+
+-- 조회 성능을 위해 필요한 인덱스 추가
+CREATE INDEX IX_sys_audit_log_event_type ON dbo.sys_audit_log(event_type);
+CREATE INDEX IX_sys_audit_log_ref_id     ON dbo.sys_audit_log(ref_id);
+CREATE INDEX IX_sys_audit_log_created_at ON dbo.sys_audit_log(created_at);
 
 CREATE TABLE dbo.sys_job_run (
   job_id      BIGINT IDENTITY(1,1) PRIMARY KEY,
