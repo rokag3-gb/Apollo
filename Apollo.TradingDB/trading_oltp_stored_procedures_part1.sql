@@ -1,34 +1,32 @@
 /********************************************************************************************
  * Trading Ledger OLTP Simulation Stored Procedures V3 - Part 1 of 2 (SQL Server)
  * -------------------------------------------------------------------------------------------
- * ÀÌ ½ºÅ©¸³Æ®´Â ÁÖ½Ä °Å·¡ ½Ã½ºÅÛÀÇ ´Ù¾çÇÑ OLTP ¿öÅ©·Îµå¸¦ ½Ã¹Ä·¹ÀÌ¼ÇÇÏ±â À§ÇÑ
- * ÀúÀå ÇÁ·Î½ÃÀú(Stored Procedure) 1¹øºÎÅÍ 50¹ø±îÁö¸¦ Á¤ÀÇÇÕ´Ï´Ù.
+ * ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” ì£¼ì‹ ê±°ë˜ ì‹œìŠ¤í…œì˜ ë‹¤ì–‘í•œ OLTP ì›Œí¬ë¡œë“œë¥¼ ì‹œë®¬ë ˆì´ì…˜í•˜ê¸° ìœ„í•œ
+ * ì €ì¥ í”„ë¡œì‹œì €(Stored Procedure) 1ë²ˆë¶€í„° 50ë²ˆê¹Œì§€ë¥¼ ì •ì˜í•©ë‹ˆë‹¤.
  *
- * ½ÇÇà ¼ø¼­:
- * 1. ÀÌ ÆÄÀÏ(part1.sql)À» ¸ÕÀú ½ÇÇàÇÏ¿© sp_catalog Å×ÀÌºí°ú ±âº» SPµéÀ» »ı¼ºÇÕ´Ï´Ù.
- * 2. trading_oltp_stored_procedures_part2.sql ÆÄÀÏÀ» ½ÇÇàÇÏ¿© ³ª¸ÓÁö SPµéÀ» »ı¼ºÇÕ´Ï´Ù.
+ * ì‹¤í–‰ ìˆœì„œ:
+ * 1. ì´ íŒŒì¼(part1.sql)ì„ ë¨¼ì € ì‹¤í–‰í•˜ì—¬ sp_catalog í…Œì´ë¸”ê³¼ ê¸°ë³¸ SPë“¤ì„ ìƒì„±í•©ë‹ˆë‹¤.
+ * 2. trading_oltp_stored_procedures_part2.sql íŒŒì¼ì„ ì‹¤í–‰í•˜ì—¬ ë‚˜ë¨¸ì§€ SPë“¤ì„ ìƒì„±í•©ë‹ˆë‹¤.
  *
- * ½ºÅ©¸³Æ® ±¸Á¶:
- *   1) sp_catalog Å×ÀÌºí »ı¼º
- *   2) sp_catalog Å×ÀÌºí¿¡ SP 1-50 ¸ŞÅ¸µ¥ÀÌÅÍ INSERT
- *   3) ±âÁ¸ SP 1-50 ÀÏ°ı »èÁ¦
- *   4) SP 1-50 »ı¼º (Ä«Å×°í¸®º°)
+ * ìŠ¤í¬ë¦½íŠ¸ êµ¬ì¡°:
+ *   1) sp_catalog í…Œì´ë¸” ìƒì„±
+ *   2) sp_catalog í…Œì´ë¸”ì— SP 1-50 ë©”íƒ€ë°ì´í„° INSERT
+ *   3) ê¸°ì¡´ SP 1-50 ì¼ê´„ ì‚­ì œ
+ *   4) SP 1-50 ìƒì„± (ì¹´í…Œê³ ë¦¬ë³„)
  ********************************************************************************************/
 
 SET NOCOUNT ON;
 GO
 
 /********************************************************************************************
- * 1) sp_catalog Å×ÀÌºí »ı¼º
+ * 1) sp_catalog í…Œì´ë¸” ìƒì„±
  ********************************************************************************************/
 PRINT 'Part 1: Step 1 - Creating sp_catalog table...';
-
-DROP TABLE IF EXISTS dbo.sp_catalog;
 
 IF OBJECT_ID('dbo.sp_catalog', 'U') IS NULL
 BEGIN
     CREATE TABLE dbo.sp_catalog (
-        sp_id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+        sp_id INT IDENTITY(1,1) PRIMARY KEY,
         sp_name NVARCHAR(128) NOT NULL UNIQUE,
         caller NVARCHAR(20) NOT NULL, -- 'User', 'Admin', 'Batch'
         remark NVARCHAR(500) NOT NULL
@@ -37,71 +35,71 @@ END
 GO
 
 /********************************************************************************************
- * 2) sp_catalog Å×ÀÌºí¿¡ SP 1-50 ¸ŞÅ¸µ¥ÀÌÅÍ INSERT
+ * 2) sp_catalog í…Œì´ë¸”ì— SP 1-50 ë©”íƒ€ë°ì´í„° INSERT
  ********************************************************************************************/
 PRINT 'Part 1: Step 2 - Populating sp_catalog for SPs 1-50...';
 
--- È¤½Ã ¸ğ¸¦ Áßº¹À» ÇÇÇÏ±â À§ÇØ MERGE »ç¿ë
+-- í˜¹ì‹œ ëª¨ë¥¼ ì¤‘ë³µì„ í”¼í•˜ê¸° ìœ„í•´ MERGE ì‚¬ìš©
 MERGE dbo.sp_catalog AS target
 USING (
     VALUES
     -- Market Data (1-8)
-    ('usp_t_UpdateSecurityPrice_001', 'Batch', 'Æ¯Á¤ Á¾¸ñÀÇ ÇöÀç°¡¸¦ °»½Å (±âº»).'),
-    ('usp_t_UpdateMarketPricesBulk_002', 'Batch', '´Ù¼ö Á¾¸ñÀÇ ½Ã¼¼¸¦ ·£´ıÇÏ°Ô ÀÏ°ı °»½Å.'),
-    ('usp_s_GetSecurityPrice_003', 'User', 'Æ¯Á¤ Á¾¸ñÀÇ ÃÖ½Å ½Ã¼¼¸¦ Á¶È¸ (±âº»).'),
-    ('usp_s_GetSecurityPriceWithNolock_004', 'User', 'Æ¯Á¤ Á¾¸ñÀÇ ÃÖ½Å ½Ã¼¼¸¦ NOLOCK ÈùÆ®¸¦ »ç¿ëÇÏ¿© Á¶È¸ (Dirty Read).'),
-    ('usp_s_GetMultipleSecurityPrices_005', 'User', '½°Ç¥·Î ±¸ºĞµÈ ¿©·¯ Á¾¸ñ ID¸¦ ¹Ş¾Æ ½Ã¼¼¸¦ ÇÑ ¹ø¿¡ Á¶È¸.'),
-    ('usp_s_GetPriceHistory_006', 'User', 'Æ¯Á¤ Á¾¸ñÀÇ ÁöÁ¤µÈ ±â°£ µ¿¾ÈÀÇ ºĞºÀ µ¥ÀÌÅÍ¸¦ Á¶È¸.'),
-    ('usp_s_GetTopMovers_007', 'User', 'ÀüÀÏ Á¾°¡ ´ëºñ µî¶ô·ü »óÀ§ N°³ Á¾¸ñ Á¶È¸.'),
-    ('usp_s_GetWorstMovers_008', 'User', 'ÀüÀÏ Á¾°¡ ´ëºñ µî¶ô·ü ÇÏÀ§ N°³ Á¾¸ñ Á¶È¸.'),
+    ('usp_t_UpdateSecurityPrice_001', 'Batch', 'íŠ¹ì • ì¢…ëª©ì˜ í˜„ì¬ê°€ë¥¼ ê°±ì‹  (ê¸°ë³¸).'),
+    ('usp_t_UpdateMarketPricesBulk_002', 'Batch', 'ë‹¤ìˆ˜ ì¢…ëª©ì˜ ì‹œì„¸ë¥¼ ëœë¤í•˜ê²Œ ì¼ê´„ ê°±ì‹ .'),
+    ('usp_s_GetSecurityPrice_003', 'User', 'íŠ¹ì • ì¢…ëª©ì˜ ìµœì‹  ì‹œì„¸ë¥¼ ì¡°íšŒ (ê¸°ë³¸).'),
+    ('usp_s_GetSecurityPriceWithNolock_004', 'User', 'íŠ¹ì • ì¢…ëª©ì˜ ìµœì‹  ì‹œì„¸ë¥¼ NOLOCK íŒíŠ¸ë¥¼ ì‚¬ìš©í•˜ì—¬ ì¡°íšŒ (Dirty Read).'),
+    ('usp_s_GetMultipleSecurityPrices_005', 'User', 'ì‰¼í‘œë¡œ êµ¬ë¶„ëœ ì—¬ëŸ¬ ì¢…ëª© IDë¥¼ ë°›ì•„ ì‹œì„¸ë¥¼ í•œ ë²ˆì— ì¡°íšŒ.'),
+    ('usp_s_GetPriceHistory_006', 'User', 'íŠ¹ì • ì¢…ëª©ì˜ ì§€ì •ëœ ê¸°ê°„ ë™ì•ˆì˜ ë¶„ë´‰ ë°ì´í„°ë¥¼ ì¡°íšŒ.'),
+    ('usp_s_GetTopMovers_007', 'User', 'ì „ì¼ ì¢…ê°€ ëŒ€ë¹„ ë“±ë½ë¥  ìƒìœ„ Nê°œ ì¢…ëª© ì¡°íšŒ.'),
+    ('usp_s_GetWorstMovers_008', 'User', 'ì „ì¼ ì¢…ê°€ ëŒ€ë¹„ ë“±ë½ë¥  í•˜ìœ„ Nê°œ ì¢…ëª© ì¡°íšŒ.'),
 
     -- Customer & Account (9-20)
-    ('usp_t_RegisterCustomer_009', 'User', '½Å±Ô °í°´ Á¤º¸¸¦ µî·Ï.'),
-    ('usp_t_OpenAccount_010', 'User', '±âÁ¸ °í°´ÀÇ ½Å±Ô °èÁÂ¸¦ °³¼³.'),
-    ('usp_t_DepositCash_011', 'User', 'Æ¯Á¤ °èÁÂ¿¡ Çö±İÀ» ÀÔ±İ. Æ®·£Àè¼Ç Ã³¸® Æ÷ÇÔ.'),
-    ('usp_t_WithdrawCash_012', 'User', 'Æ¯Á¤ °èÁÂ¿¡¼­ Çö±İÀ» Ãâ±İ. ÀÜ°í È®ÀÎ ¹× Æ®·£Àè¼Ç Ã³¸® Æ÷ÇÔ.'),
-    ('usp_s_GetCustomerInfo_013', 'User', '°í°´ ID·Î °í°´ÀÇ ±âº» Á¤º¸¸¦ Á¶È¸.'),
-    ('usp_s_GetCustomerAccounts_014', 'User', '°í°´ ID·Î ÇØ´ç °í°´ÀÌ ¼ÒÀ¯ÇÑ ¸ğµç °èÁÂ ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_s_GetAccountCashBalance_015', 'User', 'Æ¯Á¤ °èÁÂÀÇ ÅëÈ­º° Çö±İ ÀÜ¾×À» Á¶È¸.'),
-    ('usp_t_Admin_UpdateCustomerKYC_016', 'Admin', '°ü¸®ÀÚ°¡ Æ¯Á¤ °í°´ÀÇ KYC ·¹º§À» º¯°æ.'),
-    ('usp_s_Admin_SearchCustomers_017', 'Admin', '°ü¸®ÀÚ°¡ ÀÌ¸§, ±¹°¡ µîÀ¸·Î °í°´À» °Ë»ö (LIKE, RECOMPILE ÈùÆ® »ç¿ë).'),
-    ('usp_s_Admin_GetFullAccountDetails_018', 'Admin', '°ü¸®ÀÚ°¡ °èÁÂÀÇ ¸ğµç »ó¼¼ Á¤º¸(°í°´Á¤º¸, ÀÜ°í, Æ÷Áö¼Ç)¸¦ JOINÇÏ¿© Á¶È¸.'),
-    ('usp_s_Batch_GetActiveAccounts_019', 'Batch', '¹èÄ¡ ÀÛ¾÷¿ë: ÇöÀç È°¼ºÈ­µÈ ¸ğµç °èÁÂ ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_t_Admin_ToggleAccountStatus_020', 'Admin', '°ü¸®ÀÚ°¡ Æ¯Á¤ °èÁÂ¸¦ È°¼º/ºñÈ°¼º Ã³¸®.'),
+    ('usp_t_RegisterCustomer_009', 'User', 'ì‹ ê·œ ê³ ê° ì •ë³´ë¥¼ ë“±ë¡.'),
+    ('usp_t_OpenAccount_010', 'User', 'ê¸°ì¡´ ê³ ê°ì˜ ì‹ ê·œ ê³„ì¢Œë¥¼ ê°œì„¤.'),
+    ('usp_t_DepositCash_011', 'User', 'íŠ¹ì • ê³„ì¢Œì— í˜„ê¸ˆì„ ì…ê¸ˆ. íŠ¸ëœì­ì…˜ ì²˜ë¦¬ í¬í•¨.'),
+    ('usp_t_WithdrawCash_012', 'User', 'íŠ¹ì • ê³„ì¢Œì—ì„œ í˜„ê¸ˆì„ ì¶œê¸ˆ. ì”ê³  í™•ì¸ ë° íŠ¸ëœì­ì…˜ ì²˜ë¦¬ í¬í•¨.'),
+    ('usp_s_GetCustomerInfo_013', 'User', 'ê³ ê° IDë¡œ ê³ ê°ì˜ ê¸°ë³¸ ì •ë³´ë¥¼ ì¡°íšŒ.'),
+    ('usp_s_GetCustomerAccounts_014', 'User', 'ê³ ê° IDë¡œ í•´ë‹¹ ê³ ê°ì´ ì†Œìœ í•œ ëª¨ë“  ê³„ì¢Œ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_s_GetAccountCashBalance_015', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ í†µí™”ë³„ í˜„ê¸ˆ ì”ì•¡ì„ ì¡°íšŒ.'),
+    ('usp_t_Admin_UpdateCustomerKYC_016', 'Admin', 'ê´€ë¦¬ìê°€ íŠ¹ì • ê³ ê°ì˜ KYC ë ˆë²¨ì„ ë³€ê²½.'),
+    ('usp_s_Admin_SearchCustomers_017', 'Admin', 'ê´€ë¦¬ìê°€ ì´ë¦„, êµ­ê°€ ë“±ìœ¼ë¡œ ê³ ê°ì„ ê²€ìƒ‰ (LIKE, RECOMPILE íŒíŠ¸ ì‚¬ìš©).'),
+    ('usp_s_Admin_GetFullAccountDetails_018', 'Admin', 'ê´€ë¦¬ìê°€ ê³„ì¢Œì˜ ëª¨ë“  ìƒì„¸ ì •ë³´(ê³ ê°ì •ë³´, ì”ê³ , í¬ì§€ì…˜)ë¥¼ JOINí•˜ì—¬ ì¡°íšŒ.'),
+    ('usp_s_Batch_GetActiveAccounts_019', 'Batch', 'ë°°ì¹˜ ì‘ì—…ìš©: í˜„ì¬ í™œì„±í™”ëœ ëª¨ë“  ê³„ì¢Œ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_t_Admin_ToggleAccountStatus_020', 'Admin', 'ê´€ë¦¬ìê°€ íŠ¹ì • ê³„ì¢Œë¥¼ í™œì„±/ë¹„í™œì„± ì²˜ë¦¬.'),
 
     -- Trading (21-45)
-    ('usp_t_PlaceOrder_Limit_021', 'User', 'ÁöÁ¤°¡(LIMIT) ¸Å¼ö/¸Åµµ ÁÖ¹®À» »ı¼º.'),
-    ('usp_t_PlaceOrder_Market_022', 'User', '½ÃÀå°¡(MARKET) ¸Å¼ö/¸Åµµ ÁÖ¹®À» »ı¼ºÇÏ°í Áï½Ã Ã¼°á ½Ã¹Ä·¹ÀÌ¼Ç.'),
-    ('usp_t_CancelOrder_023', 'User', '¹ÌÃ¼°á ÁÖ¹®À» Ãë¼Ò.'),
-    ('usp_s_GetOrderStatus_024', 'User', 'Æ¯Á¤ ÁÖ¹®ÀÇ ÇöÀç »óÅÂ¸¦ Á¶È¸.'),
-    ('usp_s_GetAccountPositions_025', 'User', 'Æ¯Á¤ °èÁÂÀÇ ÇöÀç º¸À¯ Á¾¸ñ(Æ÷Áö¼Ç) ¸ñ·ÏÀ» Á¶È¸ (±âº»).'),
-    ('usp_s_GetAccountPositions_TempTable_026', 'User', 'ÀÓ½Ã Å×ÀÌºí(#)À» »ç¿ëÇÏ¿© Æ¯Á¤ °èÁÂÀÇ Æ÷Áö¼Ç ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_s_GetAccountPositions_TableVar_027', 'User', 'Å×ÀÌºí º¯¼ö(@)¸¦ »ç¿ëÇÏ¿© Æ¯Á¤ °èÁÂÀÇ Æ÷Áö¼Ç ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_s_GetOpenOrders_028', 'User', 'Æ¯Á¤ °èÁÂÀÇ ¹ÌÃ¼°á(New, PartiallyFilled) ÁÖ¹® ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_s_GetOrderHistory_029', 'User', 'Æ¯Á¤ °èÁÂÀÇ ÁöÁ¤µÈ ±â°£ µ¿¾ÈÀÇ ¸ğµç ÁÖ¹® ³»¿ªÀ» Á¶È¸.'),
-    ('usp_s_GetOrderHistory_SelectStar_030', 'User', 'SELECT * ¸¦ »ç¿ëÇÏ¿© Æ¯Á¤ °èÁÂÀÇ ÁÖ¹® ³»¿ªÀ» Á¶È¸.'),
-    ('usp_s_GetExecutionHistory_031', 'User', 'Æ¯Á¤ ÁÖ¹®¿¡ ´ëÇÑ ¸ğµç Ã¼°á ³»¿ªÀ» Á¶È¸.'),
-    ('usp_s_GetDailyExecutionSummary_032', 'User', 'Æ¯Á¤ °èÁÂÀÇ ´çÀÏ Ã¼°á ³»¿ªÀ» ¿ä¾àÇÏ¿© Á¶È¸.'),
-    ('usp_t_SettleTrade_033', 'Batch', '´ÜÀÏ Ã¼°á °Ç¿¡ ´ëÇÑ Á¤»ê Ã³¸®(¿øÀå ±â·Ï, Çö±İ/Æ÷Áö¼Ç ¾÷µ¥ÀÌÆ®).'),
-    ('usp_s_Admin_FindLargeOrders_034', 'Admin', '°ü¸®ÀÚ°¡ ÁöÁ¤µÈ ±İ¾× ÀÌ»óÀÇ ´ë·® ÁÖ¹®À» °Ë»ö.'),
-    ('usp_s_Admin_MonitorRecentTrades_035', 'Admin', '°ü¸®ÀÚ°¡ ÃÖ±Ù NºĞ µ¿¾ÈÀÇ ¸ğµç °Å·¡¸¦ ½Ç½Ã°£À¸·Î ¸ğ´ÏÅÍ¸µ.'),
-    ('usp_s_Admin_CheckRiskLimit_036', 'Admin', '°ü¸®ÀÚ°¡ Æ¯Á¤ °èÁÂÀÇ ¸®½ºÅ© ÇÑµµ(ÀÏÀÏ ¼Õ½Ç µî) À§¹İ ¿©ºÎ¸¦ È®ÀÎ.'),
-    ('usp_t_Admin_ManualExecution_037', 'Admin', '°ü¸®ÀÚ°¡ ¼öµ¿À¸·Î Ã¼°á µ¥ÀÌÅÍ¸¦ ÀÔ·Â.'),
-    ('usp_s_GetOrderAndExecutions_038', 'User', 'ÁÖ¹® ÇÑ °Ç°ú ±×¿¡ µû¸¥ Ã¼°á ³»¿ªÀ» ÇÔ²² Á¶È¸ (JOIN).'),
-    ('usp_s_GetOrderAndExecutions_LoopJoin_039', 'User', 'LOOP JOIN ÈùÆ®¸¦ »ç¿ëÇÏ¿© ÁÖ¹®°ú Ã¼°á ³»¿ªÀ» Á¶È¸.'),
-    ('usp_s_GetOrderAndExecutions_HashJoin_040', 'User', 'HASH JOIN ÈùÆ®¸¦ »ç¿ëÇÏ¿© ÁÖ¹®°ú Ã¼°á ³»¿ªÀ» Á¶È¸.'),
-    ('usp_s_GetOrdersWithExists_041', 'User', 'EXISTS ÀıÀ» »ç¿ëÇÏ¿© Ã¼°á ³»¿ªÀÌ ÀÖ´Â ÁÖ¹®¸¸ Á¶È¸.'),
-    ('usp_s_GetOrdersWithIn_042', 'User', 'IN ÀıÀ» »ç¿ëÇÏ¿© Ã¼°á ³»¿ªÀÌ ÀÖ´Â ÁÖ¹®¸¸ Á¶È¸.'),
-    ('usp_s_GetOrdersBySource_043', 'Admin', 'ÁÖ¹® ¼Ò½º(api, gui, fix)º°·Î ÁÖ¹® ¸ñ·ÏÀ» Á¶È¸.'),
-    ('usp_t_PlaceOrder_Complex_044', 'User', '¿©·¯ ¿É¼Ç(TIF, Stop Price µî)À» Æ÷ÇÔÇÏ´Â º¹ÇÕ ÁÖ¹® »ı¼º.'),
-    ('usp_s_GetPositionLots_045', 'User', 'Æ¯Á¤ Æ÷Áö¼ÇÀÇ °³º° Lot(Ãëµæ ³»¿ª) Á¤º¸¸¦ Á¶È¸.'),
+    ('usp_t_PlaceOrder_Limit_021', 'User', 'ì§€ì •ê°€(LIMIT) ë§¤ìˆ˜/ë§¤ë„ ì£¼ë¬¸ì„ ìƒì„±.'),
+    ('usp_t_PlaceOrder_Market_022', 'User', 'ì‹œì¥ê°€(MARKET) ë§¤ìˆ˜/ë§¤ë„ ì£¼ë¬¸ì„ ìƒì„±í•˜ê³  ì¦‰ì‹œ ì²´ê²° ì‹œë®¬ë ˆì´ì…˜.'),
+    ('usp_t_CancelOrder_023', 'User', 'ë¯¸ì²´ê²° ì£¼ë¬¸ì„ ì·¨ì†Œ.'),
+    ('usp_s_GetOrderStatus_024', 'User', 'íŠ¹ì • ì£¼ë¬¸ì˜ í˜„ì¬ ìƒíƒœë¥¼ ì¡°íšŒ.'),
+    ('usp_s_GetAccountPositions_025', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ í˜„ì¬ ë³´ìœ  ì¢…ëª©(í¬ì§€ì…˜) ëª©ë¡ì„ ì¡°íšŒ (ê¸°ë³¸).'),
+    ('usp_s_GetAccountPositions_TempTable_026', 'User', 'ì„ì‹œ í…Œì´ë¸”(#)ì„ ì‚¬ìš©í•˜ì—¬ íŠ¹ì • ê³„ì¢Œì˜ í¬ì§€ì…˜ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_s_GetAccountPositions_TableVar_027', 'User', 'í…Œì´ë¸” ë³€ìˆ˜(@)ë¥¼ ì‚¬ìš©í•˜ì—¬ íŠ¹ì • ê³„ì¢Œì˜ í¬ì§€ì…˜ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_s_GetOpenOrders_028', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ ë¯¸ì²´ê²°(New, PartiallyFilled) ì£¼ë¬¸ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_s_GetOrderHistory_029', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ ì§€ì •ëœ ê¸°ê°„ ë™ì•ˆì˜ ëª¨ë“  ì£¼ë¬¸ ë‚´ì—­ì„ ì¡°íšŒ.'),
+    ('usp_s_GetOrderHistory_SelectStar_030', 'User', 'SELECT * ë¥¼ ì‚¬ìš©í•˜ì—¬ íŠ¹ì • ê³„ì¢Œì˜ ì£¼ë¬¸ ë‚´ì—­ì„ ì¡°íšŒ.'),
+    ('usp_s_GetExecutionHistory_031', 'User', 'íŠ¹ì • ì£¼ë¬¸ì— ëŒ€í•œ ëª¨ë“  ì²´ê²° ë‚´ì—­ì„ ì¡°íšŒ.'),
+    ('usp_s_GetDailyExecutionSummary_032', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ ë‹¹ì¼ ì²´ê²° ë‚´ì—­ì„ ìš”ì•½í•˜ì—¬ ì¡°íšŒ.'),
+    ('usp_t_SettleTrade_033', 'Batch', 'ë‹¨ì¼ ì²´ê²° ê±´ì— ëŒ€í•œ ì •ì‚° ì²˜ë¦¬(ì›ì¥ ê¸°ë¡, í˜„ê¸ˆ/í¬ì§€ì…˜ ì—…ë°ì´íŠ¸).'),
+    ('usp_s_Admin_FindLargeOrders_034', 'Admin', 'ê´€ë¦¬ìê°€ ì§€ì •ëœ ê¸ˆì•¡ ì´ìƒì˜ ëŒ€ëŸ‰ ì£¼ë¬¸ì„ ê²€ìƒ‰.'),
+    ('usp_s_Admin_MonitorRecentTrades_035', 'Admin', 'ê´€ë¦¬ìê°€ ìµœê·¼ Në¶„ ë™ì•ˆì˜ ëª¨ë“  ê±°ë˜ë¥¼ ì‹¤ì‹œê°„ìœ¼ë¡œ ëª¨ë‹ˆí„°ë§.'),
+    ('usp_s_Admin_CheckRiskLimit_036', 'Admin', 'ê´€ë¦¬ìê°€ íŠ¹ì • ê³„ì¢Œì˜ ë¦¬ìŠ¤í¬ í•œë„(ì¼ì¼ ì†ì‹¤ ë“±) ìœ„ë°˜ ì—¬ë¶€ë¥¼ í™•ì¸.'),
+    ('usp_t_Admin_ManualExecution_037', 'Admin', 'ê´€ë¦¬ìê°€ ìˆ˜ë™ìœ¼ë¡œ ì²´ê²° ë°ì´í„°ë¥¼ ì…ë ¥.'),
+    ('usp_s_GetOrderAndExecutions_038', 'User', 'ì£¼ë¬¸ í•œ ê±´ê³¼ ê·¸ì— ë”°ë¥¸ ì²´ê²° ë‚´ì—­ì„ í•¨ê»˜ ì¡°íšŒ (JOIN).'),
+    ('usp_s_GetOrderAndExecutions_LoopJoin_039', 'User', 'LOOP JOIN íŒíŠ¸ë¥¼ ì‚¬ìš©í•˜ì—¬ ì£¼ë¬¸ê³¼ ì²´ê²° ë‚´ì—­ì„ ì¡°íšŒ.'),
+    ('usp_s_GetOrderAndExecutions_HashJoin_040', 'User', 'HASH JOIN íŒíŠ¸ë¥¼ ì‚¬ìš©í•˜ì—¬ ì£¼ë¬¸ê³¼ ì²´ê²° ë‚´ì—­ì„ ì¡°íšŒ.'),
+    ('usp_s_GetOrdersWithExists_041', 'User', 'EXISTS ì ˆì„ ì‚¬ìš©í•˜ì—¬ ì²´ê²° ë‚´ì—­ì´ ìˆëŠ” ì£¼ë¬¸ë§Œ ì¡°íšŒ.'),
+    ('usp_s_GetOrdersWithIn_042', 'User', 'IN ì ˆì„ ì‚¬ìš©í•˜ì—¬ ì²´ê²° ë‚´ì—­ì´ ìˆëŠ” ì£¼ë¬¸ë§Œ ì¡°íšŒ.'),
+    ('usp_s_GetOrdersBySource_043', 'Admin', 'ì£¼ë¬¸ ì†ŒìŠ¤(api, gui, fix)ë³„ë¡œ ì£¼ë¬¸ ëª©ë¡ì„ ì¡°íšŒ.'),
+    ('usp_t_PlaceOrder_Complex_044', 'User', 'ì—¬ëŸ¬ ì˜µì…˜(TIF, Stop Price ë“±)ì„ í¬í•¨í•˜ëŠ” ë³µí•© ì£¼ë¬¸ ìƒì„±.'),
+    ('usp_s_GetPositionLots_045', 'User', 'íŠ¹ì • í¬ì§€ì…˜ì˜ ê°œë³„ Lot(ì·¨ë“ ë‚´ì—­) ì •ë³´ë¥¼ ì¡°íšŒ.'),
 
     -- Queries (46-50)
-    ('usp_s_GetMostTradedSecurities_046', 'User', '´çÀÏ °Å·¡·® »óÀ§ N°³ Á¾¸ñÀ» Á¶È¸.'),
-    ('usp_s_GetHighestTurnoverSecurities_047', 'User', '´çÀÏ °Å·¡´ë±İ »óÀ§ N°³ Á¾¸ñÀ» Á¶È¸.'),
-    ('usp_s_SearchSecurityBySymbol_048', 'User', 'Á¾¸ñ¸í(symbol)À¸·Î Á¾¸ñ Á¤º¸¸¦ °Ë»ö (LIKE).'),
-    ('usp_s_GetAccountCashLedger_Paged_049', 'User', 'Æ¯Á¤ °èÁÂÀÇ ÀÔÃâ±İ ³»¿ªÀ» ÆäÀÌÁö ´ÜÀ§·Î Á¶È¸ (OFFSET/FETCH).'),
-    ('usp_s_GetCorporateActions_050', 'User', 'Æ¯Á¤ Á¾¸ñÀÇ ±Ç¸®¶ô(¹è´ç, ºĞÇÒ µî) Á¤º¸¸¦ Á¶È¸.')
+    ('usp_s_GetMostTradedSecurities_046', 'User', 'ë‹¹ì¼ ê±°ë˜ëŸ‰ ìƒìœ„ Nê°œ ì¢…ëª©ì„ ì¡°íšŒ.'),
+    ('usp_s_GetHighestTurnoverSecurities_047', 'User', 'ë‹¹ì¼ ê±°ë˜ëŒ€ê¸ˆ ìƒìœ„ Nê°œ ì¢…ëª©ì„ ì¡°íšŒ.'),
+    ('usp_s_SearchSecurityBySymbol_048', 'User', 'ì¢…ëª©ëª…(symbol)ìœ¼ë¡œ ì¢…ëª© ì •ë³´ë¥¼ ê²€ìƒ‰ (LIKE).'),
+    ('usp_s_GetAccountCashLedger_Paged_049', 'User', 'íŠ¹ì • ê³„ì¢Œì˜ ì…ì¶œê¸ˆ ë‚´ì—­ì„ í˜ì´ì§€ ë‹¨ìœ„ë¡œ ì¡°íšŒ (OFFSET/FETCH).'),
+    ('usp_s_GetCorporateActions_050', 'User', 'íŠ¹ì • ì¢…ëª©ì˜ ê¶Œë¦¬ë½(ë°°ë‹¹, ë¶„í•  ë“±) ì •ë³´ë¥¼ ì¡°íšŒ.')
 ) AS source (sp_name, caller, remark)
 ON (target.sp_name = source.sp_name)
 WHEN NOT MATCHED THEN
@@ -110,7 +108,7 @@ WHEN NOT MATCHED THEN
 GO
 
 /********************************************************************************************
- * 3) ±âÁ¸ SP 1-50 ÀÏ°ı »èÁ¦
+ * 3) ê¸°ì¡´ SP 1-50 ì¼ê´„ ì‚­ì œ
  ********************************************************************************************/
 PRINT 'Part 1: Step 3 - Dropping existing stored procedures (1-50)...';
 
@@ -136,7 +134,7 @@ GO
 
 
 /********************************************************************************************
- * 4) SP 1-50 »ı¼º
+ * 4) SP 1-50 ìƒì„±
  ********************************************************************************************/
 PRINT 'Part 1: Step 4 - Creating stored procedures (1-50)...';
 GO
