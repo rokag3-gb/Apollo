@@ -33,7 +33,7 @@ class Program
                 .Enrich.FromLogContext()
                 .Enrich.WithCallerInfo(
                     includeFileInfo: true,
-                    assemblyPrefix: "Apollo", // Apollo, Apollo.Core, Apollo.Awaker 전부 매칭
+                    assemblyPrefix: "Apollo", // Apollo, Apollo.Core 전부 매칭
                     filePathDepth: 2 // SourceFile 경로를 뒤에서 2개 디렉토리만 남김
                 )
                 .WriteTo.Console(
@@ -96,6 +96,7 @@ class Program
                     services.AddSingleton<NetInfoHelper>();
 
                     services.AddHostedService<Scheduler.CronPollingService>();
+                    services.AddHostedService<Scheduler.DbHammerService>();
 
                     services.AddTransient<IFileService, FileService>();
 
