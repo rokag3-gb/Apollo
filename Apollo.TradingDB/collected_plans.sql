@@ -1,3 +1,38 @@
+
+-- 테이블 49개
+select  *
+from    sys.objects
+where   type = 'U'
+
+exec batch_t_collected_plans;
+
+select * from collected_plans;
+
+sp_columns collected_plans
+
+-- SP 310개
+select  *
+--select  'drop proc ' + object_name(object_id) + ';'
+from    sys.all_sql_modules
+where   object_id > 0
+and     object_name(object_id) like 'up_%'
+and     object_name(object_id) not in ('batch_t_collected_plans');
+
+sp_helptext up_s_query_admin_audit_event_summary
+
+
+select * from sp_catalog
+
+sp_helptext up_t_order_amend_price_010
+
+
+
+
+
+
+
+------------------------------------------------------------------
+
 DROP TABLE IF EXISTS dbo.collected_plans;
 
 CREATE TABLE dbo.collected_plans
@@ -20,23 +55,6 @@ CREATE TABLE dbo.collected_plans
   last_exec_time     datetime2      NULL,
   CONSTRAINT PK_collected_plans PRIMARY KEY (collected_at, query_id, plan_id) -- seq_id
 );
-
-------------------------------------------------------------------
-
-exec batch_t_collected_plans;
-
-select * from collected_plans;
-
-sp_columns collected_plans
-
-select  *
-        --'drop proc ' + object_name(object_id) + ';'
-from    sys.all_sql_modules
-where   object_id > 0
-and     object_name(object_id) like 'up_%';
-
-sp_helptext up_s_query_admin_audit_event_summary
-
 
 ------------------------------------------------------------------
 
