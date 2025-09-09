@@ -21,11 +21,11 @@ and     object_name(object_id) not in ('batch_t_collected_plans');
 sp_helptext up_s_query_admin_audit_event_summary
 
 
-select * from sp_catalog
+select *
+from sp_catalog
+where sp_name like 'usp_t_%'
 
-sp_helptext up_t_order_amend_price_010
-
-
+sp_helptext usp_t_UpdateSecurityPrice_001
 
 
 

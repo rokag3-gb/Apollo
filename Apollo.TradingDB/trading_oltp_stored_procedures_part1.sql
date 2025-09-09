@@ -23,15 +23,14 @@ GO
  ********************************************************************************************/
 PRINT 'Part 1: Step 1 - Creating sp_catalog table...';
 
-IF OBJECT_ID('dbo.sp_catalog', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.sp_catalog (
-        sp_id INT IDENTITY(1,1) PRIMARY KEY,
-        sp_name NVARCHAR(128) NOT NULL UNIQUE,
-        caller NVARCHAR(20) NOT NULL, -- 'User', 'Admin', 'Batch'
-        remark NVARCHAR(500) NOT NULL
-    );
-END
+DROP TABLE IF EXISTS dbo.sp_catalog;
+
+CREATE TABLE dbo.sp_catalog (
+    sp_id INT IDENTITY(1,1) PRIMARY KEY,
+    sp_name NVARCHAR(128) NOT NULL UNIQUE,
+    caller NVARCHAR(20) NOT NULL, -- 'User', 'Admin', 'Batch'
+    remark NVARCHAR(500) NOT NULL
+);
 GO
 
 /********************************************************************************************
