@@ -97,13 +97,6 @@ class Program
 
                     services.AddHostedService<Scheduler.CronPollingService>();
 
-                    //services.AddTransient<FileTransferService>();
-                    //services.AddTransient<IFileTransferService>(provider =>
-                    //{
-                    //    var logger = provider.GetRequiredService<ILogger<FileTransferService>>();
-                    //    var notifier = provider.GetRequiredService<Core.Notification.NotificationService>();
-                    //    return new FileTransferService(logger, notifier);
-                    //});
                     services.AddTransient<IFileService, FileService>();
 
                     services.AddTransient<Core.Notification.LarkNotificationSender>();
@@ -113,9 +106,6 @@ class Program
                     // Factory 및 Service 등록
                     services.AddSingleton<Core.Notification.INotificationSenderFactory, Core.Notification.NotificationSenderFactory>();
                     services.AddSingleton<Core.Notification.NotificationService>();
-
-                    // NamedPipe 서버 등록
-                    services.AddSingleton<INamedPipeServer, NamedPipeServer>();
                 })
                 .Build();
 
@@ -133,10 +123,6 @@ class Program
 
             logger.LogInformation($"NET Info 불러오기 성공!");
             logger.LogInformation($"HostName = [{Conf.CurrentNetInfo.HostName}], Private IPv4 = [{Conf.CurrentNetInfo.PrivateIPv4}], Public IPv4 = [{Conf.CurrentNetInfo.PublicIPv4}], Private IPv6 = [{Conf.CurrentNetInfo.PrivateIPv6}]");
-
-            // NamedPipe 서버 시작
-            var namedPipeServer = host.Services.GetRequiredService<INamedPipeServer>();
-            namedPipeServer.Start();
 
             await host.RunAsync();
         }
