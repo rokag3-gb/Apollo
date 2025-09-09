@@ -1,10 +1,12 @@
-﻿using Apollo.Core;
-using Apollo.Core.Helper;
-using Apollo.Core.Ipc;
+﻿using System.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Data.SqlClient;
 using Serilog;
 using Serilog.Enrichers.CallerInfo;
+using Apollo.Core;
+using Apollo.Core.Helper;
+using Apollo.Core.Credential;
 
 namespace Apollo;
 
@@ -90,12 +92,15 @@ class Program
             // 호스트 빌더 설정
             var host = Host.CreateDefaultBuilder(args)
                 .UseSerilog() // 모든 Logger<T>는 Serilog을 사용
-                .ConfigureServices(services =>
+                .ConfigureServices((hostContext, services) =>
                 {
+                    // DB Connection 등록 (Dapper)
+                    services.AddTransient<IDbConnection>(c => new SqlConnection(SqlConnectionSecret.TradingDB));
+                    
                     services.AddSingleton<YamlConfigHelper>();
                     services.AddSingleton<NetInfoHelper>();
 
-                    services.AddHostedService<Scheduler.CronPollingService>();
+                    //services.AddHostedService<Scheduler.CronPollingService>();
                     services.AddHostedService<Scheduler.DbHammerService>();
 
                     services.AddTransient<IFileService, FileService>();
