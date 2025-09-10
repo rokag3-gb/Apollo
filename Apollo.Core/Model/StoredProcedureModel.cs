@@ -2,12 +2,13 @@
 
 public class StoredProcedureList
 {
-    public List<StoredProcedureModel>? SPs { get; set; } = new();
+    public List<StoredProcedureModel> Procedures { get; set; } = new();
 }
 
 public class StoredProcedureModel
 {
-    public required string Name { get; set; } // 예: usp_GetUserProfile
+    public required string Name { get; set; }
+    public string? Caller { get; set; } // 호출자: User, Admin, Batch (sp_catalog 테이블에서 가져옴)
     public List<ParameterMetadata>? Parameters { get; set; } = new();
 }
 
@@ -22,6 +23,7 @@ public class ParameterMetadata
 public class StoredProcedureRawdata
 {
     public required string ProcedureName { get; set; }
+    public string? Caller { get; set; }
     public int? ParameterId { get; set; }
     public string? ParameterName { get; set; }
     public string? TypeName { get; set; }

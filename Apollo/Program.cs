@@ -96,7 +96,7 @@ class Program
                     // DB Connection 등록 (Dapper)
                     services.AddTransient<IDbConnection>(c => new SqlConnection(SqlConnectionSecret.TradingDB));
 
-                    services.AddHostedService<Scheduler.DbHammerService>();
+                    services.AddHostedService<DbHammerService>();
 
                     services.AddSingleton<YamlConfigHelper>();
                     services.AddSingleton<NetInfoHelper>();

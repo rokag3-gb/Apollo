@@ -19,6 +19,10 @@ where   object_id > 0
 and     object_name(object_id) like 'up_%'
 and     object_name(object_id) not in ('batch_t_collected_plans');
 
+select  p.*
+FROM	sys.procedures p
+WHERE	p.is_ms_shipped = 0 -- Microsoft 기본 제공 SP 제외
+
 sp_helptext up_s_query_admin_audit_event_summary
 
 
@@ -28,9 +32,26 @@ where sp_name like 'usp_t_%'
 
 sp_helptext usp_t_UpdateSecurityPrice_001
 
+select *
+from sys.parameters
 
 
 
+SELECT	ProcedureName = p.name
+	, Caller = c.caller
+	, ParameterId = m.parameter_id
+	, ParameterName = m.name
+	, TypeName = t.name
+	, MaxLength = case when t.name in ('nvarchar', 'nchar') then m.max_length / 2 else m.max_length end
+	, IsNullable = m.is_nullable
+	--, pm.*
+FROM	sys.procedures p
+	LEFT OUTER JOIN sys.parameters m ON p.object_id = m.object_id
+	LEFT OUTER JOIN sys.types t ON m.system_type_id = t.system_type_id and m.user_type_id = t.user_type_id
+	LEFT OUTER JOIN sp_catalog c on p.name = c.sp_name
+WHERE	p.is_ms_shipped = 0 -- Microsoft 기본 제공 SP 제외
+--AND	p.name LIKE 'usp_t_RegisterCustomer_009%' -- 특정 패턴의 SP만 가져오고 싶을 경우
+ORDER BY ProcedureName, m.parameter_id;
 
 ------------------------------------------------------------------
 
