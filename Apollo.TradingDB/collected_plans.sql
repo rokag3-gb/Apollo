@@ -1,3 +1,4 @@
+use TradingDB;
 
 -- 테이블 49개
 select  *
@@ -10,7 +11,7 @@ select * from collected_plans;
 
 sp_columns collected_plans
 
--- SP 310개
+-- SP 101개
 select  *
 --select  'drop proc ' + object_name(object_id) + ';'
 from    sys.all_sql_modules

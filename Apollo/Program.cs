@@ -39,8 +39,7 @@ class Program
                     filePathDepth: 2 // SourceFile 경로를 뒤에서 2개 디렉토리만 남김
                 )
                 .WriteTo.Console(
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] [{SourceContext}] {Message:lj}{NewLine}{Exception}"
-                    //outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] [{Namespace}.{Method}():{LineNumber}] {Message:lj}{NewLine}{Exception}"
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] [{SourceContext}] {Message:lj}{NewLine}{Exception}" // [{Namespace}.{Method}():{LineNumber}]
                 )
                 .WriteTo.File(
                     path: "logs/Apollo-.log",
@@ -96,36 +95,32 @@ class Program
                 {
                     // DB Connection 등록 (Dapper)
                     services.AddTransient<IDbConnection>(c => new SqlConnection(SqlConnectionSecret.TradingDB));
-                    
-                    services.AddSingleton<YamlConfigHelper>();
-                    services.AddSingleton<NetInfoHelper>();
 
-                    //services.AddHostedService<Scheduler.CronPollingService>();
                     services.AddHostedService<Scheduler.DbHammerService>();
 
-                    services.AddTransient<IFileService, FileService>();
+                    services.AddSingleton<YamlConfigHelper>();
+                    services.AddSingleton<NetInfoHelper>();
 
                     services.AddTransient<Core.Notification.LarkNotificationSender>();
                     services.AddTransient<Core.Notification.EmailNotificationSender>();
                     services.AddTransient<Core.Notification.SmsNotificationSender>();
-
-                    // Factory 및 Service 등록
                     services.AddSingleton<Core.Notification.INotificationSenderFactory, Core.Notification.NotificationSenderFactory>();
                     services.AddSingleton<Core.Notification.NotificationService>();
                 })
                 .Build();
 
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
-            logger.LogInformation($"AirBridge {AssemblyInfo.HeadVer} Started! ({AssemblyInfo.InformationVersion})");
+            logger.LogInformation($"Apollo {AssemblyInfo.HeadVer} Started! ({AssemblyInfo.InformationVersion})");
 
             // YAML 설정 파일 로드 -> new LoggerFactory()로 YamlConfigHelper을 직접 만들지 말고 DI에서 꺼내 쓰는 방식으로 변경
             var yamlConfigHelper = host.Services.GetRequiredService<YamlConfigHelper>();
             Conf.Current = yamlConfigHelper.Load();
-            yamlConfigHelper = null; // 명시적 메모리 해제
+            yamlConfigHelper = null;
 
             // NetInfo Snapshot 불러오기
             var netInfoHelper = host.Services.GetRequiredService<NetInfoHelper>();
             Conf.CurrentNetInfo = await netInfoHelper.SnapshotAsync();
+            netInfoHelper = null;
 
             logger.LogInformation($"NET Info 불러오기 성공!");
             logger.LogInformation($"HostName = [{Conf.CurrentNetInfo.HostName}], Private IPv4 = [{Conf.CurrentNetInfo.PrivateIPv4}], Public IPv4 = [{Conf.CurrentNetInfo.PublicIPv4}], Private IPv6 = [{Conf.CurrentNetInfo.PrivateIPv6}]");
@@ -134,7 +129,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "AirBridge 시작 중 오류가 발생했습니다.");
+            Log.Fatal(ex, "Apollo 시작 중 오류가 발생했습니다.");
         }
         finally
         {

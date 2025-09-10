@@ -6,9 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
     <!-- 필요 시 크기/성능 최적화 옵션들 -->
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Globalization Invariant Mode (글로벌라이제이션 비가변 모드)
+
+    Globalization: 전 세계의 다양한 문화권(언어, 날짜/시간 형식, 숫자 형식, 대소문자 규칙 등)을 지원하는 데 필요한 대용량 데이터 라이브러리.
+
+    true: 비가변 모드를 켬 -> Globalization 라이브러리 제외시킴. (최종 실행 파일의 크기를 줄이는 최적화 옵션 중 하나)
+    false: 비가변 모드를 끔 -> Globalization 라이브러리 포함시킴.
+    -->
+    <InvariantGlobalization>false</InvariantGlobalization>
     <OptimizationPreference>Speed</OptimizationPreference>
     <IlcOptimizationPreference>Speed</IlcOptimizationPreference>
     <StripSymbols>true</StripSymbols>
