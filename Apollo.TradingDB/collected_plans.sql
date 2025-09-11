@@ -11,7 +11,7 @@ select * from collected_plans;
 
 sp_columns collected_plans
 
--- SP 101개
+-- SP 99개
 select  *
 --select  'drop proc ' + object_name(object_id) + ';'
 from    sys.all_sql_modules
@@ -53,6 +53,31 @@ WHERE	p.is_ms_shipped = 0 -- Microsoft 기본 제공 SP 제외
 --AND	p.name LIKE 'usp_t_RegisterCustomer_009%' -- 특정 패턴의 SP만 가져오고 싶을 경우
 ORDER BY ProcedureName, m.parameter_id;
 
+SELECT	ParameterName = m.name
+FROM	sys.procedures p
+	LEFT OUTER JOIN sys.parameters m ON p.object_id = m.object_id
+	LEFT OUTER JOIN sys.types t ON m.system_type_id = t.system_type_id and m.user_type_id = t.user_type_id
+	LEFT OUTER JOIN sp_catalog c on p.name = c.sp_name
+WHERE	p.is_ms_shipped = 0 -- Microsoft 기본 제공 SP 제외
+group by m.name
+
+
+
+sp_helptext stp_Users_Insert
+sp_helptext stp_UserSecurities_Insert
+
+
+
+usp_s_Admin_MonitorRecentTrades_035
+usp_t_Batch_SettleAllTrades_061
+usp_t_Batch_GenerateRiskSnapshots_066
+usp_t_Batch_RebuildIndexes_069
+usp_s_Admin_MonitorRecentTrades_ReadUncommitted_075
+
+-- SP 채택 목록에서 제외 (ALTER INDEX REBUILD, REORGANIZE)
+DROP PROC usp_t_Batch_RebuildIndexes_069;
+DROP PROC usp_t_Batch_DefragmentIndexes_095;
+
 ------------------------------------------------------------------
 
 DROP TABLE IF EXISTS dbo.collected_plans;
@@ -81,7 +106,8 @@ CREATE TABLE dbo.collected_plans
 ------------------------------------------------------------------
 
 CREATE OR ALTER PROC batch_t_collected_plans
-as
+        @LAST_HOUR INT = 3
+AS
 DECLARE @batch_ts datetime2(3) = SYSUTCDATETIME();
 set nocount on;
 
@@ -105,7 +131,7 @@ WITH rs AS
         -- 필요하면 최근 실행 기준도 가져올 수 있음:
         -- , MAX(rs.last_query_max_used_memory) * 8 AS last_used_mem_kb
     FROM sys.query_store_runtime_stats AS rs
-    --WHERE rs.last_execution_time >= DATEADD(minute, -10, SYSUTCDATETIME())
+    WHERE rs.last_execution_time >= DATEADD(hour, @LAST_HOUR * (-1), SYSUTCDATETIME())
     GROUP BY rs.plan_id
 )
 INSERT dbo.collected_plans
