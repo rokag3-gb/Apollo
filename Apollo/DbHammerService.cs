@@ -31,6 +31,25 @@ public class DbHammerService : BackgroundService
     {
         _logger.LogInformation($"DbHammerService is starting with {_workerCount} workers.");
 
+        try
+        {
+            _logger.LogInformation("Starting in 5 seconds... (Press Ctrl+C to cancel)");
+
+            for (int i = 5; i > 0; i--)
+            {
+                _logger.LogInformation($"{i}...");
+
+                await Task.Delay(1000, stoppingToken);
+            }
+
+            _logger.LogInformation("Starting now!");
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Countdown was cancelled.");
+            return;
+        }
+
         // 저장프로시저 메타데이터 로드
         _spList = await GetStoredProcedureList();
 
@@ -109,7 +128,7 @@ public class DbHammerService : BackgroundService
                     sql: spToRun.Name,
                     param: parameters,
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: 180 // 초 단위, 3분
+                    commandTimeout: 30 // 30초
                     );
 
                 _logger.LogInformation($"Worker: {wId}, TId: {tId}, Proc: {spToRun.Name} 실행 완료!");

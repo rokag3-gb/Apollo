@@ -7,7 +7,7 @@ where   type = 'U'
 
 exec TradingDB.dbo.batch_t_collected_plans;
 
-select * from collected_plans;
+select count(1) from collected_plans;
 
 sp_columns collected_plans
 

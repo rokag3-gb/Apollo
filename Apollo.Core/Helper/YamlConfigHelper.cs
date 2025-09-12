@@ -19,7 +19,7 @@ public class YamlConfigHelper
     {
         AppConfig appConfig = new AppConfig();
 
-        var yamlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.yaml");
+        var yamlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.yaml");
 
         if (!File.Exists(yamlFilePath)) // 파일이 없으면 모두 default 값으로 AppConfig 인스턴스화
         {
@@ -70,14 +70,14 @@ public class YamlConfigHelper
         {
             try
             {
-                // YAML 파일을 읽어 AppConfig 객체로 변환
-                // var yaml = File.ReadAllText(yamlFilePath);
+                // YAML 파일을 읽어오기
                 using var fs = File.OpenRead(yamlFilePath);
                 using var sr = new StreamReader(fs, detectEncodingFromByteOrderMarks: true);
                 var yaml = sr.ReadToEnd();
 
                 _logger.LogInformation($"YAML text 불러오기 정상");
 
+                // YAML 문법 검사
                 var stream = new YamlStream();
                 using var reader = new StringReader(yaml);
                 stream.Load(reader); // 문법 에러면 여기서 터짐
@@ -88,9 +88,6 @@ public class YamlConfigHelper
                 var deserializer = new StaticDeserializerBuilder(new AppConfigYamlContext())
                     .WithNamingConvention(UnderscoredNamingConvention.Instance)
                     .Build();
-
-                // 디버깅을 위하여 AppConfig의 실제 타입 출력
-                //_logger.LogDebug($"사용하는 AppConfig 타입: {typeof(AppConfig).FullName}");
 
                 appConfig = deserializer.Deserialize<AppConfig>(yaml);
             }
