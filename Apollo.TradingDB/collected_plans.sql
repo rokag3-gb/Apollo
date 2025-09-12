@@ -84,6 +84,36 @@ usp_t_Batch_GenerateRiskSnapshots_066
 
 
 
+select  s.db_name
+        , s.schema_name
+        , p.object_id
+        , p.name
+        , s.execution_count
+        , s.cached_time
+        , s.last_execution_time
+        , s.total_elapsed_time
+        , avg_elapsed_time = s.total_elapsed_time / s.execution_count
+        , s.total_worker_time
+        , avg_worker_time = s.total_worker_time / s.execution_count
+FROM	sys.procedures p
+        outer apply (
+        SELECT  ps.object_id
+                , db_name = min(DB_NAME(ps.database_id))
+                , schema_name = min(OBJECT_SCHEMA_NAME(ps.object_id, ps.database_id))
+                , execution_count = sum(ps.execution_count)
+                , cached_time = min(ps.cached_time)
+                , last_execution_time = max(ps.last_execution_time)
+                , total_elapsed_time = sum(ps.total_elapsed_time)
+                , total_worker_time = sum(ps.total_worker_time)
+        FROM    sys.dm_exec_procedure_stats ps
+        WHERE   ps.object_id = p.object_id
+        group by ps.object_id
+        ) s
+WHERE	p.is_ms_shipped = 0
+order by execution_count;
+
+
+usp_t_PlaceOrder_Limit_WithRecompile_084
 
 
 

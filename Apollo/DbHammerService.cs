@@ -217,7 +217,7 @@ public class DbHammerService : BackgroundService
                              paramInfo.Name.Contains("PageNumber", StringComparison.OrdinalIgnoreCase);
 
         // IsNullable이 true이고, 페이징 관련 파라미터가 아닌 경우 10% 확률로 null 반환
-        if (paramInfo.IsNullable && !isPagingParam && rand.Next(1, 11) == 1)
+        if (paramInfo.IsNullable && !isPagingParam && paramInfo.Name != "@AccountID" && rand.Next(1, 11) == 1)
         {
             return null;
         }
