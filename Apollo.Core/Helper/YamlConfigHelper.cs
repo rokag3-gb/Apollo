@@ -29,7 +29,7 @@ public class YamlConfigHelper
                 {
                     worker = new WorkerSection
                     {
-                        count = 10 // 기본 워커 수
+                        count = 5 // 기본 워커 수
                     },
                     notification = new NotificationSection
                     {
