@@ -8,5 +8,5 @@ public static class Conf
 {
     public static AppConfig Current { get; set; } = new AppConfig();
 
-    public static NetSnapshot CurrentNetInfo { get; set; } = new(); // new NetInfo().SnapshotAsync().GetAwaiter().GetResult();
+    public static NetSnapshot CurrentNetInfo { get; set; } = new();
 }

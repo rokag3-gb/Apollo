@@ -1,3 +1,4 @@
+using Apollo.Core;
 using Apollo.Core.Model;
 using Dapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,7 @@ public class DbHammerService : BackgroundService
     private List<StoredProcedureModel> _spListAdmin = new();
     private List<StoredProcedureModel> _spListBatch = new();
 
-    private readonly int _workerCount = 50; // 동시에 실행할 워커(스레드) 수
+    private readonly int _workerCount = Conf.Current.worker.count; // 동시에 실행할 워커(스레드) 수
 
     public DbHammerService(ILogger<DbHammerService> logger, IServiceProvider serviceProvider)
     {
@@ -83,7 +84,7 @@ public class DbHammerService : BackgroundService
                 {
                     _logger.LogWarning($"Worker: {wId}, 실행시킬 stored procedure를 랜덤 추출하지 못했습니다. 재시도 중...");
 
-                    await Task.Delay(TimeSpan.FromSeconds(0.6), stoppingToken); // 잠시 후 재시도
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken); // 잠시 후 재시도
 
                     continue;
                 }
@@ -95,8 +96,11 @@ public class DbHammerService : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var connection = scope.ServiceProvider.GetRequiredService<IDbConnection>();
 
-                // parameters to dict.
-                var dictParams = parameters.ParameterNames.ToDictionary(name => name, name => parameters.Get<object>(name));
+                // Dapper.DynamicParameters to Dict.
+                var dictParams = parameters.ParameterNames.ToDictionary(
+                    name => name,
+                    name => parameters.Get<object>(name)
+                    );
 
                 _logger.LogInformation($"Worker: {wId}, TId: {tId}, Proc: {spToRun.Name} 실행 준비 - Params: {JsonConvert.SerializeObject(dictParams)}");
 
@@ -111,7 +115,7 @@ public class DbHammerService : BackgroundService
                 _logger.LogInformation($"Worker: {wId}, TId: {tId}, Proc: {spToRun.Name} 실행 완료!");
 
                 // 임의의 지연 시간
-                await Task.Delay(TimeSpan.FromSeconds(0.2), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(0.8), stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -123,7 +127,7 @@ public class DbHammerService : BackgroundService
                 _logger.LogError(ex, $"Worker: {wId}, TId: {tId}, An error occurred! - {ex.Message}");
                 
                 // 오류 발생 시, 시스템에 과도한 부하를 주지 않기 위해 잠시 대기 후 다음 작업을 시도합니다.
-                await Task.Delay(TimeSpan.FromSeconds(0.5), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(0.8), stoppingToken);
             }
         }
 

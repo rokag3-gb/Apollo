@@ -19,12 +19,7 @@ public class YamlConfigHelper
     {
         AppConfig appConfig = new AppConfig();
 
-        //var yamlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "AirBridge.Core", "AirBridgeConfig.yaml");
-        var yamlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AirBridgeConfig.yaml");
-
-        //_logger.LogInformation($"AppDomain.CurrentDomain.BaseDirectory = {AppDomain.CurrentDomain.BaseDirectory}"); // = "C:\source\AirBridge\AirBridge\bin\Debug\net8.0\"
-        //_logger.LogInformation($"AppDomain.CurrentDomain.DynamicDirectory = {AppDomain.CurrentDomain.DynamicDirectory}"); // = null
-        //_logger.LogInformation($"yamlFilePath = {yamlFilePath}"); // = "C:\source\AirBridge\AirBridge\bin\Debug\net8.0\AirBridgeConfig.yaml"
+        var yamlFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.yaml");
 
         if (!File.Exists(yamlFilePath)) // 파일이 없으면 모두 default 값으로 AppConfig 인스턴스화
         {
@@ -32,35 +27,9 @@ public class YamlConfigHelper
             {
                 appConfig = new AppConfig()
                 {
-                    schedule = new ScheduleSection
+                    worker = new WorkerSection
                     {
-                        cron_expression = new List<string> {
-                            // 초 분 시 일 월 요일
-                            // "0/30 * 4-19 * * *", // 새벽4시 ~ 오후7시 사이 매 30초 마다
-                            // "* 0/1 * * * *", // 매 1분 마다 (PRD)
-                            "*/10 * * * * *", // 매 10초 마다 (DEV/TEST)
-                        },
-                        time_zone = TimeZoneInfo.Local.Id // 로컬시간 (OS kernel 시간대)
-                    },
-                    source = new SourceSection
-                    {
-                        type = ConnectType.mounted_path,
-                        mounted_path = new MountedPathConfig
-                        {
-                            path = "/opt/airbridge/ledger/", // 원본 경로
-                            archive_path = "/opt/airbridge/archive/", // 처리 후 보관 경로
-                        }
-                    },
-                    target = new TargetSection
-                    {
-                        type = ConnectType.azure_blob_sftp,
-                        azure_blob_sftp = new AzureBlobSftpConfig
-                        {
-                            host = AzureBlobSecret.Host,
-                            port = AzureBlobSecret.Port,
-                            username = AzureBlobSecret.Username,
-                            password = AzureBlobSecret.Password, // default는 AzureBlobSecret 안에 비밀번호 사용
-                        }
+                        count = 10 // 기본 워커 수
                     },
                     notification = new NotificationSection
                     {
@@ -72,10 +41,6 @@ public class YamlConfigHelper
                         },
                         enabled = true, // 알림 기능 사용 여부
                     },
-                    awaker = new AwakerSection
-                    {
-                        ping_interval_min = 0.5 // 30초
-                    }
                 };
 
                 // appConfig를 YAML 파일로 저장하기 위해 직렬화. 모든 프로퍼티를 snake_case로 설정 (UnderscoredNamingConvention.Instance)

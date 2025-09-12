@@ -4,11 +4,18 @@ namespace Apollo.Core.Model;
 
 public class AppConfig
 {
-    public ScheduleSection schedule { get; set; } = new();
-    public SourceSection source { get; set; } = new();
-    public TargetSection target { get; set; } = new();
+    public WorkerSection worker { get; set; } = new();
     public NotificationSection notification { get; set; } = new();
-    public AwakerSection awaker { get; set; } = new();
+
+    //public ScheduleSection schedule { get; set; } = new();
+    //public SourceSection source { get; set; } = new();
+    //public TargetSection target { get; set; } = new();
+    //public AwakerSection awaker { get; set; } = new();
+}
+
+public class WorkerSection
+{
+    public int count { get; set; } = 10; // 기본 워커 수
 }
 
 public class ScheduleSection

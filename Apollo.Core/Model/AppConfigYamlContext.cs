@@ -4,6 +4,7 @@ namespace Apollo.Core.Model;
 
 [YamlStaticContext]
 [YamlSerializable(typeof(AppConfig))]
+[YamlSerializable(typeof(WorkerSection))]
 [YamlSerializable(typeof(ScheduleSection))]
 [YamlSerializable(typeof(SourceSection))]
 [YamlSerializable(typeof(TargetSection))]

@@ -5,7 +5,7 @@ select  *
 from    sys.objects
 where   type = 'U'
 
-exec batch_t_collected_plans;
+exec TradingDB.dbo.batch_t_collected_plans;
 
 select * from collected_plans;
 
@@ -53,6 +53,7 @@ WHERE	p.is_ms_shipped = 0 -- Microsoft 기본 제공 SP 제외
 --AND	p.name LIKE 'usp_t_RegisterCustomer_009%' -- 특정 패턴의 SP만 가져오고 싶을 경우
 ORDER BY ProcedureName, m.parameter_id;
 
+
 SELECT	ParameterName = m.name
 FROM	sys.procedures p
 	LEFT OUTER JOIN sys.parameters m ON p.object_id = m.object_id
@@ -67,7 +68,7 @@ sp_helptext stp_Users_Insert
 sp_helptext stp_UserSecurities_Insert
 
 
-
+-- Blocking Query (9/11)
 usp_s_Admin_MonitorRecentTrades_035
 usp_t_Batch_SettleAllTrades_061
 usp_t_Batch_GenerateRiskSnapshots_066
@@ -77,6 +78,14 @@ usp_s_Admin_MonitorRecentTrades_ReadUncommitted_075
 -- SP 채택 목록에서 제외 (ALTER INDEX REBUILD, REORGANIZE)
 DROP PROC usp_t_Batch_RebuildIndexes_069;
 DROP PROC usp_t_Batch_DefragmentIndexes_095;
+
+-- Blocking Query (9/12)
+usp_t_Batch_GenerateRiskSnapshots_066
+
+
+
+
+
 
 ------------------------------------------------------------------
 
