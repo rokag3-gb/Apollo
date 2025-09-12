@@ -4,8 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishAot>true</PublishAot>
-    <IsAotCompatible>true</IsAotCompatible>
+    <!--<PublishAot>true</PublishAot>-->
+    <!--<IsAotCompatible>true</IsAotCompatible>-->
     <!--
     IsAotCompatible 속성: 라이브러리가 Native AOT와 호환되는지 여부
     위의 구성은 다음 속성의 true 기본값을 할당함 -> IsTrimmable, EnableTrimAnalyzer, EnableSingleFileAnalyzer, EnableAotAnalyzer
