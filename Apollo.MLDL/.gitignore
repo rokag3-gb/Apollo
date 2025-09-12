@@ -1,0 +1,28 @@
+# Python 캐시/빌드 파일
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+
+# 가상환경 (venv는 안 쓰더라도 혹시 몰라 추가)
+.venv/
+env/
+venv/
+
+# Jupyter 노트북 체크포인트
+.ipynb_checkpoints/
+
+# IDE/에디터 설정
+.vscode/
+.idea/
+
+# 출력 아티팩트
+artifacts/
+*.parquet
+*.csv
+*.log
+
+# 민감한 설정 파일
+config.yaml
