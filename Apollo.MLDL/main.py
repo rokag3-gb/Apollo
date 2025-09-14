@@ -29,19 +29,19 @@ def cmd_train(args):
     cfg = load_config(args.config)
     import pandas as pd
     df_feat = pd.read_parquet(Path(cfg.output_dir) / "features.parquet")
-    res = train_run(df_feat, cfg.train, cfg.output_dir)
+    res = train_run(df_feat, cfg.train, cfg.model, cfg.features, cfg.output_dir)
     print(json.dumps(res, ensure_ascii=False, indent=2))
 
 def cmd_eval(args):
     cfg = load_config(args.config)
     import pandas as pd
     df_feat = pd.read_parquet(Path(cfg.output_dir) / "features.parquet")
-    res = evaluate(args.model, df_feat, cfg.train.target)
+    res = evaluate(args.model, df_feat, cfg.train.target, cfg.features)
     print(json.dumps(res, ensure_ascii=False, indent=2))
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser("Apollo.MLDL")
-    p.add_argument("--config", default=None, help="config.yaml  (ɼ)")
+    p.add_argument("--config", default="config.yaml", help="config.yaml 파일 경로 (기본값: config.yaml)")
     sp = p.add_subparsers(dest="cmd", required=True)
 
     sp_fetch = sp.add_parser("fetch");     sp_fetch.set_defaults(func=cmd_fetch)

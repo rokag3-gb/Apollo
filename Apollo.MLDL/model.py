@@ -1,17 +1,21 @@
 from xgboost import XGBRegressor
 from joblib import dump, load
 from pathlib import Path
+from config import ModelConfig
 
-def build_model() -> XGBRegressor:
+def build_model(cfg: ModelConfig = None) -> XGBRegressor:
+    if cfg is None:
+        cfg = ModelConfig()
+    
     return XGBRegressor(
-        n_estimators=500,
-        max_depth=6,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        tree_method="hist",
-        random_state=42,
-        n_jobs=-1,
+        n_estimators=cfg.n_estimators,
+        max_depth=cfg.max_depth,
+        learning_rate=cfg.learning_rate,
+        subsample=cfg.subsample,
+        colsample_bytree=cfg.colsample_bytree,
+        tree_method=cfg.tree_method,
+        random_state=cfg.random_state,
+        n_jobs=cfg.n_jobs,
     )
 
 def save_model(model, out_dir: str, name: str = "xgb_reg.joblib") -> str:

@@ -372,3 +372,6 @@ AirBridgeConfig.yaml
 # Ignore SSH keys
 *sshkey*
 *.pem
+
+# Ignore MLDL configuration files with sensitive data
+Apollo.MLDL/config.yaml
