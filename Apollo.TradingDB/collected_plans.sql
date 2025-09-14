@@ -6,10 +6,21 @@ from    sys.objects
 where   type = 'U'
 
 exec TradingDB.dbo.batch_t_collected_plans;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 21567, @batch_size = 2000;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 8200, @batch_size = 30;
 
 select count(1) from collected_plans;
+select TOP 20 * from collected_plans;
 
 sp_columns collected_plans
+
+select  convert(varchar(13), collected_at, 120)
+        , count(1)
+from    collected_plans
+group by convert(varchar(13), collected_at, 120)
+order by 1;
+
+------------------------------------------------------------------
 
 -- SP 99개
 select  *
@@ -126,7 +137,6 @@ CREATE TABLE dbo.collected_plans
   collected_at       datetime2      NOT NULL DEFAULT sysdatetime(),
   query_id           bigint         NOT NULL,
   plan_id            bigint         NOT NULL,
-  --seq_id             bigint identity(1, 1) not null,
   query_hash         binary(8)      NULL,
   plan_hash          binary(8)      NULL,
   sql_text           nvarchar(max)  NULL,
@@ -139,7 +149,7 @@ CREATE TABLE dbo.collected_plans
   max_used_mem_kb    bigint         NULL,
   max_dop            int            NULL,
   last_exec_time     datetime2      NULL,
-  CONSTRAINT PK_collected_plans PRIMARY KEY (collected_at, query_id, plan_id) -- seq_id
+  CONSTRAINT PK_collected_plans PRIMARY KEY (collected_at, query_id, plan_id)
 );
 
 ------------------------------------------------------------------
@@ -210,51 +220,3 @@ WHERE NOT EXISTS
 );
 
 ------------------------------------------------------------------
-
-/*
-INSERT dbo.collected_plans (query_id, plan_id, query_hash, plan_hash, sql_text, plan_xml,
-                            count_exec, last_ms, avg_ms, last_cpu_ms, last_reads,
-                            max_used_mem_kb, max_dop, last_exec_time)
-SELECT
-    qsq.query_id,
-    qsp.plan_id,
-    qs.query_hash,
-    plan_hash = null, -- qs.plan_hash
-    qsqt.query_sql_text,
-    TRY_CAST(qsp.query_plan AS xml),
-    rs.count_executions,
-    rs.last_duration/1000.0       AS last_ms,
-    rs.avg_duration/1000.0        AS avg_ms,
-    rs.last_cpu_time/1000.0       AS last_cpu_ms,
-    rs.last_logical_io_reads      AS last_reads,
-    max_used_memory_kb = null, -- rs.max_used_memory_kb
-    rs.max_dop,
-    rs.last_execution_time
-FROM sys.query_store_query qsq
-JOIN sys.query_store_plan qsp           ON qsp.query_id = qsq.query_id
-JOIN sys.query_store_query_text qsqt    ON qsqt.query_text_id = qsq.query_text_id
-JOIN sys.query_store_runtime_stats rs   ON rs.plan_id = qsp.plan_id
-CROSS APPLY sys.dm_exec_query_stats qs
-WHERE rs.last_execution_time >= DATEADD(minute, -10, sysdatetime());  -- 최근 10분
-
-SELECT TOP (5000)
-    DB_NAME()                AS dbname,
-    qsq.query_id, qsp.plan_id,
-    qsqt.query_sql_text,
-    TRY_CAST(qsp.query_plan AS XML) AS plan_xml,
-    rs.last_duration/1000.0  AS last_ms,
-    rs.avg_duration/1000.0   AS avg_ms,
-    rs.last_cpu_time/1000.0  AS cpu_ms,
-    rs.last_logical_io_reads AS logical_reads,
-    rs.max_used_memory_kb,
-    rs.count_executions,
-    rs.last_execution_time
-FROM sys.query_store_query qsq
-JOIN sys.query_store_plan  qsp ON qsp.query_id = qsq.query_id
-JOIN sys.query_store_query_text qsqt ON qsqt.query_text_id = qsq.query_text_id
-JOIN sys.query_store_runtime_stats rs ON rs.plan_id = qsp.plan_id
-WHERE rs.last_execution_time >= DATEADD(hour, -6, SYSDATETIME())
-ORDER BY rs.last_execution_time DESC;
-
-select * from sys.query_store_runtime_stats
-*/
