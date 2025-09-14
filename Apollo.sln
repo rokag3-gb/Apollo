@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollo", "Apollo\Apollo.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apollo.Core", "Apollo.Core\Apollo.Core.csproj", "{A131FDB9-C2A6-4374-B3E2-9234D00672DD}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Apollo.ML", "Apollo.MLDL\Apollo.ML.pyproj", "{7F221F81-2810-453A-B3B1-9104ECBF99B3}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Apollo.ML", "Apollo.ML\Apollo.ML.pyproj", "{7F221F81-2810-453A-B3B1-9104ECBF99B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
