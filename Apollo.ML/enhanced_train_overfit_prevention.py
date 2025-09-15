@@ -10,7 +10,7 @@ from datetime import datetime
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score, TimeSeriesSplit
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.feature_selection import SelectKBest, f_regression, RFE
 from xgboost import XGBRegressor
 import warnings
@@ -333,11 +333,39 @@ def train_overfit_prevention_model(df):
     # 예측 및 평가
     y_pred = model.predict(X_val_scaled)
     
+    # 다양한 평가 메트릭 계산
     rmse = np.sqrt(mean_squared_error(y_val, y_pred))
+    mae = mean_absolute_error(y_val, y_pred)
     r2 = r2_score(y_val, y_pred)
     
-    print(f"  검증 RMSE: {rmse:.2f}")
-    print(f"  검증 R²: {r2:.4f}")
+    # MAPE 계산 (0으로 나누기 방지)
+    mape = np.mean(np.abs((y_val - y_pred) / np.maximum(y_val, 1e-8))) * 100
+    
+    print(f"\n  === 검증 데이터 평가 결과 ===")
+    print(f"  RMSE: {rmse:.2f}")
+    print(f"  MAE: {mae:.2f}")
+    print(f"  R²: {r2:.4f}")
+    print(f"  MAPE: {mape:.2f}%")
+    
+    # 상세 분석
+    print(f"\n  === 상세 분석 ===")
+    print(f"  실제값 범위: {y_val.min():.2f} ~ {y_val.max():.2f}")
+    print(f"  예측값 범위: {y_pred.min():.2f} ~ {y_pred.max():.2f}")
+    print(f"  실제값 평균: {y_val.mean():.2f}")
+    print(f"  예측값 평균: {y_pred.mean():.2f}")
+    
+    # 오차 분석
+    residuals = y_val - y_pred
+    print(f"  잔차 평균: {residuals.mean():.2f}")
+    print(f"  잔차 표준편차: {residuals.std():.2f}")
+    
+    # 성능 구간별 분석
+    print(f"\n  === 성능 구간별 분석 ===")
+    for threshold in [1, 10, 100, 1000]:
+        mask = y_val < threshold
+        if mask.sum() > 0:
+            subset_r2 = r2_score(y_val[mask], y_pred[mask])
+            print(f"  {threshold}ms 미만 쿼리 R²: {subset_r2:.4f} (샘플 수: {mask.sum()})")
     
     # 교차 검증으로 overfitting 확인
     print("\n  교차 검증 수행 중...")
@@ -378,20 +406,42 @@ def main():
     """메인 실행 함수"""
     results = phase2_overfit_prevention()
     
-    print(f"\n=== Phase 2 Overfitting 방지 결과 ===")
+    print(f"\n=== Phase 2 Overfitting 방지 최종 결과 ===")
+    print(f"검증 RMSE: {results['rmse']:.2f}")
     print(f"검증 R²: {results['r2']:.4f}")
     print(f"교차 검증 R²: {results['cv_r2_mean']:.4f} ± {results['cv_r2_std']:.4f}")
     print(f"훈련 R²: {results['train_r2']:.4f}")
     print(f"검증 R²: {results['val_r2']:.4f}")
     print(f"Overfitting Gap: {results['overfitting_gap']:.4f}")
     
+    # 모델 품질 평가
+    print(f"\n=== 모델 품질 평가 ===")
+    if results['r2'] >= 0.9:
+        print("🟢 우수한 성능 (R² ≥ 0.9)")
+    elif results['r2'] >= 0.7:
+        print("🟡 양호한 성능 (0.7 ≤ R² < 0.9)")
+    elif results['r2'] >= 0.5:
+        print("🟠 보통 성능 (0.5 ≤ R² < 0.7)")
+    else:
+        print("🔴 낮은 성능 (R² < 0.5)")
+    
     # Overfitting 판정
+    print(f"\n=== Overfitting 분석 ===")
     if results['overfitting_gap'] < 0.05:
         print("✅ Overfitting 없음 (Gap < 0.05)")
     elif results['overfitting_gap'] < 0.1:
         print("⚠️  경미한 Overfitting (Gap < 0.1)")
     else:
         print("❌ Overfitting 의심 (Gap >= 0.1)")
+    
+    # 안정성 평가
+    print(f"\n=== 모델 안정성 평가 ===")
+    if results['cv_r2_std'] < 0.01:
+        print("🟢 매우 안정적 (CV std < 0.01)")
+    elif results['cv_r2_std'] < 0.05:
+        print("🟡 안정적 (CV std < 0.05)")
+    else:
+        print("🟠 불안정 (CV std ≥ 0.05)")
     
     # 모델 저장
     import joblib

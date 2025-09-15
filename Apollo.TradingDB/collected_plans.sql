@@ -12,6 +12,7 @@ usp_augment_collected_plans
 --EXEC dbo.usp_augment_collected_plans @target_rows = 8200, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 12590, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 21456, @batch_size = 200;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 27219, @batch_size = 500;
 
 select count(1) from collected_plans;
 select TOP 20 * from collected_plans;
