@@ -5,9 +5,13 @@ select  *
 from    sys.objects
 where   type = 'U'
 
-exec TradingDB.dbo.batch_t_collected_plans;
---EXEC dbo.usp_augment_collected_plans @target_rows = 21567, @batch_size = 2000;
+batch_t_collected_plans
+usp_augment_collected_plans
+
+--EXEC dbo.usp_augment_collected_plans @target_rows = 11567, @batch_size = 300;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 8200, @batch_size = 30;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 12590, @batch_size = 30;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 18846, @batch_size = 100;
 
 select count(1) from collected_plans;
 select TOP 20 * from collected_plans;
@@ -126,7 +130,34 @@ order by execution_count;
 
 usp_t_PlaceOrder_Limit_WithRecompile_084
 
+------------------------------------------------------------------
 
+select * from collected_plans where est_total_subtree_cost is null;
+
+-- backfill query
+WITH XMLNAMESPACES (DEFAULT 'http://schemas.microsoft.com/sqlserver/2004/07/showplan')
+update  a
+set     est_total_subtree_cost = isnull(isnull(d.est_total_subtree_cost1, d.est_total_subtree_cost2), d.est_total_subtree_cost3)
+from    collected_plans a
+        cross apply (
+        select  est_total_subtree_cost1 = c.plan_xml.value(
+                  '(/ShowPlanXML/BatchSequence/Batch/Statements/*/QueryPlan/RelOp/@EstimatedTotalSubtreeCost)[1]',
+                  'float'
+                )
+                , est_total_subtree_cost2 = c.plan_xml.value(
+                  '(/ShowPlanXML/BatchSequence/Batch/Statements/*/*/QueryPlan/RelOp/@EstimatedTotalSubtreeCost)[1]',
+                  'float'
+                )
+                , est_total_subtree_cost3 = c.plan_xml.value(
+                  '(/ShowPlanXML/BatchSequence/Batch/Statements/*/*/*/QueryPlan/RelOp/@EstimatedTotalSubtreeCost)[1]',
+                  'float'
+                )
+        from    collected_plans c
+        where   c.collected_at = a.collected_at
+        and     c.query_id = a.query_id
+        and     c.plan_id = a.plan_id
+        ) d
+where   a.est_total_subtree_cost is null
 
 ------------------------------------------------------------------
 
@@ -142,6 +173,7 @@ CREATE TABLE dbo.collected_plans
   sql_text           nvarchar(max)  NULL,
   plan_xml           xml            NOT NULL,
   count_exec         bigint         NULL,
+  est_total_subtree_cost float null,
   last_ms            float          NULL,
   avg_ms             float          NULL,
   last_cpu_ms        float          NULL,
@@ -152,71 +184,6 @@ CREATE TABLE dbo.collected_plans
   CONSTRAINT PK_collected_plans PRIMARY KEY (collected_at, query_id, plan_id)
 );
 
-------------------------------------------------------------------
-
-CREATE OR ALTER PROC batch_t_collected_plans
-        @LAST_HOUR INT = 3
-AS
-DECLARE @batch_ts datetime2(3) = SYSUTCDATETIME();
-set nocount on;
-
-WITH rs AS
-(
-    SELECT
-        rs.plan_id,
-        SUM(rs.count_executions) AS count_exec,
-        MAX(rs.last_duration) / 1000.0 AS last_ms,
-        CASE WHEN SUM(rs.count_executions) > 0
-             THEN (SUM(rs.count_executions * rs.avg_duration) * 1.0) / SUM(rs.count_executions) / 1000.0
-             ELSE NULL
-        END AS avg_ms,
-        MAX(rs.last_cpu_time) / 1000.0 AS last_cpu_ms,
-        MAX(rs.last_logical_io_reads) AS last_reads,
-        MAX(rs.max_dop) AS max_dop,
-        MAX(rs.last_execution_time) AS last_exec_time,
-
-        -- 메모리: 8KB 페이지 단위 → KB로 변환(×8)
-        MAX(rs.max_query_max_used_memory) * 8 AS max_used_mem_kb
-        -- 필요하면 최근 실행 기준도 가져올 수 있음:
-        -- , MAX(rs.last_query_max_used_memory) * 8 AS last_used_mem_kb
-    FROM sys.query_store_runtime_stats AS rs
-    WHERE rs.last_execution_time >= DATEADD(hour, @LAST_HOUR * (-1), SYSUTCDATETIME())
-    GROUP BY rs.plan_id
-)
-INSERT dbo.collected_plans
-(
-    collected_at, query_id, plan_id, query_hash, plan_hash,
-    sql_text, plan_xml,
-    count_exec, last_ms, avg_ms, last_cpu_ms, last_reads,
-    max_used_mem_kb, max_dop, last_exec_time
-)
-SELECT
-    @batch_ts,
-    qsq.query_id,
-    qsp.plan_id,
-    qsq.query_hash,
-    CONVERT(varbinary(8), SUBSTRING(HASHBYTES('SHA2_256', qsp.query_plan), 1, 8)) AS plan_hash, -- DMV 없이 대체 해시
-    qsqt.query_sql_text,
-    TRY_CAST(qsp.query_plan AS xml),
-    rs.count_exec,
-    rs.last_ms,
-    rs.avg_ms,
-    rs.last_cpu_ms,
-    rs.last_reads,
-    rs.max_used_mem_kb,
-    rs.max_dop,
-    rs.last_exec_time
-FROM rs
-JOIN sys.query_store_plan       AS qsp  ON qsp.plan_id = rs.plan_id
-JOIN sys.query_store_query      AS qsq  ON qsq.query_id = qsp.query_id
-JOIN sys.query_store_query_text AS qsqt ON qsqt.query_text_id = qsq.query_text_id
-WHERE NOT EXISTS
-(
-    SELECT 1
-    FROM dbo.collected_plans t
-    WHERE t.collected_at = @batch_ts
-      AND t.query_id     = qsq.query_id
-      AND t.plan_id      = qsp.plan_id
-);
+alter TABLE dbo.collected_plans add est_total_subtree_cost float null;
 
 ------------------------------------------------------------------

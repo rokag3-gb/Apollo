@@ -9,5 +9,5 @@ def connect(cfg: DBConfig) -> pyodbc.Connection:
     return pyodbc.connect(conn_str)
 
 def fetch_collected_plans(conn: pyodbc.Connection) -> pd.DataFrame:
-    sql = "SELECT plan_id, plan_xml, last_ms FROM dbo.collected_plans"
+    sql = "SELECT query_id, plan_id, plan_xml, count_exec, est_total_subtree_cost, avg_ms, last_cpu_ms, last_reads, max_used_mem_kb, max_dop, last_exec_time, last_ms FROM dbo.collected_plans"
     return pd.read_sql(sql, conn)
