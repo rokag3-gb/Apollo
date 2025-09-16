@@ -6,21 +6,26 @@ from collections import Counter
 from plan_graph import planxml_to_graph
 
 def enhanced_featurize(df_plans: pd.DataFrame, target_col: str = "last_ms") -> pd.DataFrame:
-    """실행계획 데이터를 향상된 피처로 변환합니다."""
+    """전처리된 데이터에 피처 엔지니어링을 적용합니다."""
     rows = []
     
-    print(f"총 {len(df_plans)}개의 실행계획을 처리합니다...")
+    print(f"총 {len(df_plans)}개의 전처리된 실행계획을 처리합니다...")
     
     for idx, row in df_plans.iterrows():
         if idx % 1000 == 0:
             print(f"처리 중: {idx + 1}/{len(df_plans)} - Plan ID: {row['plan_id']}")
         
         try:
-            # 기본 메타데이터
+            # 기본 메타데이터 (전처리된 데이터에서 가져옴)
             feats = {
                 "plan_id": row["plan_id"],
                 target_col: row[target_col]
             }
+            
+            # 전처리된 데이터의 모든 컬럼을 유지
+            for col in df_plans.columns:
+                if col not in ['plan_id', target_col]:
+                    feats[col] = row[col]
             
             # 1. 데이터베이스에서 가져온 추가 컬럼들 활용
             if 'query_id' in row:
@@ -41,7 +46,11 @@ def enhanced_featurize(df_plans: pd.DataFrame, target_col: str = "last_ms") -> p
                 feats['max_dop'] = row['max_dop']
             
             # 2. 실행계획 XML에서 그래프 특성 추출
-            g = planxml_to_graph(row["plan_xml"])
+            if 'plan_xml' in row and pd.notna(row['plan_xml']):
+                g = planxml_to_graph(row["plan_xml"])
+            else:
+                print(f"Plan ID {row['plan_id']}: plan_xml이 없거나 비어있음")
+                g = nx.DiGraph()  # 빈 그래프 생성
             
             # 그래프 기본 특성
             feats.update(graph_basic_features(g))
@@ -98,7 +107,7 @@ def graph_basic_features(g: nx.DiGraph) -> dict:
         "density": nx.density(g),
         "is_connected": nx.is_weakly_connected(g),
         "num_components": nx.number_weakly_connected_components(g),
-        "diameter": nx.diameter(g) if nx.is_weakly_connected(g) and g.number_of_nodes() > 0 else 0,
+        "diameter": nx.diameter(g) if nx.is_strongly_connected(g) and g.number_of_nodes() > 0 else 0,
         "avg_clustering": nx.average_clustering(g.to_undirected())
     }
 

@@ -19,7 +19,8 @@ def cmd_fetch(args):
 def cmd_featurize(args):
     cfg = load_config(args.config)
     import pandas as pd
-    df = pd.read_parquet(Path(cfg.output_dir) / "collected_plans.parquet")
+    # 전처리된 데이터를 읽음
+    df = pd.read_parquet(Path(cfg.output_dir) / "preprocessed_data.parquet")
     df_feat = enhanced_featurize(df, cfg.train.target)
     out = Path(cfg.output_dir) / "enhanced_features.parquet"
     df_feat.to_parquet(out, index=False)
