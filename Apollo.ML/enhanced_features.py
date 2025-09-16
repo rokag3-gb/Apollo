@@ -67,6 +67,9 @@ def enhanced_featurize(df_plans: pd.DataFrame, target_col: str = "last_ms") -> p
             # 3. 새로운 파생 피처들
             feats.update(derived_features(row, g))
             
+            # 4. 짧은 쿼리 예측을 위한 추가 피처
+            feats.update(short_query_features(row, g))
+            
             rows.append(feats)
             
         except Exception as e:
@@ -355,6 +358,72 @@ def derived_features(row: pd.Series, g: nx.DiGraph) -> dict:
     
     return feats
 
+def short_query_features(row: pd.Series, g: nx.DiGraph) -> dict:
+    """짧은 쿼리 예측을 위한 추가 피처들을 생성합니다."""
+    feats = {}
+    
+    # 1. 쿼리 복잡도 기반 분류
+    if g.number_of_nodes() == 0:
+        feats['is_simple_query'] = 1
+        feats['is_medium_query'] = 0
+        feats['is_complex_query'] = 0
+    elif g.number_of_nodes() <= 5:
+        feats['is_simple_query'] = 1
+        feats['is_medium_query'] = 0
+        feats['is_complex_query'] = 0
+    elif g.number_of_nodes() <= 15:
+        feats['is_simple_query'] = 0
+        feats['is_medium_query'] = 1
+        feats['is_complex_query'] = 0
+    else:
+        feats['is_simple_query'] = 0
+        feats['is_medium_query'] = 0
+        feats['is_complex_query'] = 1
+    
+    # 2. 실행 시간 기반 분류
+    if 'last_ms' in row and pd.notna(row['last_ms']):
+        last_ms = row['last_ms']
+        if last_ms < 1:
+            feats['execution_speed'] = 0  # 매우 빠름
+        elif last_ms < 10:
+            feats['execution_speed'] = 1  # 빠름
+        elif last_ms < 100:
+            feats['execution_speed'] = 2  # 보통
+        elif last_ms < 1000:
+            feats['execution_speed'] = 3  # 느림
+        else:
+            feats['execution_speed'] = 4  # 매우 느림
+    else:
+        feats['execution_speed'] = 2  # 기본값
+    
+    # 3. 리소스 사용 패턴
+    if 'last_cpu_ms' in row and 'last_ms' in row and pd.notna(row['last_cpu_ms']) and pd.notna(row['last_ms']):
+        cpu_ratio = row['last_cpu_ms'] / (row['last_ms'] + 1e-8)
+        if cpu_ratio > 0.8:
+            feats['resource_type'] = 0  # CPU 집약적
+        elif cpu_ratio > 0.3:
+            feats['resource_type'] = 1  # 균형
+        else:
+            feats['resource_type'] = 2  # I/O 집약적
+    else:
+        feats['resource_type'] = 1  # 기본값
+    
+    # 4. 실행 빈도 기반 분류
+    if 'count_exec' in row and pd.notna(row['count_exec']):
+        count_exec = row['count_exec']
+        if count_exec == 1:
+            feats['frequency_type'] = 0  # 일회성
+        elif count_exec <= 10:
+            feats['frequency_type'] = 1  # 가끔
+        elif count_exec <= 100:
+            feats['frequency_type'] = 2  # 자주
+        else:
+            feats['frequency_type'] = 3  # 매우 자주
+    else:
+        feats['frequency_type'] = 1  # 기본값
+    
+    return feats
+
 def create_default_features(row: pd.Series, target_col: str) -> dict:
     """오류 발생 시 기본 피처를 생성합니다."""
     feats = {
@@ -382,6 +451,12 @@ def create_default_features(row: pd.Series, target_col: str) -> dict:
         "max_dop": 0,
         "is_parallel": 0,
         "plan_xml_length": 0,
-        "is_large_plan": 0
+        "is_large_plan": 0,
+        "is_simple_query": 0,
+        "is_medium_query": 0,
+        "is_complex_query": 0,
+        "execution_speed": 2,
+        "resource_type": 1,
+        "frequency_type": 1
     }
     return feats

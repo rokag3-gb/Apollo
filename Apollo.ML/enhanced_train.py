@@ -59,7 +59,7 @@ def train_overfit_prevention_model(df):
     X_train_scaled = scaler.fit_transform(X_train)
     X_val_scaled = scaler.transform(X_val)
     
-    # Overfitting 방지 모델 설정
+    # 안정성 우선 모델 설정 (이전 설정으로 복원)
     model = XGBRegressor(
         n_estimators=300,  # 감소
         max_depth=5,       # 감소

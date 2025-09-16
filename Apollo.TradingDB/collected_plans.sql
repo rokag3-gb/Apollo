@@ -1,10 +1,5 @@
 use TradingDB;
 
--- 테이블 49개
-select  *
-from    sys.objects
-where   type = 'U'
-
 batch_t_collected_plans
 usp_augment_collected_plans
 
@@ -13,6 +8,7 @@ usp_augment_collected_plans
 --EXEC dbo.usp_augment_collected_plans @target_rows = 12590, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 21456, @batch_size = 200;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 27219, @batch_size = 500;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 32974, @batch_size = 200;
 
 select count(1) from collected_plans;
 select TOP 20 * from collected_plans;
@@ -26,6 +22,11 @@ group by convert(varchar(13), collected_at, 120)
 order by 1;
 
 ------------------------------------------------------------------
+
+-- 테이블 49개
+select  *
+from    sys.objects
+where   type = 'U'
 
 -- SP 99개
 select  *
