@@ -129,20 +129,20 @@ def evaluate_model_performance(model, scaler, X, y, feature_cols, data_type=""):
     metrics = calculate_regression_metrics(y, y_pred)
     
     # 결과 출력
-    print(f"\n📊 기본 메트릭:")
+    print(f"\n# 기본 메트릭:")
     print(f"  RMSE: {metrics['rmse']:.2f}")
     print(f"  MAE: {metrics['mae']:.2f}")
     print(f"  R²: {metrics['r2']:.4f}")
     print(f"  EVS: {metrics['evs']:.4f}")
     
-    print(f"\n📈 오차 분석:")
+    print(f"\n# 오차 분석:")
     print(f"  MAPE: {metrics['mape']:.2f}%")
     print(f"  MAPE (대안): {metrics['mape_alt']:.2f}%")
     print(f"  SMAPE: {metrics['smape']:.2f}%")
     print(f"  MASE: {metrics['mase']:.4f}")
     print(f"  상대 오차: {metrics['relative_error']:.4f}")
     
-    print(f"\n📋 분포 분석:")
+    print(f"\n# 분포 분석:")
     print(f"  중앙값 절대 오차: {metrics['medae']:.2f}")
     print(f"  최대 오차: {metrics['max_error']:.2f}")
     print(f"  잔차 평균: {metrics['residual_mean']:.2f}")
@@ -332,6 +332,38 @@ def model_quality_assessment(metrics, cv_results=None):
     
     print(f"편향성: {bias} (잔차 평균 = {metrics['residual_mean']:.2f})")
 
+def print_sample_predictions(y_true, y_pred, X_val, n_samples=20):
+    """개별 예측 결과를 출력합니다."""
+    
+    # 예측 오차 계산
+    errors = y_true - y_pred
+    error_rates = np.abs(errors) / (y_true + 1e-8) * 100
+    
+    # 결과를 DataFrame으로 정리
+    results_df = pd.DataFrame({
+        '실제값(ms)': y_true.values,
+        '예측값(ms)': y_pred,
+        '오차(ms)': errors,
+        '오차율(%)': error_rates
+    })
+    
+    # 오차율 기준으로 정렬 (큰 오차부터)
+    results_df = results_df.sort_values('오차율(%)', ascending=True)
+    
+    print(f"{'순위':<4} {'실제값(ms)':<12} {'예측값(ms)':<12} {'오차(ms)':<12} {'오차율(%)':<10}")
+    print("-" * 60)
+    
+    for i, (idx, row) in enumerate(results_df.head(n_samples).iterrows()):
+        print(f"{i+1:<4} {row['실제값(ms)']:<12.2f} {row['예측값(ms)']:<12.2f} {row['오차(ms)']:<12.2f} {row['오차율(%)']:<10.2f}")
+    
+    # 통계 요약
+    print(f"\n=== 예측 정확도 요약 ===")
+    print(f"평균 오차율: {error_rates.mean():.2f}%")
+    print(f"중앙값 오차율: {error_rates.median():.2f}%")
+    print(f"최대 오차율: {error_rates.max():.2f}%")
+    print(f"오차율 < 10%: {(error_rates < 10).sum()}개 ({(error_rates < 10).mean()*100:.1f}%)")
+    print(f"오차율 < 50%: {(error_rates < 50).sum()}개 ({(error_rates < 50).mean()*100:.1f}%)")
+
 def main():
     """메인 실행 함수"""
     
@@ -388,6 +420,10 @@ def main():
     
     # 모델 품질 종합 평가 (검증 데이터 기준)
     model_quality_assessment(metrics_val, cv_results)
+    
+    # 개별 예측 결과 출력 (샘플)
+    print(f"\n=== 개별 예측 결과 (상위 20개 샘플) ===")
+    print_sample_predictions(y_val, y_pred_val, X_val)
     
     print(f"\n=== 평가 완료 ===")
     print(f"상세한 분석 결과가 출력되었습니다.")
