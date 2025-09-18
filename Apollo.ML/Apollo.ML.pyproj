@@ -22,25 +22,51 @@
   <ItemGroup>
     <Compile Include="config.py" />
     <Compile Include="db.py" />
-    <Compile Include="evaluate.py" />
     <Compile Include="enhanced_evaluate.py" />
     <Compile Include="enhanced_features.py" />
     <Compile Include="enhanced_featurize.py" />
     <Compile Include="enhanced_fetch.py" />
     <Compile Include="enhanced_preprocess.py" />
     <Compile Include="enhanced_train.py" />
-    <Compile Include="features.py" />
-    <Compile Include="main.py" />
-    <Compile Include="model.py" />
-    <Compile Include="plan_graph.py" />
-    <Compile Include="train.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.yaml" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
-    <Content Include="setup.bat" />
-    <Content Include="setup.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="code-backup\" />
+    <Folder Include="code-backup\catboost_info\" />
+    <Folder Include="code-backup\catboost_info\learn\" />
+    <Folder Include="code-backup\catboost_info\tmp\" />
+    <Folder Include="RLQO\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="code-backup\analyze_data.py" />
+    <Compile Include="code-backup\analyze_original_data.py" />
+    <Compile Include="code-backup\debug_xml.py" />
+    <Compile Include="code-backup\deep_analysis.py" />
+    <Compile Include="code-backup\enhanced_evaluate.py" />
+    <Compile Include="code-backup\features.py" />
+    <Compile Include="code-backup\final_results_summary.py" />
+    <Compile Include="code-backup\improve_model.py" />
+    <Compile Include="code-backup\improvement_roadmap.py" />
+    <Compile Include="code-backup\main.py" />
+    <Compile Include="code-backup\overfit_comparison_analysis.py" />
+    <Compile Include="code-backup\phase1_improvements.py" />
+    <Compile Include="code-backup\phase1_overfit_prevention.py" />
+    <Compile Include="code-backup\phase2_advanced_features.py" />
+    <Compile Include="code-backup\phase3_ensemble_models.py" />
+    <Compile Include="code-backup\test_setup.py" />
+    <Content Include="code-backup\Apollo.ML.pyproj" />
+    <Content Include="code-backup\catboost_info\catboost_training.json" />
+    <Content Include="code-backup\catboost_info\learn\events.out.tfevents" />
+    <Content Include="code-backup\catboost_info\learn_error.tsv" />
+    <Content Include="code-backup\catboost_info\time_left.tsv" />
+    <Compile Include="code-backup\evaluate.py" />
+    <Compile Include="code-backup\model.py" />
+    <Compile Include="code-backup\plan_graph.py" />
+    <Compile Include="code-backup\train.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
