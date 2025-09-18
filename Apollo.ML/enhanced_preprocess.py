@@ -308,7 +308,7 @@ def main():
     try:
         preprocessed_df = preprocess_data()
         print(f"\n✅ 전처리 완료!")
-        print(f"다음 단계: python enhanced_train.py")
+        print(f"다음 단계: python enhanced_featurize.py")
     except Exception as e:
         print(f"❌ 전처리 실패: {e}")
         raise
