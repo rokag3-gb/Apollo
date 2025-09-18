@@ -6,8 +6,14 @@
 
 import argparse
 from pathlib import Path
+from datetime import datetime  # datetime 임포트
 from config import load_config
 from db import connect, fetch_collected_plans
+
+def log_message(message):
+    """메시지에 타임스탬프를 추가하여 출력"""
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    print(f"{timestamp} {message}")
 
 def main():
     """메인 실행 함수"""
@@ -15,7 +21,7 @@ def main():
     parser.add_argument("--config", default="config.yaml", help="config.yaml 파일 경로 (기본값: config.yaml)")
     args = parser.parse_args()
     
-    print("=== 데이터 수집 시작 ===")
+    log_message("=== 데이터 수집 시작 ===")
     
     # 설정 로드
     cfg = load_config(args.config)
@@ -29,9 +35,9 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out, index=False)
     
-    print(f"수집된 데이터 크기: {df.shape}")
-    print(f"저장 완료: {out}")
-    print("다음 단계: python enhanced_preprocess.py")
+    log_message(f"수집된 데이터 크기: {df.shape}")
+    log_message(f"저장 완료: {out}")
+    log_message("다음 단계: python enhanced_preprocess.py")
 
 if __name__ == "__main__":
     main()

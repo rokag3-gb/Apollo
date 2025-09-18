@@ -5,6 +5,37 @@ import networkx as nx
 from collections import Counter
 from plan_graph import planxml_to_graph
 
+def get_tree_depth(g: nx.DiGraph) -> (int, float):
+    """실행 계획 트리의 깊이와 평균 깊이를 계산합니다."""
+    if g.number_of_nodes() == 0:
+        return 0, 0.0
+    
+    # 루트 노드 찾기 (in_degree가 0인 노드)
+    root_nodes = [n for n, d in g.in_degree() if d == 0]
+    if not root_nodes:
+        # 순환 그래프 등의 예외 케이스 처리
+        # 가장 긴 경로를 찾아서 깊이로 간주
+        try:
+            dag_longest_path = nx.dag_longest_path(g)
+            dag_longest_path_length = len(dag_longest_path) - 1 if dag_longest_path else 0
+            return dag_longest_path_length, dag_longest_path_length
+        except (nx.NetworkXError, nx.NetworkXUnfeasible): # 순환 감지 시
+             return 0, 0.0 # 순환이 있으면 깊이를 0으로 처리
+        
+    all_path_lengths = []
+    # 모든 리프 노드 찾기 (out_degree가 0인 노드)
+    leaf_nodes = [n for n, d in g.out_degree() if d == 0]
+    
+    for root in root_nodes:
+        for leaf in leaf_nodes:
+            if nx.has_path(g, root, leaf):
+                all_path_lengths.append(nx.shortest_path_length(g, root, leaf))
+    
+    if not all_path_lengths:
+        return 0, 0.0
+        
+    return max(all_path_lengths), np.mean(all_path_lengths)
+
 def enhanced_featurize(df_plans: pd.DataFrame, target_col: str = "last_ms") -> pd.DataFrame:
     """전처리된 데이터에 피처 엔지니어링을 적용합니다."""
     rows = []
@@ -99,6 +130,7 @@ def graph_basic_features(g: nx.DiGraph) -> dict:
     
     out_degrees = dict(g.out_degree())
     in_degrees = dict(g.in_degree())
+    max_depth, avg_depth = get_tree_depth(g)
     
     return {
         "num_nodes": g.number_of_nodes(),
@@ -107,6 +139,9 @@ def graph_basic_features(g: nx.DiGraph) -> dict:
         "max_out_degree": max(out_degrees.values()) if out_degrees else 0,
         "avg_in_degree": np.mean(list(in_degrees.values())),
         "max_in_degree": max(in_degrees.values()) if in_degrees else 0,
+        "max_children_per_node": max(out_degrees.values()) if out_degrees else 0,
+        "tree_depth": max_depth,
+        "avg_tree_depth": avg_depth,
         "density": nx.density(g),
         "is_connected": nx.is_weakly_connected(g),
         "num_components": nx.number_weakly_connected_components(g),
@@ -224,7 +259,8 @@ def operator_features(g: nx.DiGraph) -> dict:
         "scan_ops_count": scan_ops,
         "join_ops_count": join_ops,
         "sort_ops_count": sort_ops,
-        "aggregate_ops_count": aggregate_ops
+        "aggregate_ops_count": aggregate_ops,
+        "join_to_scan_ratio": join_ops / scan_ops if scan_ops > 0 else 0.0
     }
 
 def index_features(g: nx.DiGraph) -> dict:
@@ -266,95 +302,63 @@ def index_features(g: nx.DiGraph) -> dict:
     }
 
 def derived_features(row: pd.Series, g: nx.DiGraph) -> dict:
-    """새로운 파생 피처들을 생성합니다."""
+    """데이터 누수를 방지한 안전한 파생 피처들을 생성합니다."""
     feats = {}
     
     # 1. 실행 빈도 관련 피처
-    if 'count_exec' in row and pd.notna(row['count_exec']):
-        feats['count_exec'] = row['count_exec']
-        feats['is_frequent_query'] = 1 if row['count_exec'] > 10 else 0
-    else:
-        feats['count_exec'] = 0
-        feats['is_frequent_query'] = 0
+    count_exec = row.get('count_exec', 0)
+    feats['count_exec'] = count_exec
+    feats['is_frequent_query'] = 1 if count_exec > 10 else 0
     
-    # 2. 비용 효율성 피처
-    if 'est_total_subtree_cost' in row and pd.notna(row['est_total_subtree_cost']):
-        feats['est_total_subtree_cost'] = row['est_total_subtree_cost']
-        if 'last_ms' in row and row['last_ms'] > 0:
-            feats['cost_efficiency'] = row['est_total_subtree_cost'] / row['last_ms']
-        else:
-            feats['cost_efficiency'] = 0
-    else:
-        feats['est_total_subtree_cost'] = 0
-        feats['cost_efficiency'] = 0
+    # 2. 비용 효율성 피처 (Data Leakage 제거)
+    # est_total_subtree_cost는 전처리 단계에서 다른 피처들로부터 생성될 수 있으므로,
+    # featurize 단계에서 row에 포함되어 있을 수 있습니다. 없으면 기본값 0 사용.
+    total_estimated_cost = row.get('total_estimated_cost', 0)
+    total_cpu_cost = row.get('total_cpu_cost', 0)
+    total_io_cost = row.get('total_io_cost', 0)
     
-    # 3. 평균 실행시간과의 비교
-    if 'avg_ms' in row and pd.notna(row['avg_ms']):
-        feats['avg_ms'] = row['avg_ms']
-        if 'last_ms' in row and row['last_ms'] > 0:
-            feats['performance_ratio'] = row['last_ms'] / row['avg_ms']
-            feats['is_slower_than_avg'] = 1 if row['last_ms'] > row['avg_ms'] else 0
-        else:
-            feats['performance_ratio'] = 0
-            feats['is_slower_than_avg'] = 0
-    else:
-        feats['avg_ms'] = 0
-        feats['performance_ratio'] = 0
-        feats['is_slower_than_avg'] = 0
+    feats['estimated_cpu_per_cost'] = total_cpu_cost / total_estimated_cost if total_estimated_cost > 0 else 0
+    feats['estimated_io_per_cost'] = total_io_cost / total_estimated_cost if total_estimated_cost > 0 else 0
     
-    # 4. CPU 사용량 관련
-    if 'last_cpu_ms' in row and pd.notna(row['last_cpu_ms']):
-        feats['last_cpu_ms'] = row['last_cpu_ms']
-        if 'last_ms' in row and row['last_ms'] > 0:
-            feats['cpu_ratio'] = row['last_cpu_ms'] / row['last_ms']
-        else:
-            feats['cpu_ratio'] = 0
-    else:
-        feats['last_cpu_ms'] = 0
-        feats['cpu_ratio'] = 0
+    # 3. 평균 실행시간 기반 비율 피처 (Data Leakage 제거)
+    avg_ms = row.get('avg_ms', 0)
+    last_cpu_ms = row.get('last_cpu_ms', 0)
+    last_reads = row.get('last_reads', 0)
     
-    # 5. I/O 관련
-    if 'last_reads' in row and pd.notna(row['last_reads']):
-        feats['last_reads'] = row['last_reads']
-        if 'last_ms' in row and row['last_ms'] > 0:
-            feats['reads_per_ms'] = row['last_reads'] / row['last_ms']
-        else:
-            feats['reads_per_ms'] = 0
+    if avg_ms > 0:
+        feats['cpu_per_avg_ms'] = last_cpu_ms / avg_ms
+        feats['reads_per_avg_ms'] = last_reads / avg_ms
     else:
-        feats['last_reads'] = 0
-        feats['reads_per_ms'] = 0
+        feats['cpu_per_avg_ms'] = 0
+        feats['reads_per_avg_ms'] = 0
+
+    # 4. 메모리 사용량 관련
+    max_used_mem_kb = row.get('max_used_mem_kb', 0)
+    feats['max_used_mem_kb'] = max_used_mem_kb
+    feats['memory_intensive'] = 1 if max_used_mem_kb > 10000 else 0  # 10MB 이상
+
+    # 5. 병렬 처리 관련
+    max_dop = row.get('max_dop', 0)
+    feats['max_dop'] = max_dop
+    feats['is_parallel'] = 1 if max_dop > 1 else 0
     
-    # 6. 메모리 사용량 관련
-    if 'max_used_mem_kb' in row and pd.notna(row['max_used_mem_kb']):
-        feats['max_used_mem_kb'] = row['max_used_mem_kb']
-        feats['memory_intensive'] = 1 if row['max_used_mem_kb'] > 10000 else 0  # 10MB 이상
-    else:
-        feats['max_used_mem_kb'] = 0
-        feats['memory_intensive'] = 0
-    
-    # 7. 병렬 처리 관련
-    if 'max_dop' in row and pd.notna(row['max_dop']):
-        feats['max_dop'] = row['max_dop']
-        feats['is_parallel'] = 1 if row['max_dop'] > 1 else 0
-    else:
-        feats['max_dop'] = 0
-        feats['is_parallel'] = 0
-    
-    # 8. 그래프 복잡도 점수
-    feats['complexity_score'] = (
+    # 6. 그래프 복잡도 점수
+    complexity = (
         g.number_of_nodes() * 0.3 +
         g.number_of_edges() * 0.3 +
         len([n for n, d in g.nodes(data=True) if 'PhysicalOp' in d]) * 0.2 +
         len([n for n, d in g.nodes(data=True) if 'LogicalOp' in d]) * 0.2
     )
+    feats['complexity_score'] = complexity
     
-    # 9. 실행계획 크기 (XML 길이)
-    if 'plan_xml' in row:
-        feats['plan_xml_length'] = len(str(row['plan_xml']))
-        feats['is_large_plan'] = 1 if len(str(row['plan_xml'])) > 50000 else 0
-    else:
-        feats['plan_xml_length'] = 0
-        feats['is_large_plan'] = 0
+    # 7. 상호작용 피처
+    feats['cost_x_complexity'] = total_estimated_cost * complexity
+    feats['reads_x_cpu'] = last_reads * last_cpu_ms
+    
+    # 8. 실행계획 크기 (XML 길이)
+    plan_xml_str = str(row.get('plan_xml', ''))
+    feats['plan_xml_length'] = len(plan_xml_str)
+    feats['is_large_plan'] = 1 if len(plan_xml_str) > 50000 else 0
     
     return feats
 
@@ -380,25 +384,25 @@ def short_query_features(row: pd.Series, g: nx.DiGraph) -> dict:
         feats['is_medium_query'] = 0
         feats['is_complex_query'] = 1
     
-    # 2. 실행 시간 기반 분류
-    if 'last_ms' in row and pd.notna(row['last_ms']):
-        last_ms = row['last_ms']
-        if last_ms < 1:
-            feats['execution_speed'] = 0  # 매우 빠름
-        elif last_ms < 10:
-            feats['execution_speed'] = 1  # 빠름
-        elif last_ms < 100:
-            feats['execution_speed'] = 2  # 보통
-        elif last_ms < 1000:
-            feats['execution_speed'] = 3  # 느림
+    # 2. 실행 시간 기반 분류 (Data Leakage 제거하고 avg_ms 사용)
+    if 'avg_ms' in row and pd.notna(row['avg_ms']):
+        avg_ms = row['avg_ms']
+        if avg_ms < 1:
+            feats['avg_execution_speed'] = 0  # 매우 빠름
+        elif avg_ms < 10:
+            feats['avg_execution_speed'] = 1  # 빠름
+        elif avg_ms < 100:
+            feats['avg_execution_speed'] = 2  # 보통
+        elif avg_ms < 1000:
+            feats['avg_execution_speed'] = 3  # 느림
         else:
-            feats['execution_speed'] = 4  # 매우 느림
+            feats['avg_execution_speed'] = 4  # 매우 느림
     else:
-        feats['execution_speed'] = 2  # 기본값
+        feats['avg_execution_speed'] = 2  # 기본값
     
-    # 3. 리소스 사용 패턴
-    if 'last_cpu_ms' in row and 'last_ms' in row and pd.notna(row['last_cpu_ms']) and pd.notna(row['last_ms']):
-        cpu_ratio = row['last_cpu_ms'] / (row['last_ms'] + 1e-8)
+    # 3. 리소스 사용 패턴 (Data Leakage 제거하고 avg_ms 사용)
+    if 'last_cpu_ms' in row and 'avg_ms' in row and pd.notna(row['last_cpu_ms']) and pd.notna(row['avg_ms']):
+        cpu_ratio = row['last_cpu_ms'] / (row['avg_ms'] + 1e-8)
         if cpu_ratio > 0.8:
             feats['resource_type'] = 0  # CPU 집약적
         elif cpu_ratio > 0.3:
@@ -431,31 +435,65 @@ def create_default_features(row: pd.Series, target_col: str) -> dict:
         target_col: row[target_col],
         "num_nodes": 0,
         "num_edges": 0,
+        "avg_out_degree": 0.0,
+        "max_out_degree": 0,
+        "avg_in_degree": 0.0,
+        "max_in_degree": 0,
+        "max_children_per_node": 0,
+        "tree_depth": 0,
+        "avg_tree_depth": 0.0,
+        "density": 0.0,
+        "is_connected": False,
+        "num_components": 0,
+        "diameter": 0,
+        "avg_clustering": 0.0,
         "total_estimated_cost": 0.0,
+        "avg_estimated_cost": 0.0,
+        "max_estimated_cost": 0.0,
+        "total_io_cost": 0.0,
+        "total_cpu_cost": 0.0,
+        "total_rows": 0.0,
+        "avg_rows": 0.0,
+        "max_rows": 0.0,
+        "total_avg_row_size": 0.0,
+        "cost_per_row": 0.0,
         "num_physical_ops": 0,
+        "num_logical_ops": 0,
+        "unique_physical_ops": 0,
+        "unique_logical_ops": 0,
+        "most_common_physical_op": "",
+        "most_common_logical_op": "",
+        "parallel_ops_ratio": 0.0,
+        "scan_ops_count": 0,
+        "join_ops_count": 0,
+        "sort_ops_count": 0,
+        "aggregate_ops_count": 0,
+        "join_to_scan_ratio": 0.0,
         "index_ops_count": 0,
-        "complexity_score": 0.0,
+        "unique_index_kinds": 0,
+        "clustered_index_ops": 0,
+        "nonclustered_index_ops": 0,
+        "index_scan_ops": 0,
+        "index_seek_ops": 0,
         "count_exec": 0,
         "is_frequent_query": 0,
-        "est_total_subtree_cost": 0.0,
-        "cost_efficiency": 0.0,
-        "avg_ms": 0.0,
-        "performance_ratio": 0.0,
-        "is_slower_than_avg": 0,
-        "last_cpu_ms": 0.0,
-        "cpu_ratio": 0.0,
-        "last_reads": 0,
-        "reads_per_ms": 0.0,
+        "estimated_cpu_per_cost": 0.0,
+        "estimated_io_per_cost": 0.0,
+        "cpu_per_avg_ms": 0.0,
+        "reads_per_avg_ms": 0.0,
         "max_used_mem_kb": 0,
         "memory_intensive": 0,
         "max_dop": 0,
         "is_parallel": 0,
+        "complexity_score": 0.0,
+        "cost_x_complexity": 0.0,
+        "reads_x_cpu": 0.0,
         "plan_xml_length": 0,
         "is_large_plan": 0,
-        "is_simple_query": 0,
+        "is_simple_query": 1,
         "is_medium_query": 0,
         "is_complex_query": 0,
-        "execution_speed": 2,
+        "avg_execution_speed": 2,
         "resource_type": 1,
         "frequency_type": 1
     }

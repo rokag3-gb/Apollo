@@ -35,7 +35,7 @@ def preprocess_data():
     
     # 3. 이상치 처리 (타겟 변수 정보 누출 방지)
     print("\n2. 이상치 처리 (타겟 변수 정보 누출 방지)...")
-    df_clean = improved_outlier_handling_safe(df_features, y)
+    df_clean, y = improved_outlier_handling_safe(df_features, y)
     
     # 4. 결측값 처리 (타겟 변수 제외)
     print("\n3. 결측값 처리 (타겟 변수 제외)...")
@@ -68,40 +68,96 @@ def preprocess_data():
     return df_clean
 
 def improved_outlier_handling_safe(df_features, y):
-    """타겟 변수 정보 누출을 방지한 이상치 처리"""
+    """타겟 변수 정보 누출을 방지한 이상치 처리 (IQR 기반 제거 추가)"""
+    
+    # 임시로 피처와 타겟을 합쳐서 이상치 제거 (행 일관성 유지)
+    df_combined = df_features.copy()
+    df_combined['last_ms'] = y
+    
+    initial_rows = len(df_combined)
+    print(f"  IQR 처리 전 데이터 크기: {initial_rows}개 행")
+
+    # IQR 기반 이상치 제거 (타겟 변수 포함 모든 수치형 컬럼)
+    numeric_cols = df_combined.select_dtypes(include=np.number).columns.tolist()
+    numeric_cols = [col for col in numeric_cols if col not in ['plan_id', 'query_id']]
+
+    df_clean = df_combined.copy()
+    # 이상치로 인해 제거될 인덱스를 추적
+    outlier_indices = pd.Series(False, index=df_clean.index)
+
+    for col in numeric_cols:
+        # 0을 포함하는 데이터가 많으므로, 0을 제외하고 IQR 계산
+        col_data = df_clean[col][df_clean[col] > 0]
+        if col_data.empty:
+            continue
+
+        Q1 = col_data.quantile(0.25)
+        Q3 = col_data.quantile(0.75)
+        IQR = Q3 - Q1
+        
+        # IQR이 0인 경우 (데이터가 거의 동일한 경우) 이상치 탐지 스킵
+        if IQR == 0:
+            continue
+
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        is_outlier = (df_clean[col] < lower_bound) | (df_clean[col] > upper_bound)
+        num_outliers = is_outlier.sum()
+        
+        if num_outliers > 0:
+            print(f"  - '{col}' 컬럼에서 IQR 이상치 {num_outliers}개 발견")
+            outlier_indices = outlier_indices | is_outlier
+
+    # 한 번에 이상치 행 제거
+    df_clean = df_clean[~outlier_indices]
+    
+    final_rows = len(df_clean)
+    removed_rows = initial_rows - final_rows
+    print(f"  IQR 처리로 총 {removed_rows}개의 이상치 행 제거됨. 최종 크기: {final_rows}개 행")
+
+    if df_clean.empty:
+        raise ValueError("이상치 제거 후 남은 데이터가 없습니다. contamination을 조정하거나 데이터 품질을 확인하세요.")
+
+    # 다시 타겟 변수와 피처 분리
+    y_clean = df_clean['last_ms'].copy()
+    df_features_clean = df_clean.drop('last_ms', axis=1)
     
     # 타겟 변수를 제외한 피처만으로 이상치 탐지
-    feature_cols = [col for col in df_features.columns if col not in ['plan_id', 'query_id']]
-    numeric_cols = df_features[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
+    feature_cols = [col for col in df_features_clean.columns if col not in ['plan_id', 'query_id']]
+    numeric_cols_iso = df_features_clean[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
     
     # 1. 피처 기반 Isolation Forest
-    if len(numeric_cols) > 0:
-        iso_forest = IsolationForest(contamination=0.1, random_state=42)
-        outlier_mask = iso_forest.fit_predict(df_features[numeric_cols]) == -1
+    if len(numeric_cols_iso) > 0:
+        iso_forest = IsolationForest(contamination='auto', random_state=42)
+        outlier_mask = iso_forest.fit_predict(df_features_clean[numeric_cols_iso]) == -1
         print(f"  피처 기반 Isolation Forest 이상치: {outlier_mask.sum()}개")
         
         # 이상치를 중앙값으로 대체
-        for col in numeric_cols:
+        for col in numeric_cols_iso:
             if outlier_mask.sum() > 0:
-                median_val = df_features[col].median()
-                df_features.loc[outlier_mask, col] = median_val
+                median_val = df_features_clean[col].median()
+                df_features_clean.loc[outlier_mask, col] = median_val
     
     # 2. 타겟 변수 변환 (별도 처리)
-    y_log = np.log1p(y)
-    y_boxcox = np.zeros_like(y)
+    y_log = np.log1p(y_clean)
+    y_boxcox = np.zeros_like(y_clean, dtype=float)
     
     try:
-        positive_mask = y > 0
+        positive_mask = y_clean > 0
         if positive_mask.sum() > 0:
-            y_boxcox[positive_mask], _ = boxcox(y[positive_mask])
-    except:
+            # Box-Cox 변환은 양수 값만 처리 가능. 0을 포함하는 경우, 1을 더해 안정성 확보
+            transformed_data, _ = boxcox(y_clean[positive_mask].astype(float) + 1)
+            y_boxcox[positive_mask] = transformed_data
+    except Exception as e:
+        print(f"  Box-Cox 변환 실패: {e}. 로그 변환으로 대체합니다.")
         y_boxcox = y_log
     
     # 변환된 타겟 변수 저장 (나중에 사용)
-    df_features['target_log'] = y_log
-    df_features['target_boxcox'] = y_boxcox
+    df_features_clean['target_log'] = y_log
+    df_features_clean['target_boxcox'] = y_boxcox
     
-    return df_features
+    return df_features_clean, y_clean
 
 def improved_missing_value_handling_safe(df):
     """타겟 변수 제외한 결측값 처리"""
