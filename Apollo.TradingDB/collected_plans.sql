@@ -6,13 +6,22 @@ usp_augment_collected_plans
 --EXEC dbo.usp_augment_collected_plans @target_rows = 8200, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 12590, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 21456, @batch_size = 200;
---EXEC dbo.usp_augment_collected_plans @target_rows = 27219, @batch_size = 500;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 32974, @batch_size = 200;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 38062, @batch_size = 200;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 51714, @batch_size = 1000;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 65960, @batch_size = 200;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 78960, @batch_size = 400;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 105209, @batch_size = 1000;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 142637, @batch_size = 700;
+--EXEC dbo.usp_augment_collected_plans @target_rows = 190406, @batch_size = 1000;
 
-select count(1) from collected_plans;
+select  count(1)
+        , min_collected_at = min(collected_at)
+        , max_collected_at = max(collected_at)
+        , min_last_exec_time = min(last_exec_time)
+        , max_last_exec_time = max(last_exec_time)
+from    collected_plans (nolock);
+
 select TOP 20 * from collected_plans;
 
 sp_columns collected_plans
@@ -101,8 +110,10 @@ DROP PROC usp_t_Batch_DefragmentIndexes_095;
 -- Blocking Query (9/12)
 usp_t_Batch_GenerateRiskSnapshots_066
 
+-- 한번도 호출 안됨
+usp_t_PlaceOrder_Limit_WithRecompile_084
 
-
+-- dmv 활용해서 SP의 execution_count
 select  s.db_name
         , s.schema_name
         , p.object_id
@@ -130,9 +141,6 @@ FROM	sys.procedures p
         ) s
 WHERE	p.is_ms_shipped = 0
 order by execution_count;
-
-
-usp_t_PlaceOrder_Limit_WithRecompile_084
 
 ------------------------------------------------------------------
 
