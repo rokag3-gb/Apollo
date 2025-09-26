@@ -1,0 +1,32 @@
+[
+    {
+        "id": 0,
+        "name": "SET_MAXDOP_1",
+        "description": "Set MAXDOP to 1",
+        "hint_string": "OPTION (MAXDOP 1)"
+    },
+    {
+        "id": 1,
+        "name": "SET_MAXDOP_4",
+        "description": "Set MAXDOP to 4",
+        "hint_string": "OPTION (MAXDOP 4)"
+    },
+    {
+        "id": 2,
+        "name": "SET_MAXDOP_8",
+        "description": "Set MAXDOP to 8",
+        "hint_string": "OPTION (MAXDOP 8)"
+    },
+    {
+        "id": 3,
+        "name": "USE_HASH_JOIN",
+        "description": "Prefer Hash Join algorithm for major joins",
+        "hint_string": "OPTION (HASH JOIN)"
+    },
+    {
+        "id": 4,
+        "name": "USE_LOOP_JOIN",
+        "description": "Prefer Nested Loop Join algorithm for major joins",
+        "hint_string": "OPTION (LOOP JOIN)"
+    }
+]
