@@ -17,7 +17,7 @@ class QueryPlanEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self, xgb_model_path='Apollo.ML/artifacts/model.joblib',
-                 action_space_path='Apollo.ML/RLQO/configs/phase1_action_space.json',
+                 action_space_path='Apollo.ML/artifacts/RLQO/configs/phase1_action_space.json',
                  max_steps=10):
         super(QueryPlanEnv, self).__init__()
 

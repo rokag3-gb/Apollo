@@ -22,9 +22,9 @@ EXPLORATION_FRACTION = 0.5
 EXPLORATION_FINAL_EPS = 0.05
 
 # 경로 설정 (프로젝트 루트 기준)
-LOG_DIR = "Apollo.ML/RLQO/logs/dqn_v1/"
-MODEL_PATH = "Apollo.ML/RLQO/models/dqn_v1.zip"
-CHECKPOINT_DIR = "Apollo.ML/RLQO/models/checkpoints/dqn_v1/"
+LOG_DIR = "Apollo.ML/artifacts/RLQO/logs/dqn_v1/"
+MODEL_PATH = "Apollo.ML/artifacts/RLQO/models/dqn_v1.zip"
+CHECKPOINT_DIR = "Apollo.ML/artifacts/RLQO/models/checkpoints/dqn_v1/"
 
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
@@ -39,7 +39,7 @@ def train_agent():
     try:
         # 프로젝트 루트를 기준으로 상대 경로를 사용하도록 수정
         xgb_model_path_from_root = 'Apollo.ML/artifacts/model.joblib'
-        action_space_path_from_root = 'Apollo.ML/RLQO/configs/phase1_action_space.json'
+        action_space_path_from_root = 'Apollo.ML/artifacts/RLQO/configs/phase1_action_space.json'
         
         env = QueryPlanEnv(
             xgb_model_path=xgb_model_path_from_root,
@@ -49,7 +49,7 @@ def train_agent():
         print("Environment created successfully.")
     except FileNotFoundError as e:
         print(f"Error: {e}")
-        print("Please check if 'Apollo.ML/artifacts/model.joblib' and 'Apollo.ML/RLQO/configs/phase1_action_space.json' exist from the project root.")
+        print("Please check if 'Apollo.ML/artifacts/model.joblib' and 'Apollo.ML/artifacts/RLQO/configs/phase1_action_space.json' exist from the project root.")
         return
     except Exception as e:
         print(f"An unexpected error occurred while creating the environment: {e}")
@@ -78,7 +78,7 @@ def train_agent():
         gradient_steps=1,
         target_update_interval=1000,
         verbose=1,
-        tensorboard_log="Apollo.ML/RLQO/tb/dqn_v1/"
+        tensorboard_log="Apollo.ML/artifacts/RLQO/tb/dqn_v1/"
     )
     print("Model created.")
     print("Policy Architecture:", model.policy)
