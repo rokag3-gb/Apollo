@@ -21,10 +21,25 @@ def parse_statistics(stats_io: str, stats_time: str) -> dict:
     metrics['logical_reads'] = logical_reads
     
     # TIME 파싱 (예: SQL Server Execution Times: CPU time = 0 ms,  elapsed time = 0 ms.)
-    cpu_time = sum(map(int, re.findall(r'CPU time = (\d+) ms', stats_time)))
-    elapsed_time = sum(map(int, re.findall(r'elapsed time = (\d+) ms', stats_time)))
-    metrics['cpu_time_ms'] = cpu_time
-    metrics['elapsed_time_ms'] = elapsed_time
+    # [MOD] ms와 s 단위를 모두 처리하도록 수정
+    cpu_time_ms = 0
+    elapsed_time_ms = 0
+
+    cpu_match = re.search(r'CPU time = (\d+) ms', stats_time)
+    if cpu_match:
+        cpu_time_ms = int(cpu_match.group(1))
+
+    elapsed_match = re.search(r'elapsed time = (\d+) (ms|s)', stats_time)
+    if elapsed_match:
+        value = int(elapsed_match.group(1))
+        unit = elapsed_match.group(2)
+        if unit == 's':
+            elapsed_time_ms = value * 1000
+        else:
+            elapsed_time_ms = value
+            
+    metrics['cpu_time_ms'] = cpu_time_ms
+    metrics['elapsed_time_ms'] = elapsed_time_ms
     return metrics
 
 def apply_action_to_sql(sql: str, action: dict) -> str:
@@ -80,6 +95,7 @@ class QueryPlanDBEnv(gym.Env):
         self.current_sql = ""
         self.max_steps = max_steps
         self.current_step = 0
+        self.baseline_metrics = {} # [NEW] 베이스라인 메트릭 저장
         
         # 3. Gym 인터페이스 정의
         self.action_space = spaces.Discrete(len(self.actions))
@@ -119,7 +135,8 @@ class QueryPlanDBEnv(gym.Env):
                 "The query might be invalid or the table may not exist. Please check the DB and the query."
             )
 
-        self.baseline_cost = self.xgb_model.predict(obs.reshape(1, -1))[0]
+        self.baseline_metrics = metrics # [NEW]
+        self.current_metrics = metrics # [NEW]
         self.current_obs = obs
 
         return self.current_obs, {"metrics": metrics}
@@ -134,19 +151,22 @@ class QueryPlanDBEnv(gym.Env):
         # 2. 수정된 SQL 실행 및 결과 관측
         next_obs, metrics = self._get_obs_from_db(modified_sql)
         
+        # [NEW] 실행된 쿼리와 시간 로깅
+        elapsed_time = metrics.get('elapsed_time_ms', 'N/A')
+        print(f"  - Executed SQL ({elapsed_time} ms): {modified_sql[:150]}...")
+
         done = False
         reward = 0
         
         if next_obs is None: # 쿼리 실행 실패 (예: 잘못된 힌트)
-            reward = -10.0 # 큰 페널티
+            reward = -100.0 # 큰 페널티 (기존 -10.0)
             next_obs = self.current_obs # 상태는 그대로 유지
             done = True # 에피소드 종료
         else:
-            # 3. 보상 계산 (XGBoost 모델 사용)
-            cost_before = self.xgb_model.predict(self.current_obs.reshape(1, -1))[0]
-            cost_after = self.xgb_model.predict(next_obs.reshape(1, -1))[0]
-            reward = calculate_reward(cost_before, cost_after)
+            # 3. 보상 계산 (실제 실행 시간 및 IO 기반)
+            reward = calculate_reward(self.current_metrics, metrics)
             self.current_obs = next_obs
+            self.current_metrics = metrics # [NEW] 다음 스텝을 위해 현재 메트릭 업데이트
 
         # 4. 종료 조건 확인
         terminated = done

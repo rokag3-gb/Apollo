@@ -10,6 +10,7 @@ PLAN_NS = "{http://schemas.microsoft.com/sqlserver/2004/07/showplan}"
 def parse_plan_features(plan_xml: str) -> dict:
     """실행 계획 XML을 파싱하여 주요 특징을 딕셔너리로 추출합니다."""
     features = {
+        # 기존 특징
         'estimated_rows': 0,
         'estimated_cost': 0,
         'parallelism_degree': 0,
@@ -17,47 +18,97 @@ def parse_plan_features(plan_xml: str) -> dict:
         'join_type_loop': 0,
         'scan_type_index': 0,
         'scan_type_table': 0,
+        # [NEW] Step 1: 컨텍스트 특징 추가
+        'join_count': 0,
+        'subquery_count': 0,
+        'table_count': 0,
+        'cardinality_error': 0.0, # (실제 row / 예상 row)
+        'actual_rows': 0,
+        'missing_index_count': 0, # [NEW] 누락된 인덱스 제안 개수
+        # [NEW] 가장 비싼 연산자 정보
+        'most_expensive_op_cost': 0.0,
+        'most_expensive_op_is_join': 0,
+        'most_expensive_op_is_scan': 0,
+        'plan_warning_count': 0, # [NEW] 계획 경고 개수
     }
     if not plan_xml:
         return features
 
     try:
         root = etree.fromstring(plan_xml.encode('utf-8'))
-        # [FIX] .xpath()를 사용하기 위한 네임스페이스 맵 정의
+        # .xpath()를 사용하기 위한 네임스페이스 맵 정의
         ns = {'sh': PLAN_NS.strip('{}')}
         
-        # 전체 서브트리 비용
-        stmt = root.find(f".//{PLAN_NS}StmtSimple") # find()는 predicate가 없으므로 그대로 사용 가능
+        # 전체 서브트리 비용 및 실제/예상 Rows
+        stmt = root.find(f".//{PLAN_NS}StmtSimple")
         if stmt is not None:
             features['estimated_cost'] = float(stmt.get('StatementSubTreeCost', 0))
+            
+        rel_op_root = root.find(f".//{PLAN_NS}RelOp")
+        if rel_op_root is not None:
+            features['estimated_rows'] = float(rel_op_root.get('EstimateRows', 0))
+            features['actual_rows'] = float(rel_op_root.get('ActualRows', 0))
 
-        # [FIX] .xpath()를 사용하여 고급 조건 검색
+        # Cardinality 오차 계산
+        if features['estimated_rows'] > 0:
+            features['cardinality_error'] = features['actual_rows'] / features['estimated_rows']
+        else:
+            features['cardinality_error'] = 1.0 if features['actual_rows'] > 0 else 0.0
+
+        # 병렬 실행 여부 (DegreeOfParallelism > 0)
         parallel_node = root.xpath(".//*[@DegreeOfParallelism > 0]", namespaces=ns)
-        if parallel_node: # xpath()는 리스트를 반환하므로, 비어있는지 여부로 확인
+        if parallel_node:
             features['parallelism_degree'] = 1
 
-        # [FIX] .xpath()와 'and'를 사용하여 조인 타입 카운트
+        # 조인 타입 및 개수
+        joins = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Join')]", namespaces=ns)
+        features['join_count'] = len(joins)
         hash_joins = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Join') and contains(@PhysicalOp, 'Hash')]", namespaces=ns)
         loop_joins = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Join') and contains(@PhysicalOp, 'Nested Loops')]", namespaces=ns)
         features['join_type_hash'] = 1 if len(hash_joins) > 0 else 0
         features['join_type_loop'] = 1 if len(loop_joins) > 0 else 0
 
-        # 스캔 타입 카운트 및 총 예상 Rows
-        total_rows = 0
-        index_scans = 0
-        table_scans = 0
-        rel_ops = root.xpath(f".//sh:RelOp", namespaces=ns)
-        for op in rel_ops:
-            total_rows += float(op.get('EstimateRows', 0))
-            physical_op = op.get('PhysicalOp', '')
-            if 'Index Scan' in physical_op or 'Index Seek' in physical_op:
-                index_scans += 1
-            elif 'Table Scan' in physical_op:
-                table_scans += 1
+        # 서브쿼리 개수 (Apply 연산자 기준)
+        subqueries = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Apply')]", namespaces=ns)
+        features['subquery_count'] = len(subqueries)
+
+        # 테이블 개수 (Table Scan, Index Scan/Seek 등 물리적 테이블 접근 연산자 기준)
+        table_access_ops = root.xpath(".//*[starts-with(name(), 'TableScan') or starts-with(name(), 'Index')]", namespaces=ns)
+        features['table_count'] = len(table_access_ops)
         
-        features['estimated_rows'] = total_rows
-        features['scan_type_index'] = 1 if index_scans > 0 else 0
-        features['scan_type_table'] = 1 if table_scans > 0 else 0
+        # 스캔 타입
+        index_scans = root.xpath(".//sh:RelOp[contains(@PhysicalOp, 'Index Scan') or contains(@PhysicalOp, 'Index Seek')]", namespaces=ns)
+        table_scans = root.xpath(".//sh:RelOp[contains(@PhysicalOp, 'Table Scan')]", namespaces=ns)
+        features['scan_type_index'] = 1 if len(index_scans) > 0 else 0
+        features['scan_type_table'] = 1 if len(table_scans) > 0 else 0
+
+        # 누락된 인덱스 제안 개수
+        missing_indexes = root.xpath(".//sh:MissingIndexes/sh:MissingIndexGroup", namespaces=ns)
+        features['missing_index_count'] = len(missing_indexes)
+
+        # 가장 비용이 높은 연산자 찾기
+        all_ops = root.xpath(".//sh:RelOp", namespaces=ns)
+        most_expensive_op = None
+        max_cost = -1.0
+        for op in all_ops:
+            cost_str = op.get('EstimatedTotalSubtreeCost')
+            if cost_str:
+                cost = float(cost_str)
+                if cost > max_cost:
+                    max_cost = cost
+                    most_expensive_op = op
+        
+        if most_expensive_op is not None:
+            features['most_expensive_op_cost'] = max_cost
+            logical_op = most_expensive_op.get('LogicalOp', '').lower()
+            if 'join' in logical_op:
+                features['most_expensive_op_is_join'] = 1
+            elif 'scan' in logical_op or 'seek' in logical_op:
+                features['most_expensive_op_is_scan'] = 1
+
+        # 계획 경고 개수
+        warnings = root.xpath(".//sh:Warnings", namespaces=ns)
+        features['plan_warning_count'] = len(warnings)
 
     except etree.XMLSyntaxError:
         print("Warning: Could not parse execution plan XML.")
@@ -70,8 +121,9 @@ def extract_features(plan_xml: str, metrics: dict) -> np.ndarray:
     """
     plan_features = parse_plan_features(plan_xml)
     
-    # Phase 1에서 사용한 피처들을 순서대로 벡터화
+    # 특징 벡터 생성 순서를 일관성 있게 유지
     feature_vector = [
+        # 기존 특징
         plan_features.get('estimated_rows', 0),
         plan_features.get('estimated_cost', 0),
         plan_features.get('parallelism_degree', 0),
@@ -79,15 +131,27 @@ def extract_features(plan_xml: str, metrics: dict) -> np.ndarray:
         plan_features.get('join_type_loop', 0),
         plan_features.get('scan_type_index', 0),
         plan_features.get('scan_type_table', 0),
+        
+        # 실행 통계 특징
+        metrics.get('logical_reads', 0),
+        metrics.get('cpu_time_ms', 0),
+        metrics.get('elapsed_time_ms', 0),
+
+        # [NEW] Step 1: 컨텍스트 특징 추가
+        plan_features.get('join_count', 0),
+        plan_features.get('subquery_count', 0),
+        plan_features.get('table_count', 0),
+        plan_features.get('cardinality_error', 0.0),
+        plan_features.get('actual_rows', 0),
+        plan_features.get('missing_index_count', 0), # [NEW]
+        # [NEW] 가장 비싼 연산자 정보
+        plan_features.get('most_expensive_op_cost', 0.0),
+        plan_features.get('most_expensive_op_is_join', 0),
+        plan_features.get('most_expensive_op_is_scan', 0),
+        plan_features.get('plan_warning_count', 0), # [NEW]
     ]
 
-    # Phase 2에서 추가된 실행 통계 피처
-    feature_vector.append(metrics.get('logical_reads', 0))
-    feature_vector.append(metrics.get('cpu_time_ms', 0))
-    feature_vector.append(metrics.get('elapsed_time_ms', 0))
-
-    # TODO: 여기에 더 많은 피처들을 추가하여 79개를 맞춰야 함.
-    # (예: Cardinality 오차, 연산자별 비용, 메모리 사용량 등)
+    # TODO: is_readonly 특징 추가 필요 (SQL 파서 필요)
 
     # XGBoost 모델의 입력 크기에 맞게 0으로 패딩
     padding_size = XGB_EXPECTED_FEATURES - len(feature_vector)

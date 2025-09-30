@@ -154,10 +154,29 @@ usp_s_Admin_GetOrphanedExecutions_097
 usp_s_CheckAllTableFragmentation_100
 usp_t_Batch_GenerateRiskSnapshots_066
 
+---
 
+SET STATISTICS IO ON; SET STATISTICS TIME ON; SET STATISTICS XML ON;
+SELECT TOP 100 execution_id FROM dbo.exe_execution e;
+
+SELECT TOP 200 AccountID=o.account_id, SecID=o.security_id, Side=o.side, Qty=e.exec_qty, Price=e.exec_price, Fee=e.fee, Tax=e.tax FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id;
+
+SELECT TOP 300 * FROM dbo.risk_exposure_snapshot WHERE CAST(ts AS DATE) = cast(getdate() as date);
+
+SELECT TOP 400 e.execution_id, o.account_id, s.symbol, o.side, e.exec_qty, e.exec_price, e.exec_time FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id JOIN dbo.ref_security s ON o.security_id=s.security_id ORDER BY e.exec_time DESC;
+
+SELECT e.* FROM dbo.exe_execution e WHERE NOT EXISTS (SELECT 1 FROM dbo.ord_order o WHERE o.order_id = e.order_id);
+
+SELECT OBJECT_NAME(ips.object_id) AS TableName, si.name AS IndexName, ips.index_type_desc, ips.avg_fragmentation_in_percent FROM sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'SAMPLED') AS ips JOIN sys.indexes AS si ON ips.object_id = si.object_id AND ips.index_id = si.index_id WHERE ips.avg_fragmentation_in_percent > 30.0 ORDER BY ips.avg_fragmentation_in_percent DESC;
+
+SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_account WHERE closed_at IS NULL;
+
+---
 
 select  top 1 *
 from    collected_plans
+where   sql_text like '%usp_t_Batch_SettleAllTrades_061%'
+
 
 ------------------------------------------------------------------
 
