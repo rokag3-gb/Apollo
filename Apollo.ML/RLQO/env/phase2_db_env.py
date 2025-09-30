@@ -9,7 +9,7 @@ from gymnasium import spaces
 from RLQO.features.phase2_features import extract_features, XGB_EXPECTED_FEATURES
 from RLQO.env.phase1_reward import calculate_reward
 from db import connect, execute_query
-from config import AppConfig
+from config import AppConfig, load_config
 
 # --- Helper Functions ---
 
@@ -67,7 +67,7 @@ class QueryPlanDBEnv(gym.Env):
         super().__init__()
         
         # 1. DB 연결 및 모델/설정 로드
-        self.config = AppConfig.load()
+        self.config = load_config('Apollo.ML/config.yaml')
         self.db_connection = connect(self.config.db)
         self.xgb_model = joblib.load('Apollo.ML/artifacts/model.joblib')
         
@@ -113,7 +113,11 @@ class QueryPlanDBEnv(gym.Env):
         # 베이스라인 (힌트 없는) 상태/비용 측정
         obs, metrics = self._get_obs_from_db(self.current_sql)
         if obs is None: # 쿼리 실행 실패 시, 다시 리셋
-            return self.reset(seed=seed)
+            # return self.reset(seed=seed) # BUG: This causes infinite recursion
+            raise RuntimeError(
+                f"Failed to get initial observation from the database for query: {self.current_sql}. "
+                "The query might be invalid or the table may not exist. Please check the DB and the query."
+            )
 
         self.baseline_cost = self.xgb_model.predict(obs.reshape(1, -1))[0]
         self.current_obs = obs

@@ -140,7 +140,24 @@ FROM	sys.procedures p
         group by ps.object_id
         ) s
 WHERE	p.is_ms_shipped = 0
-order by execution_count;
+--order by execution_count;
+--order by avg_worker_time desc;
+order by avg_elapsed_time desc;
+
+
+-- RL Phase 2에서 평가에 사용할 샘플 쿼리 목록 (성능 문제를 가진) -> Top 5 [avg_worker_time] 와 Top 5 [avg_elapsed_time] 의 합집합
+usp_t_Batch_SettleAllTrades_061
+usp_s_Admin_Rpt_DailyRiskExposure_089
+usp_s_Admin_MonitorRecentTrades_035
+usp_s_Admin_MonitorRecentTrades_ReadUncommitted_075
+usp_s_Admin_GetOrphanedExecutions_097
+usp_s_CheckAllTableFragmentation_100
+usp_t_Batch_GenerateRiskSnapshots_066
+
+
+
+select  top 1 *
+from    collected_plans
 
 ------------------------------------------------------------------
 

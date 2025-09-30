@@ -17,8 +17,15 @@ ACTION_SPACE_PATH = "Apollo.ML/artifacts/RLQO/configs/phase2_action_space.json"
 # 평가에 사용할 샘플 쿼리 목록
 # (실제로는 대표적인 성능 문제를 가진 쿼리들을 선택해야 합니다)
 SAMPLE_QUERIES = [
-    "SELECT * FROM Users WHERE Email LIKE '%.com';",
-    "SELECT TOP 100 * FROM Orders o JOIN Users u ON o.UserId = u.UserId ORDER BY o.OrderDate DESC;",
+    #"SELECT * FROM Users WHERE Email LIKE '%.com';",
+    #"SELECT TOP 100 * FROM Orders o JOIN Users u ON o.UserId = u.UserId ORDER BY o.OrderDate DESC;",
+    "SELECT execution_id FROM dbo.exe_execution e;"
+    , "SELECT AccountID=o.account_id, SecID=o.security_id, Side=o.side, Qty=e.exec_qty, Price=e.exec_price, Fee=e.fee, Tax=e.tax FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id;"
+    , "SELECT TOP 100 * FROM dbo.risk_exposure_snapshot WHERE CAST(ts AS DATE) = cast(getdate() as date);"
+    , "SELECT e.execution_id, o.account_id, s.symbol, o.side, e.exec_qty, e.exec_price, e.exec_time FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id JOIN dbo.ref_security s ON o.security_id=s.security_id ORDER BY e.exec_time DESC;"
+    , "SELECT e.* FROM dbo.exe_execution e WHERE NOT EXISTS (SELECT 1 FROM dbo.ord_order o WHERE o.order_id = e.order_id);"
+    , "SELECT OBJECT_NAME(ips.object_id) AS TableName, si.name AS IndexName, ips.index_type_desc, ips.avg_fragmentation_in_percent FROM sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, 'SAMPLED') AS ips JOIN sys.indexes AS si ON ips.object_id = si.object_id AND ips.index_id = si.index_id WHERE ips.avg_fragmentation_in_percent > 30.0 ORDER BY ips.avg_fragmentation_in_percent DESC;"
+    , "SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_account WHERE closed_at IS NULL;"
 ]
 
 def evaluate_agent():
@@ -62,10 +69,18 @@ def evaluate_agent():
         
         # 에이전트가 제안한 쿼리 실행
         print("Running Agent's suggested query...")
-        _, _, agent_stats_time = execute_query(env.db_connection, modified_sql)
+        _, stats_io, agent_stats_time = execute_query(env.db_connection, modified_sql)
         
-        # 시간 통계 파싱 (간단 버전)
-        agent_elapsed_time = int(re.findall(r'elapsed time = (\d+) ms', agent_stats_time)[0])
+        # [FIX] 에이전트의 행동으로 쿼리 실행이 실패하여 통계가 없는 경우 방어
+        agent_elapsed_time = float('inf') # 실패 시 무한대로 초기화
+        if agent_stats_time and 'elapsed time' in agent_stats_time:
+            try:
+                agent_elapsed_time = int(re.findall(r'elapsed time = (\d+) ms', agent_stats_time)[0])
+            except (IndexError, ValueError):
+                 print("  - Warning: Could not parse agent's execution time.")
+        else:
+            print("  - Warning: Agent's action may have resulted in an invalid query (no execution time stats).")
+
         print(f"  - Agent Metrics: {{'elapsed_time_ms': {agent_elapsed_time}}}")
 
         results.append({

@@ -23,20 +23,22 @@ def parse_plan_features(plan_xml: str) -> dict:
 
     try:
         root = etree.fromstring(plan_xml.encode('utf-8'))
+        # [FIX] .xpath()를 사용하기 위한 네임스페이스 맵 정의
+        ns = {'sh': PLAN_NS.strip('{}')}
         
         # 전체 서브트리 비용
-        stmt = root.find(f".//{PLAN_NS}StmtSimple")
+        stmt = root.find(f".//{PLAN_NS}StmtSimple") # find()는 predicate가 없으므로 그대로 사용 가능
         if stmt is not None:
             features['estimated_cost'] = float(stmt.get('StatementSubTreeCost', 0))
 
-        # 병렬 실행 여부 (DegreeOfParallelism > 0)
-        parallel_node = root.find(f".//*[@DegreeOfParallelism > 0]")
-        if parallel_node is not None:
+        # [FIX] .xpath()를 사용하여 고급 조건 검색
+        parallel_node = root.xpath(".//*[@DegreeOfParallelism > 0]", namespaces=ns)
+        if parallel_node: # xpath()는 리스트를 반환하므로, 비어있는지 여부로 확인
             features['parallelism_degree'] = 1
 
-        # 조인 타입 카운트
-        hash_joins = root.findall(f".//RelOp[contains(@LogicalOp, 'Join')][contains(@PhysicalOp, 'Hash')]")
-        loop_joins = root.findall(f".//RelOp[contains(@LogicalOp, 'Join')][contains(@PhysicalOp, 'Nested Loops')]")
+        # [FIX] .xpath()와 'and'를 사용하여 조인 타입 카운트
+        hash_joins = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Join') and contains(@PhysicalOp, 'Hash')]", namespaces=ns)
+        loop_joins = root.xpath(".//sh:RelOp[contains(@LogicalOp, 'Join') and contains(@PhysicalOp, 'Nested Loops')]", namespaces=ns)
         features['join_type_hash'] = 1 if len(hash_joins) > 0 else 0
         features['join_type_loop'] = 1 if len(loop_joins) > 0 else 0
 
@@ -44,7 +46,7 @@ def parse_plan_features(plan_xml: str) -> dict:
         total_rows = 0
         index_scans = 0
         table_scans = 0
-        rel_ops = root.findall(f".//{PLAN_NS}RelOp")
+        rel_ops = root.xpath(f".//sh:RelOp", namespaces=ns)
         for op in rel_ops:
             total_rows += float(op.get('EstimateRows', 0))
             physical_op = op.get('PhysicalOp', '')
