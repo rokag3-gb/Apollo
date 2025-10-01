@@ -14,12 +14,15 @@ from RLQO.constants import SAMPLE_QUERIES # [MOD] constants에서 쿼리 목록 
 
 # --- 설정 ---
 # 학습 파라미터
-TOTAL_TIMESTEPS = 5_000 # 총 학습 스텝 수 (300,000 -> 5,000, DB 연동으로 인한 속도 저하 감안)
+# [MOD] 본격 학습: 10,000 타임스텝으로 충분한 경험 제공
+# - 11개 쿼리 * ~90 에피소드/쿼리 * 10 스텝/에피소드
+# - 예상 소요 시간: ~10시간
+TOTAL_TIMESTEPS = 10_000
 LEARNING_RATE = 1e-4
-BUFFER_SIZE = 5_000 # 버퍼 사이즈도 타임스텝에 맞춰 조정
-BATCH_SIZE = 64 # 배치 사이즈 조정 (옵션)
+BUFFER_SIZE = 10_000 # 타임스텝 증가에 맞춰 버퍼 증가
+BATCH_SIZE = 64
 GAMMA = 0.99
-EXPLORATION_FRACTION = 0.8 # 탐험 비율을 늘려 다양한 경험을 쌓도록 조정
+EXPLORATION_FRACTION = 0.9 # [MOD] 탐험 기간 강화 (90% 구간까지 탐험)
 EXPLORATION_FINAL_EPS = 0.1
 
 # 경로 설정 (프로젝트 루트 기준) - Phase 1.5
@@ -60,7 +63,7 @@ def train_agent():
         env,
         learning_rate=LEARNING_RATE,
         buffer_size=BUFFER_SIZE,
-        learning_starts=100, # 학습 시작 시점 앞당기기
+        learning_starts=500, # [MOD] 충분한 탐험 후 학습 시작 (11개 쿼리 * ~4.5 에피소드)
         batch_size=BATCH_SIZE,
         gamma=GAMMA,
         exploration_fraction=EXPLORATION_FRACTION,

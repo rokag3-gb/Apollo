@@ -8,7 +8,7 @@ from gymnasium import spaces
 
 from RLQO.features.phase2_features import extract_features, XGB_EXPECTED_FEATURES
 from RLQO.env.phase1_reward import calculate_reward
-from db import connect, execute_query
+from db import connect, get_execution_plan, get_query_statistics
 from config import AppConfig, load_config
 
 # --- Helper Functions ---
@@ -20,18 +20,31 @@ def parse_statistics(stats_io: str, stats_time: str) -> dict:
     logical_reads = sum(map(int, re.findall(r'logical reads (\d+)', stats_io)))
     metrics['logical_reads'] = logical_reads
     
-    # TIME 파싱 (예: SQL Server Execution Times: CPU time = 0 ms,  elapsed time = 0 ms.)
-    # [MOD] ms와 s 단위를 모두 처리하도록 수정
-    cpu_time_ms = 0
-    elapsed_time_ms = 0
+    # TIME 파싱 (예: SQL Server Execution Times: CPU time = 0.123 ms,  elapsed time = 1.456 ms.)
+    # [MOD] "SQL Server Execution Times:" 블록을 명시적으로 찾아 파싱하여
+    # "parse and compile time"과의 혼동을 방지합니다.
+    cpu_time_ms = 0.0
+    elapsed_time_ms = 0.0
 
-    cpu_match = re.search(r'CPU time = (\d+) ms', stats_time)
+    # 'Execution Times' 블록을 먼저 찾습니다.
+    execution_times_block = stats_time
+    execution_times_match = re.search(r'SQL Server Execution Times:(.*)', stats_time, re.DOTALL)
+    if execution_times_match:
+        execution_times_block = execution_times_match.group(1)
+
+
+    cpu_match = re.search(r'CPU time = (\d+\.?\d*)\s*(ms|s)', execution_times_block)
     if cpu_match:
-        cpu_time_ms = int(cpu_match.group(1))
+        value = float(cpu_match.group(1))
+        unit = cpu_match.group(2)
+        if unit == 's':
+            cpu_time_ms = value * 1000
+        else:
+            cpu_time_ms = value
 
-    elapsed_match = re.search(r'elapsed time = (\d+) (ms|s)', stats_time)
+    elapsed_match = re.search(r'elapsed time = (\d+\.?\d*)\s*(ms|s)', execution_times_block)
     if elapsed_match:
-        value = int(elapsed_match.group(1))
+        value = float(elapsed_match.group(1))
         unit = elapsed_match.group(2)
         if unit == 's':
             elapsed_time_ms = value * 1000
@@ -39,7 +52,7 @@ def parse_statistics(stats_io: str, stats_time: str) -> dict:
             elapsed_time_ms = value
             
     metrics['cpu_time_ms'] = cpu_time_ms
-    metrics['elapsed_time_ms'] = elapsed_time_ms
+    metrics['elapsed_time_ms'] = round(elapsed_time_ms, 4) # 소수점 4자리까지 반올림
     return metrics
 
 def apply_action_to_sql(sql: str, action: dict) -> str:
@@ -105,9 +118,16 @@ class QueryPlanDBEnv(gym.Env):
 
     def _get_obs_from_db(self, sql: str) -> tuple[np.ndarray, dict]:
         """SQL을 실행하고 DB에서 관측값(State)과 통계(Metrics)를 가져옵니다."""
-        plan_xml, stats_io, stats_time = execute_query(self.db_connection, sql)
+        # [MOD] 실행 계획과 통계 수집을 분리된 함수로 호출
+        plan_xml = get_execution_plan(self.db_connection, sql)
+        stats_io, stats_time = get_query_statistics(self.db_connection, sql)
+        
         if not plan_xml: # 쿼리 실행 실패 시
-            return None, {}
+            print(f"Warning: Failed to get execution plan for SQL: {sql[:150]}...")
+            # plan_xml이 없으면 다음 단계에서 에러가 나므로, 여기서 중단.
+            # 하지만 통계는 유효할 수 있으므로, 통계만이라도 반환 (reward 계산 등에 사용될 수 있음)
+            metrics = parse_statistics(stats_io, stats_time)
+            return None, metrics
         
         metrics = parse_statistics(stats_io, stats_time)
         
@@ -127,7 +147,14 @@ class QueryPlanDBEnv(gym.Env):
         self.current_step = 0
         
         # 베이스라인 (힌트 없는) 상태/비용 측정
+        print(f"\n----- New Episode: Optimizing Query {self.current_query_ix}/{len(self.query_list)} -----")
+        print(f"Original SQL: {self.current_sql[:150]}...")
         obs, metrics = self._get_obs_from_db(self.current_sql)
+
+        # 베이스라인 쿼리 실행 시간 로깅
+        elapsed_time = metrics.get('elapsed_time_ms', 'N/A')
+        print(f"  - Baseline Execution Time: {elapsed_time} ms")
+        
         if obs is None: # 쿼리 실행 실패 시, 다시 리셋
             # return self.reset(seed=seed) # BUG: This causes infinite recursion
             raise RuntimeError(

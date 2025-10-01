@@ -20,8 +20,8 @@ sys.path.append(apollo_ml_dir)
 
 
 from RLQO.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql
-from db import execute_query, connect
-from config import AppConfig
+from db import connect
+from config import load_config
 from RLQO.constants import SAMPLE_QUERIES # [NEW]
 
 # --- 설정 ---

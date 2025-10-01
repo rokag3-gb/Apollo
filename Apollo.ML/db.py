@@ -1,27 +1,6 @@
 import pyodbc, pandas as pd
 from config import DBConfig
-
-# [NEW] 메시지 핸들러를 통해 통계 정보를 저장할 전역 변수
-_STATS_IO = []
-_STATS_TIME = []
-
-def _message_handler(conn):
-    """
-    pyodbc 연결에 대한 메시지 핸들러.
-    SET STATISTICS 출력을 캡처하여 전역 변수에 저장합니다.
-    """
-    def on_message(msg_type, message):
-        global _STATS_IO, _STATS_TIME
-        message_str = message.decode('utf-8', errors='ignore')
-        
-        for line in message_str.splitlines():
-            line = line.strip()
-            if line.startswith("Table"):
-                _STATS_IO.append(line)
-            elif line.startswith("SQL Server Execution Times"):
-                _STATS_TIME.append(line)
-    
-    conn.add_output_converter(-1, on_message)
+import subprocess
 
 def connect(cfg: DBConfig) -> pyodbc.Connection:
     conn_str = (
@@ -29,57 +8,93 @@ def connect(cfg: DBConfig) -> pyodbc.Connection:
         f"UID={cfg.username};PWD={cfg.password};Encrypt=yes;TrustServerCertificate=yes;"
     )
     conn = pyodbc.connect(conn_str)
-    # [NEW] 메시지 핸들러 등록
-    _message_handler(conn)
     return conn
 
 def fetch_collected_plans(conn: pyodbc.Connection) -> pd.DataFrame:
     sql = "SELECT query_id, plan_id, plan_xml, count_exec, est_total_subtree_cost, avg_ms, last_cpu_ms, last_reads, max_used_mem_kb, max_dop, last_exec_time, last_ms FROM dbo.collected_plans"
     return pd.read_sql(sql, conn)
 
-def execute_query(conn: pyodbc.Connection, sql: str) -> tuple[str, str, str]:
-    """
-    주어진 SQL 쿼리를 실행하고 실행 계획과 통계 정보를 반환합니다.
-    """
-    global _STATS_IO, _STATS_TIME
-    _STATS_IO.clear()
-    _STATS_TIME.clear()
-    
+def get_execution_plan(conn: pyodbc.Connection, sql: str) -> str:
+    """SET SHOWPLAN_XML을 사용하여 쿼리의 실행 계획(XML)만 반환합니다."""
     cursor = conn.cursor()
     plan_xml = None
-    
-    sql_batch = f"""
-    SET STATISTICS IO ON;
-    SET STATISTICS TIME ON;
-    SET STATISTICS XML ON;
-    {sql}
-    SET STATISTICS XML OFF;
-    SET STATISTICS IO OFF;
-    SET STATISTICS TIME OFF;
-    """
-
     try:
-        cursor.execute(sql_batch)
-        while True:
-            try:
-                row = cursor.fetchone()
-                if row and row[0] and isinstance(row[0], str) and row[0].strip().startswith('<'):
-                    plan_xml = row[0]
-            except pyodbc.ProgrammingError:
-                pass
-            if not cursor.nextset():
-                break
+        # SHOWPLAN은 배치 내에서 단독으로 실행되어야 합니다.
+        cursor.execute("SET NOCOUNT ON;")
+        cursor.execute("SET SHOWPLAN_XML ON;")
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        if row and row[0] and isinstance(row[0], str):
+            plan_xml = row[0]
+        cursor.execute("SET SHOWPLAN_XML OFF;")
+        cursor.execute("SET NOCOUNT OFF;")
     except pyodbc.Error as e:
-        print(f"Error executing query: {e}")
+        print(f"Error getting execution plan: {e}")
         conn.rollback()
     finally:
         cursor.close()
+    return plan_xml
 
-    stats_io_str = "\\n".join(_STATS_IO)
-    stats_time_str = "\\n".join(_STATS_TIME)
+def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
+    """[MOD] sqlcmd를 사용하여 쿼리를 실행하고 통계 정보를 캡처합니다."""
     
-    if not isinstance(plan_xml, str):
-        print(f"Warning: Invalid execution plan received (type: {type(plan_xml)}). Treating as no plan found.")
-        plan_xml = None
+    # pyodbc 연결 정보에서 설정 값을 가져옵니다.
+    # conn.getinfo()는 pyodbc의 숨겨진 기능일 수 있으므로, 더 명시적인 방법이 필요할 수 있습니다.
+    # 여기서는 config를 다시 로드하는 대신, 연결 문자열에서 파싱하는 방식을 가정합니다.
+    # 하지만 가장 간단한 방법은 connect 함수가 사용한 config 객체를 어딘가에 저장해두는 것입니다.
+    # 이 테스트에서는 config 값을 하드코딩하거나, 다시 로드하는 방식을 사용해야 합니다.
+    # 임시방편으로 config를 다시 로드하겠습니다.
+    from config import load_config
+    config = load_config('Apollo.ML/config.yaml').db
 
-    return plan_xml, stats_io_str, stats_time_str
+    # sqlcmd 명령어 구성
+    # 중요: 실제 환경에서는 비밀번호를 명령어에 직접 노출하지 않도록 주의해야 합니다.
+    command = [
+        'sqlcmd',
+        '-S', config.server,
+        '-d', config.database,
+        '-U', config.username,
+        '-P', config.password,
+        '-Q', f"SET STATISTICS IO ON; SET STATISTICS TIME ON; {sql}",
+        '-s', '|', # 구분자 변경 (옵션)
+        '-W' # 너비 제한 제거
+    ]
+
+    stats_io_list = []
+    stats_time_list = []
+    
+    try:
+        # [MOD] 한국어 Windows 환경을 고려하여 encoding을 'cp949'로 지정하고, 오류 발생 시에도 None이 아닌 stderr를 반환하도록 수정
+        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore')
+
+        if result.returncode != 0:
+            print(f"sqlcmd execution failed with return code {result.returncode}:")
+            print(f"Stderr: {result.stderr}")
+            return "", ""
+
+        output = result.stdout
+        output_lines = output.splitlines()
+
+        for i, line in enumerate(output_lines):
+            line = line.strip()
+            if "Table '" in line:
+                stats_io_list.append(line)
+            elif "SQL Server Execution Times:" in line:
+                # 'Execution Times:' 라인과 그 다음 라인(시간 정보)을 함께 추가
+                if i + 1 < len(output_lines):
+                    full_time_info = line + " " + output_lines[i+1].strip()
+                    stats_time_list.append(full_time_info)
+                
+    except subprocess.CalledProcessError as e:
+        print(f"sqlcmd execution failed: {e}")
+        print(f"Stderr: {e.stderr}")
+        return "", ""
+    except FileNotFoundError:
+        print("Error: 'sqlcmd' is not in your PATH. Please install SQL Server Command Line Utilities.")
+        return "", ""
+        
+    stats_io_str = "\n".join(stats_io_list)
+    # 마지막 Execution Times 블록만 사용
+    stats_time_str = "\n".join(stats_time_list)
+
+    return stats_io_str, stats_time_str
