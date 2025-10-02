@@ -14,10 +14,10 @@ from RLQO.constants import SAMPLE_QUERIES # [MOD] constants에서 쿼리 목록 
 
 # --- 설정 ---
 # 학습 파라미터
-# [MOD] 본격 학습: 10,000 타임스텝으로 충분한 경험 제공
+# [MOD] 본격 학습: 5,000 타임스텝으로 충분하진 않지만 적절한 경험 제공
 # - 11개 쿼리 * ~90 에피소드/쿼리 * 10 스텝/에피소드
 # - 예상 소요 시간: ~10시간
-TOTAL_TIMESTEPS = 10_000
+TOTAL_TIMESTEPS = 5_000
 LEARNING_RATE = 1e-4
 BUFFER_SIZE = 10_000 # 타임스텝 증가에 맞춰 버퍼 증가
 BATCH_SIZE = 64
