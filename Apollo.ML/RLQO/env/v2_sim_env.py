@@ -131,10 +131,47 @@ def map_action_to_features(action: dict, current_features: np.ndarray) -> dict:
             else:
                 action_features['estimated_cost_multiplier'] = 1.20  # 대용량에는 비효율
         
+        elif "MERGE JOIN" in action_value:
+            # Merge Join은 정렬된/인덱싱된 데이터에 유리
+            action_features['estimated_cost_multiplier'] = 0.95
+        
         # 조인 순서 강제
         elif "FORCE ORDER" in action_value:
             # 최적화기의 선택을 무시하므로 위험할 수 있음
             action_features['estimated_cost_multiplier'] = 1.15
+        
+        # 파라미터 스니핑 관련
+        elif "OPTIMIZE FOR UNKNOWN" in action_value:
+            # 평균 통계 기반, 안정적
+            action_features['estimated_cost_multiplier'] = 1.0
+        
+        elif "DISABLE_PARAMETER_SNIFFING" in action_value:
+            # 파라미터 스니핑 비활성화
+            action_features['estimated_cost_multiplier'] = 1.05
+        
+        # 호환성 레벨 변경
+        elif "COMPATIBILITY_LEVEL_140" in action_value:
+            # SQL 2017 최적화기 (안정적)
+            action_features['estimated_cost_multiplier'] = 1.0
+        
+        elif "COMPATIBILITY_LEVEL_150" in action_value:
+            # SQL 2019 최적화기 (균형)
+            action_features['estimated_cost_multiplier'] = 0.98
+        
+        elif "COMPATIBILITY_LEVEL_160" in action_value:
+            # SQL 2022 최적화기 (최신, 다소 불안정 가능)
+            action_features['estimated_cost_multiplier'] = 0.95
+        
+        # RECOMPILE
+        elif "RECOMPILE" in action_value:
+            # 매번 재컴파일, 통계 변화가 심한 경우 유용
+            action_features['estimated_cost_multiplier'] = 1.1
+        
+        # FAST n (TOP 쿼리 최적화)
+        elif "FAST" in action_value:
+            # TOP이 있는 쿼리에 매우 유용
+            # 첫 n개 행을 빠르게 반환하도록 최적화
+            action_features['estimated_cost_multiplier'] = 0.8  # 약 20% 개선
     
     elif action_type == "TABLE_HINT":
         # NOLOCK 힌트
@@ -189,10 +226,12 @@ class QueryPlanSimEnv(gym.Env):
                 print(f"[SimEnv] 휴리스틱 모드로 폴백합니다.")
             self.plan_cache = None
         
-        # 3. 액션 스페이스 로드
-        action_space_path = 'Apollo.ML/artifacts/RLQO/configs/phase2_action_space.json'
+        # 3. 액션 스페이스 로드 (v2: 15개 액션)
+        action_space_path = 'Apollo.ML/artifacts/RLQO/configs/v2_action_space.json'
         with open(action_space_path, 'r', encoding='utf-8') as f:
             self.actions = json.load(f)
+        if verbose:
+            print(f"[SimEnv] 액션 스페이스 로드 완료: {len(self.actions)}개 액션")
         
         # 3. 쿼리 목록 및 에피소드 변수
         self.query_list = query_list
@@ -286,6 +325,12 @@ class QueryPlanSimEnv(gym.Env):
                 cached = self.plan_cache[cache_key]
                 self.current_obs = cached['features']
                 self.baseline_metrics = cached['metrics'].copy()
+                
+                # 0으로 나누기 방지 (최소값 보장)
+                self.baseline_metrics['elapsed_time_ms'] = max(0.1, self.baseline_metrics.get('elapsed_time_ms', 0.1))
+                self.baseline_metrics['logical_reads'] = max(1, self.baseline_metrics.get('logical_reads', 1))
+                self.baseline_metrics['cpu_time_ms'] = max(0.1, self.baseline_metrics.get('cpu_time_ms', 0.1))
+                
                 self.current_metrics = self.baseline_metrics.copy()
                 
                 if self.verbose:
@@ -298,14 +343,17 @@ class QueryPlanSimEnv(gym.Env):
         self.current_obs = self._generate_baseline_features(self.current_sql)
         predicted_time = self.xgb_model.predict([self.current_obs])[0]
         
+        # 예측값이 0이 되는 것을 방지 (최소 0.1ms)
+        predicted_time = max(0.1, predicted_time)
+        
         if self.add_noise:
             noise = np.random.normal(0, predicted_time * self.noise_std)
             predicted_time = max(0.1, predicted_time + noise)
         
         self.baseline_metrics = {
-            'elapsed_time_ms': float(predicted_time),
-            'logical_reads': int(predicted_time * 100),
-            'cpu_time_ms': predicted_time * 0.7
+            'elapsed_time_ms': float(max(0.1, predicted_time)),
+            'logical_reads': max(1, int(predicted_time * 100)),
+            'cpu_time_ms': max(0.1, predicted_time * 0.7)
         }
         
         self.current_metrics = self.baseline_metrics.copy()
@@ -379,13 +427,15 @@ class QueryPlanSimEnv(gym.Env):
                 next_obs[5] = action_features['scan_type_index']
                 next_obs[6] = action_features.get('scan_type_table', 0)
         
-        # 4. 보상 계산 (v2 보상 함수 사용)
+        # 4. 보상 계산 (v2.1 보상 함수 사용 - 안전성 점수 포함)
+        safety_score = action.get('safety_score', 1.0)
         reward = calculate_reward_v2(
             self.current_metrics, 
             predicted_metrics,
             self.baseline_metrics,
             step_num=self.current_step,
-            max_steps=self.max_steps
+            max_steps=self.max_steps,
+            action_safety_score=safety_score
         )
         
         # 5. 상태 업데이트

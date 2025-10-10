@@ -21,7 +21,7 @@ from stable_baselines3.common.monitor import Monitor
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
 from RLQO.env.v2_sim_env import QueryPlanSimEnv
-from RLQO.env.phase2_db_env import QueryPlanDBEnv
+from RLQO.env.v2_db_env import QueryPlanDBEnvV2
 from RLQO.constants import SAMPLE_QUERIES
 
 # ============================================================================
@@ -37,7 +37,7 @@ SIM_EXPLORATION_FINAL_EPS = 0.05
 # ============================================================================
 # Phase B: 실제 DB Fine-tuning 설정
 # ============================================================================
-REAL_TIMESTEPS = 1_000  # 실제 DB 학습량 (느림: 예상 1-2시간)
+REAL_TIMESTEPS = 10_000  # 실제 DB 학습량 (느림: 예상 12-14시간)
 REAL_LEARNING_RATE = 5e-5  # 낮은 학습률로 미세 조정
 REAL_BUFFER_SIZE = 20_000
 REAL_BATCH_SIZE = 64
@@ -181,15 +181,17 @@ def train_phase_b_finetuning():
         print("  먼저 Phase A를 완료하세요.")
         return None
     
-    # 2. 실제 DB 환경 생성
+    # 2. 실제 DB 환경 생성 (v2: 확장된 액션 공간, 안전성 점수)
     print("\n[2/5] 실제 DB 환경 생성 중...")
     try:
-        env = QueryPlanDBEnv(
+        env = QueryPlanDBEnvV2(
             query_list=SAMPLE_QUERIES,
-            max_steps=10
+            max_steps=10,
+            curriculum_mode=True,  # Curriculum Learning 활성화 (쉬운 쿼리부터 학습)
+            verbose=True
         )
         env = Monitor(env, REAL_LOG_DIR)
-        print("[OK] 환경 생성 완료")
+        print("[OK] 환경 생성 완료 (v2.1: 15개 액션)")
     except Exception as e:
         print(f"[ERROR] 환경 생성 실패: {e}")
         print("  DB 연결을 확인하세요.")

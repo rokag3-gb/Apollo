@@ -5,7 +5,7 @@ RLQO 모듈에서 공유하는 상수들을 정의합니다.
 
 # 평가와 학습에 공통으로 사용할 샘플 쿼리 목록
 SAMPLE_QUERIES = [
-    # Q1: 계좌별 일별 거래 통계 (5-way JOIN + GROUP BY + 집계)
+    # [인덱스 0] 계좌별 일별 거래 통계 (5-way JOIN + GROUP BY + 집계) - 약 20-30ms
     """
     SELECT 
         a.account_id, 
@@ -27,7 +27,7 @@ SAMPLE_QUERIES = [
     ORDER BY trade_date DESC, total_trade_value DESC;
     """,
     
-    # Q2: 거래소별 종목별 평균 체결가격과 거래량 (윈도우 함수 + 서브쿼리)
+    # [인덱스 1] 거래소별 종목별 평균 체결가격과 거래량 (윈도우 함수 + 서브쿼리) - 약 7-10ms
     """
     WITH ExecutionStats AS (
         SELECT 
@@ -59,48 +59,22 @@ SAMPLE_QUERIES = [
     ORDER BY total_volume DESC;
     """,
     
-    # Q3: 리스크 노출 분석 - 계좌별 최대/최소/평균 포지션 (복잡한 집계 + 서브쿼리)
-    # """
-    # SELECT 
-    #     r.account_id,
-    #     a.base_currency,
-    #     c.name AS customer_name,
-    #     COUNT(r.snapshot_id) AS snapshot_count,
-    #     MAX(r.gross) AS max_gross_exposure,
-    #     MIN(r.gross) AS min_gross_exposure,
-    #     AVG(r.gross) AS avg_gross_exposure,
-    #     MAX(r.net) AS max_net_exposure,
-    #     AVG(r.var_1d) AS avg_var,
-    #     MAX(r.margin_required) AS max_margin_required,
-    #     (SELECT COUNT(*) FROM dbo.risk_breach_log b WHERE b.account_id = r.account_id) AS breach_count
-    # FROM dbo.risk_exposure_snapshot r
-    # JOIN dbo.cust_account a ON r.account_id = a.account_id
-    # JOIN dbo.cust_customer c ON a.customer_id = c.customer_id
-    # WHERE r.ts >= DATEADD(DAY, -7, GETDATE())
-    # GROUP BY r.account_id, a.base_currency, c.name
-    # HAVING AVG(r.gross) > 10000
-    # ORDER BY avg_gross_exposure DESC;
-    # """,
-
-    # Q3
+    # [인덱스 2] 대용량 테이블 전체 스캔 (매우 느림!) - 약 1,000-2,000ms ⚠️
     "SELECT execution_id FROM dbo.exe_execution e;",
     
-    # Q4
-    "SELECT AccountID=o.account_id, SecID=o.security_id, Side=o.side, Qty=e.exec_qty, Price=e.exec_price, Fee=e.fee, Tax=e.tax FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id;",
+    # [인덱스 3] 2-way JOIN (대용량, 매우 느림!) - 약 5,000-7,000ms ⚠️⚠️
+    "SELECT Top 100 AccountID=o.account_id, SecID=o.security_id, Side=o.side, Qty=e.exec_qty, Price=e.exec_price, Fee=e.fee, Tax=e.tax FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id order by Qty desc;",
     
-    # Q5
-    #"SELECT TOP 3000 * FROM dbo.risk_exposure_snapshot /*WHERE CAST(ts AS DATE) = cast(getdate() as date)*/;",
+    # [인덱스 4] 3-way JOIN + ORDER BY (극도로 느림!) - 약 10,000-14,000ms ⚠️⚠️⚠️ ← 가장 느린 쿼리!
+    "SELECT Top 200 e.execution_id, o.account_id, s.symbol, o.side, e.exec_qty, e.exec_price, e.exec_time FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id JOIN dbo.ref_security s ON o.security_id=s.security_id ORDER BY e.exec_time DESC;",
     
-    # Q6
-    "SELECT e.execution_id, o.account_id, s.symbol, o.side, e.exec_qty, e.exec_price, e.exec_time FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id JOIN dbo.ref_security s ON o.security_id=s.security_id ORDER BY e.exec_time DESC;",
-    
-    # Q7
+    # [인덱스 5] NOT EXISTS (서브쿼리) - 약 600ms
     "SELECT e.* FROM dbo.exe_execution e WHERE NOT EXISTS (SELECT 1 FROM dbo.ord_order o WHERE o.order_id = e.order_id);",
     
-    # Q8
+    # [인덱스 6] RAND() 함수 (빠름) - 약 30-40ms
     "SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_account WHERE closed_at IS NULL;",
     
-    # Q9: 주문 체결률과 평균 슬리피지 분석 (복잡한 LEFT JOIN + CASE + 집계)
+    # [인덱스 7] 주문 체결률과 평균 슬리피지 분석 (복잡한 LEFT JOIN + CASE + 집계) - 약 25-30ms
     """
     SELECT 
         o.account_id,
@@ -125,7 +99,7 @@ SAMPLE_QUERIES = [
     ORDER BY total_orders DESC;
     """,
     
-    # Q10: 포지션 수익률 분석 - LAG 함수를 이용한 일별 변화율
+    # [인덱스 8] 포지션 수익률 분석 (LAG 함수, 데이터 없으면 0ms) - 약 0ms (데이터 없음)
     """
     WITH DailyPnL AS (
         SELECT 
@@ -162,7 +136,7 @@ SAMPLE_QUERIES = [
     ORDER BY d.account_id, d.as_of_date DESC;
     """,
     
-    # Q11: 복합 거래 패턴 분석 - 여러 서브쿼리와 UNION
+    # [인덱스 9] 복합 거래 패턴 분석 (UNION ALL, 빠름) - 약 25-30ms
     """
     SELECT 
         'HIGH_FREQUENCY' AS trader_type,
@@ -190,3 +164,22 @@ SAMPLE_QUERIES = [
     ORDER BY order_count DESC;
     """
 ]
+
+# ==============================================================================
+# 주석 없이 깔끔하게 정리 (위의 주석 기반 요약):
+# ==============================================================================
+# 
+# 인덱스 | 쿼리 설명                        | 예상 실행 시간    | 난이도
+# -------|----------------------------------|-------------------|--------
+#   0    | 계좌별 일별 거래 통계 (5-way JOIN)  | 20-30ms          | 중
+#   1    | 거래소별 평균 체결가격 (윈도우)      | 7-10ms           | 중
+#   2    | 대용량 테이블 전체 스캔             | 1,000-2,000ms    | 높음 ⚠️
+#   3    | 2-way JOIN (대용량)               | 5,000-7,000ms    | 매우 높음 ⚠️⚠️
+#   4    | 3-way JOIN + ORDER BY (최악!)     | 10,000-14,000ms  | 극도로 높음 ⚠️⚠️⚠️
+#   5    | NOT EXISTS (서브쿼리)              | 600ms            | 중
+#   6    | RAND() 함수                       | 30-40ms          | 낮음
+#   7    | 주문 체결률 분석 (복잡 LEFT JOIN)   | 25-30ms          | 중
+#   8    | 포지션 수익률 (LAG, 데이터 없음)    | 0ms              | N/A
+#   9    | 복합 패턴 분석 (UNION ALL)         | 25-30ms          | 중
+# 
+# ==============================================================================

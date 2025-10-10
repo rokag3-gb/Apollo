@@ -14,10 +14,11 @@ def calculate_reward_v2(
     baseline_metrics: dict,
     step_num: int = 0,
     max_steps: int = 10,
-    weights: dict = None
+    weights: dict = None,
+    action_safety_score: float = 1.0
 ) -> float:
     """
-    v2 보상 함수: 다차원 메트릭과 비선형 보상을 지원합니다.
+    v2.1 보상 함수: 다차원 메트릭, 비선형 보상, 안전성 및 분산 페널티 지원
     
     Args:
         metrics_before: 이전 스텝의 메트릭
@@ -26,6 +27,7 @@ def calculate_reward_v2(
         step_num: 현재 스텝 번호 (페널티 조정용)
         max_steps: 최대 스텝 수
         weights: 각 메트릭의 가중치
+        action_safety_score: 액션의 안전성 점수 (0.0~1.0, 높을수록 안전)
     
     Returns:
         계산된 보상 값
@@ -114,11 +116,40 @@ def calculate_reward_v2(
     elif baseline_improvement < -0.2:
         penalty = -0.5 * abs(baseline_improvement)
     
-    # === 7. 최종 보상 계산 ===
-    total_reward = base_reward + bonus + penalty
+    # 극심한 악화에 대한 추가 페널티
+    if baseline_improvement < -1.0:  # 100% 이상 악화 (2배 느려짐)
+        penalty -= 5.0
+    if baseline_improvement < -2.0:  # 200% 이상 악화 (3배 느려짐)
+        penalty -= 7.0
+    if baseline_improvement < -3.0:  # 300% 이상 악화 (4배 느려짐)
+        penalty -= 8.0
     
-    # 보상 범위 제한: [-5, 5]
-    total_reward = max(-5.0, min(total_reward, 5.0))
+    # === 7. 안전성 페널티 (위험한 액션에 대한 페널티) ===
+    # safety_score가 낮을수록 (위험할수록) 페널티 증가
+    safety_penalty = (1.0 - action_safety_score) * 1.5
+    penalty -= safety_penalty
+    
+    # === 8. 분산 페널티 (성능 불안정성) ===
+    variance_penalty = 0.0
+    if time_before > 0:
+        # 이전 스텝 대비 급격한 변화 (10배 이상 차이)
+        variance_ratio = abs(time_after - time_before) / (time_before + 1e-6)
+        if variance_ratio > 10.0:
+            variance_penalty = -1.0
+        elif variance_ratio > 5.0:
+            variance_penalty = -0.5
+    
+    # === 9. 점진적 개선 보너스 ===
+    progress_bonus = 0.0
+    if time_improvement > 0 and baseline_improvement > 0:
+        # 이전 스텝보다 더 개선되었으면 보너스
+        progress_bonus = 0.3
+    
+    # === 10. 최종 보상 계산 ===
+    total_reward = base_reward + bonus + penalty + variance_penalty + progress_bonus
+    
+    # 보상 범위 제한: [-10, +10]로 확대 (더 명확한 신호)
+    total_reward = max(-10.0, min(total_reward, 10.0))
     
     return total_reward
 

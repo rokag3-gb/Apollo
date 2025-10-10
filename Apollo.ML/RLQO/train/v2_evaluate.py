@@ -21,52 +21,122 @@ from stable_baselines3 import DQN
 
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
-from RLQO.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql
+from RLQO.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql as apply_action_v1
+from RLQO.env.v2_db_env import QueryPlanDBEnvV2, apply_action_to_sql as apply_action_v2
 from RLQO.constants import SAMPLE_QUERIES
 
 
-def evaluate_model_on_queries(model, env, queries, model_name="Model", num_runs=3):
+def measure_baselines(env, queries, num_runs=10, verbose=True):
+    """
+    각 쿼리의 안정적인 베이스라인을 측정합니다.
+    
+    Args:
+        env: 평가 환경
+        queries: 쿼리 목록
+        num_runs: 각 쿼리당 실행 횟수
+        verbose: 진행 상황 출력 여부
+    
+    Returns:
+        baselines: {query_idx: median_time_ms} 딕셔너리
+    """
+    if verbose:
+        print("\n" + "="*80)
+        print("Measuring Stable Baselines (10 runs per query)")
+        print("="*80)
+    
+    baselines = {}
+    
+    for q_idx, query in enumerate(queries):
+        times = []
+        
+        for run in range(num_runs):
+            try:
+                obs, info = env.reset(seed=q_idx * 1000 + run)
+                baseline_time = info['metrics'].get('elapsed_time_ms', -1)
+                if baseline_time > 0:
+                    times.append(baseline_time)
+            except Exception as e:
+                if verbose:
+                    print(f"  [WARN] Query {q_idx} Run {run+1}: {e}")
+        
+        if times:
+            baselines[q_idx] = float(np.median(times))
+            if verbose:
+                print(f"Query {q_idx}: {baselines[q_idx]:.2f} ms (median of {len(times)} runs, "
+                      f"range: {min(times):.2f}-{max(times):.2f} ms)")
+        else:
+            baselines[q_idx] = -1
+            if verbose:
+                print(f"Query {q_idx}: [ERROR] No valid baseline")
+    
+    if verbose:
+        print("="*80 + "\n")
+    
+    return baselines
+
+
+def evaluate_model_on_queries(model, env, queries, model_name="Model", num_runs=3, 
+                              apply_action_func=None, baselines=None):
     """
     모델을 쿼리 목록에 대해 평가합니다.
     
     Args:
         model: 평가할 DQN 모델
-        env: 평가 환경 (QueryPlanDBEnv)
+        env: 평가 환경 (QueryPlanDBEnv or QueryPlanDBEnvV2)
         queries: 평가할 쿼리 목록
         model_name: 모델 이름 (로깅용)
         num_runs: 각 쿼리당 실행 횟수 (일관성 평가)
+        apply_action_func: 액션을 SQL에 적용하는 함수 (None이면 자동 선택)
+        baselines: 사전 측정된 베이스라인 딕셔너리 (None이면 매번 측정)
     
     Returns:
         results_df: 평가 결과 DataFrame
         summary: 요약 통계
     """
+    # apply_action 함수 자동 선택
+    if apply_action_func is None:
+        if isinstance(env, QueryPlanDBEnvV2):
+            apply_action_func = apply_action_v2
+        else:
+            apply_action_func = apply_action_v1
     print(f"\n{'='*80}")
-    print(f"평가 중: {model_name}")
+    print(f"Evaluating: {model_name}")
     print(f"{'='*80}")
     
     results = []
     
     for q_idx, query in enumerate(queries):
-        print(f"\n[{q_idx+1}/{len(queries)}] 쿼리 평가 중...")
+        print(f"\n[Query {q_idx}] Evaluating...")
+        
+        # 사전 측정된 베이스라인 사용 (있으면)
+        if baselines and q_idx in baselines:
+            baseline_time = baselines[q_idx]
+            if baseline_time <= 0:
+                print(f"  [WARN] Baseline invalid: {baseline_time}")
+                continue
+            print(f"  Baseline: {baseline_time:.2f} ms (pre-measured)")
+        else:
+            # 베이스라인이 없으면 1회 측정
+            obs, info = env.reset(seed=q_idx * 100)
+            baseline_time = info['metrics'].get('elapsed_time_ms', -1)
+            if baseline_time <= 0:
+                print(f"  [WARN] Baseline execution failed")
+                continue
+            print(f"  Baseline: {baseline_time:.2f} ms (single run)")
         
         # 여러 번 실행하여 일관성 측정
         run_results = []
         
         for run in range(num_runs):
-            # 환경 리셋 (베이스라인 측정)
+            # 환경 리셋 (관찰만 얻기 위해)
             obs, info = env.reset(seed=q_idx * 100 + run)
-            baseline_time = info['metrics'].get('elapsed_time_ms', -1)
-            
-            if baseline_time <= 0:
-                print(f"  [WARN] 베이스라인 실행 실패 (Run {run+1})")
-                continue
             
             # 에이전트의 액션 예측
             action_id, _ = model.predict(obs, deterministic=True)
             action = env.actions[action_id]
             
             # 수정된 SQL 생성
-            modified_sql = apply_action_to_sql(query, action)
+            modified_sql = apply_action_func(query, action)
             
             # 수정된 쿼리 실행
             _, agent_metrics = env._get_obs_from_db(modified_sql)
@@ -171,34 +241,36 @@ def compare_models():
     print(f"평가 쿼리 수: {len(SAMPLE_QUERIES)}")
     print(f"각 쿼리당 실행 횟수: 3회 (일관성 측정)")
     
-    # 모델 경로 정의
+    # 모델 경로 정의 (v2 모델만 평가)
     models_to_evaluate = [
         {
-            'name': 'DQN v1',
-            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v1.zip'
-        },
-        {
-            'name': 'DQN v1.5',
-            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v1_5.zip'
-        },
-        {
             'name': 'DQN v2 (Sim)',
-            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v2_sim.zip'
+            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v2_sim.zip',
+            'use_v2_env': True
         },
         {
             'name': 'DQN v2 (Final)',
-            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v2_final.zip'
+            'path': 'Apollo.ML/artifacts/RLQO/models/dqn_v2_final.zip',
+            'use_v2_env': True
         }
     ]
     
-    # 환경 생성
-    print("\n환경 생성 중...")
+    # 베이스라인 사전 측정 (v2 환경 사용)
+    print("\n[Step 1] Measuring stable baselines...")
     try:
-        env = QueryPlanDBEnv(query_list=SAMPLE_QUERIES, max_steps=10)
-        print("[OK] 환경 생성 완료")
+        baseline_env = QueryPlanDBEnvV2(
+            query_list=SAMPLE_QUERIES,
+            max_steps=10,
+            curriculum_mode=False,
+            verbose=False
+        )
+        baselines = measure_baselines(baseline_env, SAMPLE_QUERIES, num_runs=10, verbose=True)
+        baseline_env.close()
+        print("[OK] Baseline measurement complete\n")
     except Exception as e:
-        print(f"[ERROR] 환경 생성 실패: {e}")
-        return
+        print(f"[ERROR] Baseline measurement failed: {e}")
+        print("  Falling back to per-run baseline measurement")
+        baselines = None
     
     # 각 모델 평가
     all_results = []
@@ -207,21 +279,40 @@ def compare_models():
     for model_info in models_to_evaluate:
         model_name = model_info['name']
         model_path = model_info['path']
+        use_v2_env = model_info.get('use_v2_env', False)
         
         if not os.path.exists(model_path):
             print(f"\n[WARN] {model_name} 모델을 찾을 수 없습니다: {model_path}")
             print("  이 모델은 건너뜁니다.")
             continue
         
+        # 환경 생성 (모델 버전에 맞는 환경)
+        print(f"\n{model_name} 환경 생성 중...")
+        try:
+            if use_v2_env:
+                env = QueryPlanDBEnvV2(
+                    query_list=SAMPLE_QUERIES,
+                    max_steps=10,
+                    curriculum_mode=False,
+                    verbose=False
+                )
+                print("[OK] V2 환경 생성 완료 (19 actions)")
+            else:
+                env = QueryPlanDBEnv(query_list=SAMPLE_QUERIES, max_steps=10)
+                print("[OK] V1 환경 생성 완료 (9 actions)")
+        except Exception as e:
+            print(f"[ERROR] 환경 생성 실패: {e}")
+            continue
+        
         try:
             # 모델 로드
-            print(f"\n{model_name} 로드 중...")
+            print(f"{model_name} 로드 중...")
             model = DQN.load(model_path, env=env)
             print(f"[OK] {model_name} 로드 완료")
             
-            # 평가 실행
+            # 평가 실행 (사전 측정된 베이스라인 사용)
             results_df, summary = evaluate_model_on_queries(
-                model, env, SAMPLE_QUERIES, model_name=model_name, num_runs=3
+                model, env, SAMPLE_QUERIES, model_name=model_name, num_runs=3, baselines=baselines
             )
             
             all_results.append(results_df)
@@ -229,9 +320,8 @@ def compare_models():
             
         except Exception as e:
             print(f"[ERROR] {model_name} 평가 중 오류: {e}")
-            continue
-    
-    env.close()
+        finally:
+            env.close()
     
     if not all_summaries:
         print("\n[ERROR] 평가할 수 있는 모델이 없습니다.")
@@ -288,34 +378,41 @@ def quick_test_v2():
     """
     v2 모델만 빠르게 테스트합니다.
     """
-    print("\n=== DQN v2 빠른 테스트 ===\n")
+    print("\n=== DQN v2 Quick Test ===\n")
     
     model_path = 'Apollo.ML/artifacts/RLQO/models/dqn_v2_final.zip'
     
     if not os.path.exists(model_path):
-        print(f"[ERROR] v2 모델을 찾을 수 없습니다: {model_path}")
-        print("  먼저 v2_train_dqn.py를 실행하여 모델을 학습하세요.")
+        print(f"[ERROR] v2 model not found: {model_path}")
+        print("  Please run v2_train_dqn.py first.")
         return
     
-    # 환경 생성
-    env = QueryPlanDBEnv(query_list=SAMPLE_QUERIES[:3], max_steps=10)  # 처음 3개만
+    # Create V2 environment (19 actions)
+    env = QueryPlanDBEnvV2(
+        query_list=SAMPLE_QUERIES[:3],
+        max_steps=10,
+        curriculum_mode=False,
+        verbose=False
+    )
+    print("[OK] V2 environment created (19 actions, first 3 queries)")
     
-    # 모델 로드
+    # Load model
     model = DQN.load(model_path, env=env)
+    print("[OK] Model loaded")
     
-    # 평가
+    # Evaluate
     results_df, summary = evaluate_model_on_queries(
         model, env, SAMPLE_QUERIES[:3], model_name="DQN v2", num_runs=1
     )
     
-    print("\n[결과] 결과:")
+    print("\n[RESULTS]:")
     print(results_df.to_string(index=False))
-    print("\n요약:")
+    print("\nSummary:")
     for key, value in summary.items():
         print(f"  {key}: {value}")
     
     env.close()
-    print("\n[SUCCESS] 테스트 완료!")
+    print("\n[SUCCESS] Test complete!")
 
 
 if __name__ == '__main__':
