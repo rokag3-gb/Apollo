@@ -3,6 +3,9 @@ use TradingDB;
 batch_t_collected_plans
 usp_augment_collected_plans
 
+select ((140000 * 7) + (70000 * 1)) * 0.8
+select ((72000 * 7) + (70000 * 1)) * 0.8
+
 --EXEC dbo.usp_augment_collected_plans @target_rows = 8200, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 12590, @batch_size = 30;
 --EXEC dbo.usp_augment_collected_plans @target_rows = 21456, @batch_size = 200;
