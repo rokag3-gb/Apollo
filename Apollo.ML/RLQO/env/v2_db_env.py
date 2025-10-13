@@ -77,7 +77,24 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
         # NOLOCK 등의 테이블 힌트
         # 실제 테이블 이름을 찾아서 WITH (NOLOCK) 추가
         # 간단한 구현: FROM 절의 첫 테이블에만 적용
-        pass  # 복잡하므로 생략
+        # pass
+        # NOLOCK 등의 테이블 힌트를 FROM 절 테이블에 추가
+        # 예: "FROM dbo.table_name" -> "FROM dbo.table_name WITH (NOLOCK)"
+        
+        # 정규표현식으로 FROM 절의 첫 번째 테이블 찾기
+        import re
+        
+        # 패턴: FROM 다음에 나오는 스키마.테이블명 또는 테이블명 (별칭 포함 가능)
+        # 예: "FROM dbo.exe_execution e" 또는 "FROM exe_execution"
+        pattern = r'(FROM\s+(?:\w+\.)?\w+)(\s+\w+)?'
+        
+        def add_table_hint(match):
+            table_part = match.group(1)  # "FROM dbo.exe_execution"
+            alias_part = match.group(2) or ""  # " e" 또는 ""
+            return f"{table_part} {action_value}{alias_part}"
+        
+        modified_sql = re.sub(pattern, add_table_hint, sql, count=1, flags=re.IGNORECASE)
+        return modified_sql
     
     return sql
 

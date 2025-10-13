@@ -137,32 +137,32 @@ SAMPLE_QUERIES = [
     """,
     
     # [인덱스 9] 복합 거래 패턴 분석 (UNION ALL, 빠름) - 약 25-30ms
-    """
-    SELECT 
-        'HIGH_FREQUENCY' AS trader_type,
-        o.account_id,
-        COUNT(o.order_id) AS order_count,
-        AVG(DATEDIFF(SECOND, o.create_time, o.update_time)) AS avg_order_duration_sec,
-        SUM(e.exec_qty * e.exec_price) AS total_value
-    FROM dbo.ord_order o
-    JOIN dbo.exe_execution e ON o.order_id = e.order_id
-    WHERE o.create_time >= DATEADD(HOUR, -4, GETDATE())
-    GROUP BY o.account_id
-    HAVING COUNT(o.order_id) > 50
-    UNION ALL
-    SELECT 
-        'LARGE_TRADE' AS trader_type,
-        o.account_id,
-        COUNT(o.order_id) AS order_count,
-        AVG(DATEDIFF(SECOND, o.create_time, o.update_time)) AS avg_order_duration_sec,
-        SUM(e.exec_qty * e.exec_price) AS total_value
-    FROM dbo.ord_order o
-    JOIN dbo.exe_execution e ON o.order_id = e.order_id
-    WHERE o.create_time >= DATEADD(HOUR, -4, GETDATE())
-    GROUP BY o.account_id
-    HAVING SUM(e.exec_qty * e.exec_price) > 100000
-    ORDER BY order_count DESC;
-    """
+    # """
+    # SELECT 
+    #     'HIGH_FREQUENCY' AS trader_type,
+    #     o.account_id,
+    #     COUNT(o.order_id) AS order_count,
+    #     AVG(DATEDIFF(SECOND, o.create_time, o.update_time)) AS avg_order_duration_sec,
+    #     SUM(e.exec_qty * e.exec_price) AS total_value
+    # FROM dbo.ord_order o
+    # JOIN dbo.exe_execution e ON o.order_id = e.order_id
+    # WHERE o.create_time >= DATEADD(HOUR, -4, GETDATE())
+    # GROUP BY o.account_id
+    # HAVING COUNT(o.order_id) > 50
+    # UNION ALL
+    # SELECT 
+    #     'LARGE_TRADE' AS trader_type,
+    #     o.account_id,
+    #     COUNT(o.order_id) AS order_count,
+    #     AVG(DATEDIFF(SECOND, o.create_time, o.update_time)) AS avg_order_duration_sec,
+    #     SUM(e.exec_qty * e.exec_price) AS total_value
+    # FROM dbo.ord_order o
+    # JOIN dbo.exe_execution e ON o.order_id = e.order_id
+    # WHERE o.create_time >= DATEADD(HOUR, -4, GETDATE())
+    # GROUP BY o.account_id
+    # HAVING SUM(e.exec_qty * e.exec_price) > 100000
+    # ORDER BY order_count DESC;
+    # """
 ]
 
 # ==============================================================================

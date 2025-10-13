@@ -65,7 +65,8 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
     
     try:
         # [MOD] 한국어 Windows 환경을 고려하여 encoding을 'cp949'로 지정하고, 오류 발생 시에도 None이 아닌 stderr를 반환하도록 수정
-        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore')
+        # 타임아웃 추가 (30초)
+        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore', timeout=30)
 
         if result.returncode != 0:
             print(f"sqlcmd execution failed with return code {result.returncode}:")
@@ -88,6 +89,9 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
     except subprocess.CalledProcessError as e:
         print(f"sqlcmd execution failed: {e}")
         print(f"Stderr: {e.stderr}")
+        return "", ""
+    except subprocess.TimeoutExpired:
+        print("sqlcmd execution timed out after 30 seconds")
         return "", ""
     except FileNotFoundError:
         print("Error: 'sqlcmd' is not in your PATH. Please install SQL Server Command Line Utilities.")
