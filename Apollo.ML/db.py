@@ -1,14 +1,28 @@
 import pyodbc, pandas as pd
 from config import DBConfig
 import subprocess
+import time
 
-def connect(cfg: DBConfig) -> pyodbc.Connection:
+def connect(cfg: DBConfig, max_retries: int = 3, retry_delay: int = 5) -> pyodbc.Connection:
+    """데이터베이스에 연결합니다. 재시도 로직 포함."""
     conn_str = (
         f"DRIVER={{{cfg.driver}}};SERVER={cfg.server};DATABASE={cfg.database};"
         f"UID={cfg.username};PWD={cfg.password};Encrypt=yes;TrustServerCertificate=yes;"
     )
-    conn = pyodbc.connect(conn_str)
-    return conn
+    
+    for attempt in range(max_retries):
+        try:
+            conn = pyodbc.connect(conn_str)
+            print(f"[DB] 연결 성공 (시도 {attempt + 1}/{max_retries})")
+            return conn
+        except pyodbc.Error as e:
+            print(f"[DB] 연결 실패 (시도 {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                print(f"[DB] {retry_delay}초 후 재시도...")
+                time.sleep(retry_delay)
+            else:
+                print(f"[DB] 최대 재시도 횟수 초과. 연결 실패.")
+                raise e
 
 def fetch_collected_plans(conn: pyodbc.Connection) -> pd.DataFrame:
     sql = "SELECT query_id, plan_id, plan_xml, count_exec, est_total_subtree_cost, avg_ms, last_cpu_ms, last_reads, max_used_mem_kb, max_dop, last_exec_time, last_ms FROM dbo.collected_plans"

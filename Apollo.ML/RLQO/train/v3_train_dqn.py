@@ -302,7 +302,7 @@ def train_phase_realdb_finetuning(pretrained_model=None):
     print("\n[3/4] 콜백 설정 중...")
     try:
         checkpoint_callback = CheckpointCallback(
-            save_freq=2_000,
+            save_freq=500,  # 더 자주 저장하여 안정성 향상
             save_path=REAL_CHECKPOINT_DIR,
             name_prefix="dqn_v3_real"
         )
@@ -311,7 +311,7 @@ def train_phase_realdb_finetuning(pretrained_model=None):
             env,
             best_model_save_path=REAL_CHECKPOINT_DIR,
             log_path=REAL_LOG_DIR,
-            eval_freq=1_000,
+            eval_freq=500,  # 더 자주 평가하여 안정성 향상
             deterministic=True,
             render=False
         )

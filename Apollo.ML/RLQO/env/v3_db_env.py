@@ -10,6 +10,7 @@ DQN v3: 개선된 실제 DB 환경
 import json
 import os
 import re
+import time
 import gymnasium as gym
 import joblib
 import numpy as np
@@ -85,7 +86,7 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
     
     elif action_type == "TABLE_HINT":
         # NOLOCK 등의 테이블 힌트를 FROM 절 테이블에 추가
-        # 예: "FROM dbo.table_name" -> "FROM dbo.table_name WITH (NOLOCK)"
+        # 예: "FROM dbo.table_name" -> "FROM dbo.table_name (NOLOCK)"
         
         # 정규표현식으로 FROM 절의 첫 번째 테이블 찾기
         pattern = r'(FROM\s+(?:\w+\.)?\w+)(\s+\w+)?'
@@ -93,7 +94,7 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
         def add_table_hint(match):
             table_part = match.group(1)  # "FROM dbo.exe_execution"
             alias_part = match.group(2) or ""  # " e" 또는 ""
-            return f"{table_part} WITH ({action_value}){alias_part}"
+            return f"{table_part} ({action_value}){alias_part}"
         
         modified_sql = re.sub(pattern, add_table_hint, sql, count=1, flags=re.IGNORECASE)
         return modified_sql
@@ -121,7 +122,7 @@ class QueryPlanDBEnvV3(gym.Env):
         
         # 1. DB 연결 및 모델/설정 로드
         self.config = load_config('Apollo.ML/config.yaml')
-        self.db_connection = connect(self.config.db)
+        self.db_connection = connect(self.config.db, max_retries=3, retry_delay=5)
         self.xgb_model = joblib.load('Apollo.ML/artifacts/model.joblib')
         
         # 2. Action Space 로드 (v3: 19개 액션)
@@ -192,36 +193,46 @@ class QueryPlanDBEnvV3(gym.Env):
         
         return difficulties
 
-    def _get_obs_from_db(self, sql: str) -> tuple[np.ndarray, dict]:
-        """SQL을 실행하고 DB에서 관측값(State)과 통계(Metrics)를 가져옵니다."""
-        try:
-            plan_xml = get_execution_plan(self.db_connection, sql)
-            stats_io, stats_time = get_query_statistics(self.db_connection, sql)
-            
-            if not plan_xml:
-                if self.verbose:
-                    print(f"[WARN] Failed to get execution plan for SQL: {sql[:100]}...")
+    def _get_obs_from_db(self, sql: str, max_retries: int = 3) -> tuple[np.ndarray, dict]:
+        """SQL을 실행하고 DB에서 관측값(State)과 통계(Metrics)를 가져옵니다. 재시도 로직 포함."""
+        for attempt in range(max_retries):
+            try:
+                plan_xml = get_execution_plan(self.db_connection, sql)
+                stats_io, stats_time = get_query_statistics(self.db_connection, sql)
+                
+                if not plan_xml:
+                    if self.verbose:
+                        print(f"[WARN] Failed to get execution plan for SQL: {sql[:100]}...")
+                    metrics = parse_statistics(stats_io, stats_time)
+                    return None, metrics
+                
                 metrics = parse_statistics(stats_io, stats_time)
-                return None, metrics
-            
-            metrics = parse_statistics(stats_io, stats_time)
-            observation = extract_features(plan_xml, metrics)
-            
-            return observation, metrics
-            
-        except Exception as e:
-            if self.verbose:
-                print(f"[ERROR] DB execution failed: {e}")
-                print(f"[ERROR] SQL: {sql[:200]}...")
-            
-            # 기본값 반환
-            metrics = {
-                'elapsed_time_ms': 1000.0,
-                'logical_reads': 1000,
-                'cpu_time_ms': 1000.0
-            }
-            observation = np.zeros(79, dtype=np.float32)
-            return observation, metrics
+                observation = extract_features(plan_xml, metrics)
+                
+                return observation, metrics
+                
+            except Exception as e:
+                if self.verbose:
+                    print(f"[ERROR] DB execution failed (시도 {attempt + 1}/{max_retries}): {e}")
+                    print(f"[ERROR] SQL: {sql[:200]}...")
+                
+                if attempt < max_retries - 1:
+                    if self.verbose:
+                        print(f"[INFO] 2초 후 재시도...")
+                    time.sleep(2)
+                    continue
+                else:
+                    # 최대 재시도 횟수 초과 시 기본값 반환
+                    if self.verbose:
+                        print(f"[ERROR] 최대 재시도 횟수 초과. 기본값 반환.")
+                    
+                    metrics = {
+                        'elapsed_time_ms': 1000.0,
+                        'logical_reads': 1000,
+                        'cpu_time_ms': 1000.0
+                    }
+                    observation = np.zeros(79, dtype=np.float32)
+                    return observation, metrics
 
     def get_action_mask(self) -> np.ndarray:
         """현재 쿼리에 호환되는 액션 마스크를 반환합니다."""
