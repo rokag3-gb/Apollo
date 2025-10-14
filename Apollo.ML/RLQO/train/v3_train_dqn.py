@@ -225,12 +225,16 @@ def train_phase_simulxgb():
     return model
 
 
-def train_phase_realdb_finetuning(pretrained_model=None):
+def train_phase_realdb_finetuning(pretrained_model=None, checkpoint_path=None):
     """
     Phase RealDB: 실제 DB 환경에서 Fine-tuning
     - 시뮬레이션 모델을 기반으로 실제 환경에 적응
     - 액션 호환성 체크 및 마스킹
     - 10K 타임스텝: 약 1,000 에피소드 (9개 쿼리 기준)
+    
+    Args:
+        pretrained_model: 사전 훈련된 모델 (옵션)
+        checkpoint_path: 이어서 훈련할 체크포인트 경로 (옵션)
     """
     print("=" * 80)
     print(" Phase RealDB: 실제 DB Fine-tuning 시작")
@@ -247,7 +251,7 @@ def train_phase_realdb_finetuning(pretrained_model=None):
             query_list=SAMPLE_QUERIES,
             max_steps=10,
             curriculum_mode=True,  # 베이스라인 시간 기반 Curriculum Learning
-            verbose=False  # 학습 중에는 출력 최소화 (속도 개선)
+            verbose=True  # 실시간 진행 상황 확인을 위해 verbose=True로 변경
         )
         
         # Invalid Action Masking Wrapper 적용
@@ -261,7 +265,17 @@ def train_phase_realdb_finetuning(pretrained_model=None):
     # 2. 모델 생성 또는 로드
     print("\n[2/4] 모델 생성/로드 중...")
     try:
-        if pretrained_model:
+        if checkpoint_path:
+            # 체크포인트에서 이어서 훈련
+            if os.path.exists(checkpoint_path):
+                model = DQN.load(checkpoint_path, env=env)
+                print(f"[OK] 체크포인트 로드 완료: {checkpoint_path}")
+                print(f"[INFO] 현재 타임스텝: {model.num_timesteps}")
+            else:
+                print(f"[ERROR] 체크포인트 파일을 찾을 수 없습니다: {checkpoint_path}")
+                env.close()
+                return None
+        elif pretrained_model:
             # 사전 훈련된 모델 사용
             model = pretrained_model
             model.set_env(env)
@@ -290,8 +304,9 @@ def train_phase_realdb_finetuning(pretrained_model=None):
         model.learning_rate = REAL_LEARNING_RATE
         print(f"[OK] 학습률 설정: {REAL_LEARNING_RATE}")
         
-        # 타임스텝 카운터 리셋 (RealDB 훈련을 위해)
-        model.num_timesteps = 0
+        # 체크포인트에서 로드한 경우가 아니면 타임스텝 카운터 리셋
+        if not checkpoint_path:
+            model.num_timesteps = 0
         
     except Exception as e:
         print(f"[ERROR] 모델 생성/로드 실패: {e}")
@@ -307,17 +322,18 @@ def train_phase_realdb_finetuning(pretrained_model=None):
             name_prefix="dqn_v3_real"
         )
         
-        eval_callback = EvalCallback(
-            env,
-            best_model_save_path=REAL_CHECKPOINT_DIR,
-            log_path=REAL_LOG_DIR,
-            eval_freq=500,  # 더 자주 평가하여 안정성 향상
-            deterministic=True,
-            render=False
-        )
+        # EvalCallback 제거 - 평가 과정에서 긴 지연 발생으로 인한 훈련 중단 방지
+        # eval_callback = EvalCallback(
+        #     env,
+        #     best_model_save_path=REAL_CHECKPOINT_DIR,
+        #     log_path=REAL_LOG_DIR,
+        #     eval_freq=500,
+        #     deterministic=True,
+        #     render=False
+        # )
         
-        callbacks = [checkpoint_callback, eval_callback]
-        print("[OK] 콜백 설정 완료")
+        callbacks = [checkpoint_callback]  # EvalCallback 제거, CheckpointCallback만 사용
+        print("[OK] 콜백 설정 완료 (EvalCallback 제거됨)")
     except Exception as e:
         print(f"[ERROR] 콜백 설정 실패: {e}")
         env.close()
@@ -357,6 +373,8 @@ def main():
                        help='학습 단계 선택')
     parser.add_argument('--skip-sim', action='store_true',
                        help='시뮬레이션 단계 건너뛰기 (RealDB만 실행)')
+    parser.add_argument('--checkpoint', type=str, default=None,
+                       help='이어서 훈련할 체크포인트 경로 (예: Apollo.ML/artifacts/RLQO/models/checkpoints/dqn_v3_real/dqn_v3_real_500_steps.zip)')
     
     args = parser.parse_args()
     
@@ -365,12 +383,14 @@ def main():
     print("=" * 80)
     print(f"선택된 단계: {args.phase}")
     print(f"시뮬레이션 건너뛰기: {args.skip_sim}")
+    if args.checkpoint:
+        print(f"체크포인트: {args.checkpoint}")
     print("-" * 80)
     
     if args.phase == 'Simul':
         if args.skip_sim:
             print("[INFO] 시뮬레이션 단계를 건너뛰고 RealDB로 진행합니다.")
-            model = train_phase_realdb_finetuning()
+            model = train_phase_realdb_finetuning(checkpoint_path=args.checkpoint)
         else:
             model = train_phase_simulxgb()
             if model:
@@ -379,7 +399,7 @@ def main():
                 print("python Apollo.ML/RLQO/train/v3_train_dqn.py --phase RealDB")
     
     elif args.phase == 'RealDB':
-        model = train_phase_realdb_finetuning()
+        model = train_phase_realdb_finetuning(checkpoint_path=args.checkpoint)
     
     if model:
         print("\n" + "=" * 80)
