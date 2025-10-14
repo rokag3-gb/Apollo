@@ -247,7 +247,7 @@ def train_phase_realdb_finetuning(pretrained_model=None):
             query_list=SAMPLE_QUERIES,
             max_steps=10,
             curriculum_mode=True,  # 베이스라인 시간 기반 Curriculum Learning
-            verbose=False  # 학습 중에는 출력 최소화
+            verbose=False  # 학습 중에는 출력 최소화 (속도 개선)
         )
         
         # Invalid Action Masking Wrapper 적용

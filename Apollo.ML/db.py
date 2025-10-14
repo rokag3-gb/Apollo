@@ -36,7 +36,9 @@ def get_execution_plan(conn: pyodbc.Connection, sql: str) -> str:
         # SHOWPLAN은 배치 내에서 단독으로 실행되어야 합니다.
         cursor.execute("SET NOCOUNT ON;")
         cursor.execute("SET SHOWPLAN_XML ON;")
-        cursor.execute(sql)
+        # CTE 쿼리를 위해 SQL 앞에 세미콜론 추가 (이전 문장 종료)
+        safe_sql = f"; {sql}" if sql.strip().upper().startswith('WITH') else sql
+        cursor.execute(safe_sql)
         row = cursor.fetchone()
         if row and row[0] and isinstance(row[0], str):
             plan_xml = row[0]
@@ -44,6 +46,7 @@ def get_execution_plan(conn: pyodbc.Connection, sql: str) -> str:
         cursor.execute("SET NOCOUNT OFF;")
     except pyodbc.Error as e:
         print(f"Error getting execution plan: {e}")
+        print(f"SQL that caused error: {sql[:500]}...")  # 처음 500자 출력
         conn.rollback()
     finally:
         cursor.close()
@@ -63,13 +66,15 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
 
     # sqlcmd 명령어 구성
     # 중요: 실제 환경에서는 비밀번호를 명령어에 직접 노출하지 않도록 주의해야 합니다.
+    # CTE 쿼리를 위해 SQL 앞에 세미콜론 추가 (이전 문장 종료)
+    safe_sql = f"; {sql}" if sql.strip().upper().startswith('WITH') else sql
     command = [
         'sqlcmd',
         '-S', config.server,
         '-d', config.database,
         '-U', config.username,
         '-P', config.password,
-        '-Q', f"SET STATISTICS IO ON; SET STATISTICS TIME ON; {sql}",
+        '-Q', f"SET STATISTICS IO ON; SET STATISTICS TIME ON; {safe_sql}",
         '-s', '|', # 구분자 변경 (옵션)
         '-W' # 너비 제한 제거
     ]
@@ -79,8 +84,8 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
     
     try:
         # [MOD] 한국어 Windows 환경을 고려하여 encoding을 'cp949'로 지정하고, 오류 발생 시에도 None이 아닌 stderr를 반환하도록 수정
-        # 타임아웃 추가 (30초)
-        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore', timeout=30)
+        # 타임아웃 단축 (15초) - 빠른 실패로 재시도 로직 활용
+        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore', timeout=15)
 
         if result.returncode != 0:
             print(f"sqlcmd execution failed with return code {result.returncode}:")
@@ -105,7 +110,7 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
         print(f"Stderr: {e.stderr}")
         return "", ""
     except subprocess.TimeoutExpired:
-        print("sqlcmd execution timed out after 30 seconds")
+        print("sqlcmd execution timed out after 15 seconds")
         return "", ""
     except FileNotFoundError:
         print("Error: 'sqlcmd' is not in your PATH. Please install SQL Server Command Line Utilities.")

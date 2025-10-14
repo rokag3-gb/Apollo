@@ -88,12 +88,23 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
         # NOLOCK 등의 테이블 힌트를 FROM 절 테이블에 추가
         # 예: "FROM dbo.table_name" -> "FROM dbo.table_name (NOLOCK)"
         
-        # 정규표현식으로 FROM 절의 첫 번째 테이블 찾기
-        pattern = r'(FROM\s+(?:\w+\.)?\w+)(\s+\w+)?'
+        # TABLE_HINT는 CTE 쿼리와 호환되지 않으므로 적용하지 않음
+        # CTE가 있으면 원본 SQL 반환
+        # CTE 패턴: WITH로 시작하고 AS (가 있는 경우
+        # 공백, 줄바꿈, 탭 등을 모두 고려
+        if re.search(r'\bWITH\s+\w+\s+AS\s*\(', sql, re.IGNORECASE | re.DOTALL):
+            # CTE가 있는 경우: TABLE_HINT를 적용하지 않고 원본 반환
+            return sql
+        
+        # CTE가 없는 경우에만 TABLE_HINT 적용
+        # FROM 절의 첫 번째 테이블에 힌트 추가
+        # 패턴: "FROM table_name" 또는 "FROM schema.table_name" 형태를 찾고, 
+        # 뒤에 별칭이 있을 수 있음 (공백 + 단어)
+        pattern = r'(FROM\s+(?:\w+\.)?\w+)(\s+[a-zA-Z]\w*)?'
         
         def add_table_hint(match):
-            table_part = match.group(1)  # "FROM dbo.exe_execution"
-            alias_part = match.group(2) or ""  # " e" 또는 ""
+            table_part = match.group(1)  # "FROM dbo.table_name"
+            alias_part = match.group(2) or ""  # " alias" 또는 ""
             return f"{table_part} ({action_value}){alias_part}"
         
         modified_sql = re.sub(pattern, add_table_hint, sql, count=1, flags=re.IGNORECASE)
@@ -212,19 +223,19 @@ class QueryPlanDBEnvV3(gym.Env):
                 return observation, metrics
                 
             except Exception as e:
-                if self.verbose:
-                    print(f"[ERROR] DB execution failed (시도 {attempt + 1}/{max_retries}): {e}")
-                    print(f"[ERROR] SQL: {sql[:200]}...")
+                # 에러는 항상 출력 (verbose와 무관)
+                print(f"[ERROR] DB execution failed (시도 {attempt + 1}/{max_retries}): {e}")
+                print(f"[ERROR] SQL that caused error:")
+                print(f"{sql[:500]}...")  # 처음 500자 출력
                 
                 if attempt < max_retries - 1:
-                    if self.verbose:
-                        print(f"[INFO] 2초 후 재시도...")
+                    print(f"[INFO] 2초 후 재시도...")
                     time.sleep(2)
                     continue
                 else:
                     # 최대 재시도 횟수 초과 시 기본값 반환
-                    if self.verbose:
-                        print(f"[ERROR] 최대 재시도 횟수 초과. 기본값 반환.")
+                    print(f"[ERROR] 최대 재시도 횟수 초과. 기본값 반환.")
+                    print(f"[ERROR] Failed SQL: {sql}")
                     
                     metrics = {
                         'elapsed_time_ms': 1000.0,

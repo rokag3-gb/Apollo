@@ -194,6 +194,7 @@ select  top 1 *
 from    collected_plans
 where   sql_text like '%usp_t_Batch_SettleAllTrades_061%'
 
+DBA_All_Sessions @SessionStatus = '(All)'
 
 ------------------------------------------------------------------
 
