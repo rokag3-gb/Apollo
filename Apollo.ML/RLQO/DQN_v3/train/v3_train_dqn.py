@@ -26,8 +26,8 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML', 'RLQO'))
 
-from RLQO.env.v3_sim_env import QueryPlanSimEnvV3
-from RLQO.env.v3_db_env import QueryPlanDBEnvV3
+from RLQO.DQN_v3.env.v3_sim_env import QueryPlanSimEnvV3
+from RLQO.DQN_v3.env.v3_db_env import QueryPlanDBEnvV3
 from RLQO.constants import SAMPLE_QUERIES
 
 # ============================================================================

@@ -22,8 +22,8 @@ import numpy as np
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
 from RLQO.constants import SAMPLE_QUERIES
-from RLQO.env.v2_db_env import apply_action_to_sql
-from RLQO.features.phase2_features import extract_features
+from RLQO.DQN_v2.env.v2_db_env import apply_action_to_sql
+from RLQO.DQN_v1.features.phase2_features import extract_features
 from db import connect, get_execution_plan, get_query_statistics
 from config import load_config
 import json

@@ -14,8 +14,8 @@ import joblib
 import numpy as np
 from gymnasium import spaces
 
-from RLQO.features.phase2_features import extract_features, XGB_EXPECTED_FEATURES
-from RLQO.env.v2_reward import calculate_reward_v2
+from RLQO.DQN_v1.features.phase2_features import extract_features, XGB_EXPECTED_FEATURES
+from RLQO.DQN_v2.env.v2_reward import calculate_reward_v2
 from db import connect, get_execution_plan, get_query_statistics
 from config import load_config
 

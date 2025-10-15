@@ -9,7 +9,7 @@ from stable_baselines3.common.monitor import Monitor
 # 'Apollo.ML' 폴더를 파이썬 경로에 추가하여 모듈 임포트 문제를 해결합니다.
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
-from RLQO.env.phase2_db_env import QueryPlanDBEnv # [MOD] phase2_db_env로 변경
+from RLQO.DQN_v1.env.phase2_db_env import QueryPlanDBEnv # [MOD] phase2_db_env로 변경
 from RLQO.constants import SAMPLE_QUERIES # [MOD] constants에서 쿼리 목록 가져오기
 
 # --- 설정 ---

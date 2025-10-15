@@ -20,8 +20,8 @@ from stable_baselines3.common.monitor import Monitor
 # 프로젝트 루트 경로 설정
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
-from RLQO.env.v2_sim_env import QueryPlanSimEnv
-from RLQO.env.v2_db_env import QueryPlanDBEnvV2
+from RLQO.DQN_v2.env.v2_sim_env import QueryPlanSimEnv
+from RLQO.DQN_v2.env.v2_db_env import QueryPlanDBEnvV2
 from RLQO.constants import SAMPLE_QUERIES
 
 # ============================================================================

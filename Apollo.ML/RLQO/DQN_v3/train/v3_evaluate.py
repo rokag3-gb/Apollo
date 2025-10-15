@@ -29,7 +29,7 @@ from stable_baselines3 import DQN
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML', 'RLQO'))
 
-from RLQO.env.v3_db_env import QueryPlanDBEnvV3, apply_action_to_sql
+from RLQO.DQN_v3.env.v3_db_env import QueryPlanDBEnvV3, apply_action_to_sql
 from RLQO.constants import SAMPLE_QUERIES
 
 

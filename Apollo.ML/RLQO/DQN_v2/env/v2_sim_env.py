@@ -13,8 +13,8 @@ import joblib
 import numpy as np
 from gymnasium import spaces
 
-from RLQO.features.phase2_features import XGB_EXPECTED_FEATURES
-from RLQO.env.v2_reward import calculate_reward_v2
+from RLQO.DQN_v1.features.phase2_features import XGB_EXPECTED_FEATURES
+from RLQO.DQN_v2.env.v2_reward import calculate_reward_v2
 
 
 def simulate_query_execution(xgb_model, current_features, action_features):

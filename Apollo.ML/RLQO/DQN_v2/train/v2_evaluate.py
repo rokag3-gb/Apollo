@@ -21,8 +21,8 @@ from stable_baselines3 import DQN
 
 sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
 
-from RLQO.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql as apply_action_v1
-from RLQO.env.v2_db_env import QueryPlanDBEnvV2, apply_action_to_sql as apply_action_v2
+from RLQO.DQN_v1.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql as apply_action_v1
+from RLQO.DQN_v2.env.v2_db_env import QueryPlanDBEnvV2, apply_action_to_sql as apply_action_v2
 from RLQO.constants import SAMPLE_QUERIES
 
 

@@ -7,8 +7,10 @@ from stable_baselines3 import DQN
 # --- [MOD] 견고한 경로 설정 ---
 # 현재 파일의 절대 경로를 찾습니다.
 current_file_path = os.path.abspath(__file__)
+# DQN_v1 폴더 경로
+dqn_v1_dir = os.path.dirname(current_file_path)
 # RLQO 폴더 경로
-rlqo_dir = os.path.dirname(current_file_path)
+rlqo_dir = os.path.dirname(dqn_v1_dir)
 # Apollo.ML 폴더 경로
 apollo_ml_dir = os.path.dirname(rlqo_dir)
 # 프로젝트 루트 경로 (C:\source\Apollo)
@@ -19,7 +21,7 @@ sys.path.append(project_root)
 sys.path.append(apollo_ml_dir)
 
 
-from RLQO.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql
+from RLQO.DQN_v1.env.phase2_db_env import QueryPlanDBEnv, apply_action_to_sql
 from db import connect
 from config import load_config
 from RLQO.constants import SAMPLE_QUERIES # [NEW]

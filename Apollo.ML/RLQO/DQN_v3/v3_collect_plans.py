@@ -24,14 +24,15 @@ import numpy as np
 
 # 현재 스크립트의 디렉토리를 기준으로 경로 설정
 current_dir = os.path.dirname(os.path.abspath(__file__))
-apollo_ml_dir = os.path.join(current_dir, '..', '..')
-rlqo_dir = os.path.join(current_dir, '..')
+# DQN_v3/ -> RLQO -> Apollo.ML
+apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+rlqo_dir = os.path.abspath(os.path.join(current_dir, '..'))
 sys.path.append(apollo_ml_dir)
 sys.path.append(rlqo_dir)
 
 from RLQO.constants import SAMPLE_QUERIES
-from RLQO.env.v3_db_env import apply_action_to_sql
-from RLQO.features.phase2_features import extract_features
+from RLQO.DQN_v3.env.v3_db_env import apply_action_to_sql
+from RLQO.DQN_v1.features.phase2_features import extract_features
 from db import connect, get_execution_plan, get_query_statistics
 from config import load_config
 
