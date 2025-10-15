@@ -29,8 +29,13 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 # 프로젝트 루트 경로 설정
-sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
-sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML', 'RLQO'))
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+# PPO_v1/train/ -> PPO_v1 -> RLQO -> Apollo.ML -> Apollo
+project_root = os.path.abspath(os.path.join(current_file_dir, '..', '..', '..', '..'))
+apollo_ml_dir = os.path.join(project_root, 'Apollo.ML')
+
+sys.path.insert(0, project_root)
+sys.path.insert(0, apollo_ml_dir)
 
 from RLQO.DQN_v3.env.v3_sim_env import QueryPlanSimEnvV3
 from RLQO.constants import SAMPLE_QUERIES
@@ -38,24 +43,24 @@ from RLQO.constants import SAMPLE_QUERIES
 # ============================================================================
 # Phase Simul: 시뮬레이션 학습 설정
 # ============================================================================
-SIM_TIMESTEPS = 200_000  # 시뮬레이션 학습량 (빠름: 예상 1-2시간)
+SIM_TIMESTEPS = 2_000_000  # 시뮬레이션 학습량 (10배 증가: 예상 10-20시간)
 SIM_LEARNING_RATE = 3e-4  # PPO 표준 학습률
 SIM_N_STEPS = 2048  # 각 업데이트 전에 수집할 스텝 수
 SIM_BATCH_SIZE = 64  # 미니배치 크기
 SIM_N_EPOCHS = 10  # 각 업데이트당 에폭 수
 SIM_GAMMA = 0.99  # 할인율
 SIM_CLIP_RANGE = 0.2  # PPO 클리핑 범위
-SIM_ENT_COEF = 0.01  # 엔트로피 계수 (탐험 장려)
+SIM_ENT_COEF = 0.05  # 엔트로피 계수 (탐험 장려: 0.01 → 0.05로 증가)
 
 # 경로 설정
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 BASE_DIR = "Apollo.ML/artifacts/RLQO/"
 
-SIM_LOG_DIR = f"{BASE_DIR}logs/ppo_v1_sim/"
-SIM_MODEL_PATH = f"{BASE_DIR}models/ppo_v1_sim.zip"
-SIM_CHECKPOINT_DIR = f"{BASE_DIR}models/checkpoints/ppo_v1_sim/"
+SIM_LOG_DIR = f"{BASE_DIR}logs/ppo_v1_sim_2m/"
+SIM_MODEL_PATH = f"{BASE_DIR}models/ppo_v1_sim_2m.zip"
+SIM_CHECKPOINT_DIR = f"{BASE_DIR}models/checkpoints/ppo_v1_sim_2m/"
 
-TB_LOG_DIR = f"{BASE_DIR}tb/ppo_v1/"
+TB_LOG_DIR = f"{BASE_DIR}tb/ppo_v1_2m/"
 
 # 디렉토리 생성
 for directory in [SIM_LOG_DIR, SIM_CHECKPOINT_DIR]:
@@ -109,14 +114,14 @@ def train_phase_simul():
     Phase Simul: 시뮬레이션 환경에서 PPO 학습
     - 빠른 학습 속도 (실제 DB의 100배 이상)
     - 액션 호환성 체크 및 마스킹
-    - 200K 타임스텝: 약 18,000 에피소드 (9개 쿼리 기준)
+    - 2M 타임스텝: 약 180,000 에피소드 (9개 쿼리 기준)
     """
     print("=" * 80)
-    print(" Phase Simul: PPO 시뮬레이션 학습 시작")
+    print(" Phase Simul: PPO 시뮬레이션 학습 시작 (10배 증가)")
     print("=" * 80)
     print(f"알고리즘: MaskablePPO (sb3-contrib)")
     print(f"타임스텝: {SIM_TIMESTEPS:,}")
-    print(f"예상 소요 시간: 1-2시간")
+    print(f"예상 소요 시간: 10-20시간")
     print(f"쿼리 개수: {len(SAMPLE_QUERIES)}")
     print("-" * 80)
     print(f"하이퍼파라미터:")
@@ -168,7 +173,7 @@ def train_phase_simul():
     print("\n[3/4] 콜백 설정 중...")
     try:
         checkpoint_callback = CheckpointCallback(
-            save_freq=20_000,
+            save_freq=100_000,  # 20K → 100K (2M timesteps에 맞게 조정)
             save_path=SIM_CHECKPOINT_DIR,
             name_prefix="ppo_v1_sim"
         )
@@ -180,15 +185,15 @@ def train_phase_simul():
             eval_env,
             best_model_save_path=SIM_CHECKPOINT_DIR,
             log_path=SIM_LOG_DIR,
-            eval_freq=10_000,
+            eval_freq=50_000,  # 10K → 50K (2M timesteps에 맞게 조정)
             deterministic=True,
             render=False
         )
         
         callbacks = [checkpoint_callback, eval_callback]
         print("[OK] 콜백 설정 완료")
-        print(f"     Checkpoint frequency: 20,000 steps")
-        print(f"     Evaluation frequency: 10,000 steps")
+        print(f"     Checkpoint frequency: 100,000 steps")
+        print(f"     Evaluation frequency: 50,000 steps")
     except Exception as e:
         print(f"[ERROR] 콜백 설정 실패: {e}")
         env.close()
@@ -203,7 +208,7 @@ def train_phase_simul():
         model.learn(
             total_timesteps=SIM_TIMESTEPS,
             callback=callbacks,
-            tb_log_name="ppo_v1_sim"
+            tb_log_name="ppo_v1_sim_2m"
         )
         
         # 모델 저장
@@ -306,7 +311,7 @@ def main():
     
     if model:
         print("\n" + "=" * 80)
-        print(" 학습 완료!")
+        print(" 학습 완료! (2M timesteps)")
         print("=" * 80)
         print(f"모델 경로: {SIM_MODEL_PATH}")
         print(f"TensorBoard 로그: {TB_LOG_DIR}")
@@ -317,6 +322,9 @@ def main():
         print(f"   tensorboard --logdir {TB_LOG_DIR}")
         print("\n2. 모델 평가:")
         print(f"   python Apollo.ML/RLQO/PPO_v1/train/v1_evaluate.py --model {SIM_MODEL_PATH}")
+        print("\n3. 이전 모델(200K)과 비교:")
+        print(f"   이전: Apollo.ML/artifacts/RLQO/models/ppo_v1_sim.zip")
+        print(f"   새로: {SIM_MODEL_PATH}")
         print("-" * 80)
     else:
         print("\n[ERROR] 학습 실패!")

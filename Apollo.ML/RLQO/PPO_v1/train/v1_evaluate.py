@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-PPO v1: 포괄적 성능 평가 스크립트
-================================
-PPO v1 모델의 성능을 평가합니다.
+PPO v1: 포괄적 성능 평가 스크립트 (실제 DB 환경)
+================================================
+PPO v1 모델의 성능을 실제 DB 환경에서 평가합니다.
+
+평가 환경:
+- QueryPlanDBEnvV3 (실제 SQL Server DB)
+- 9개 쿼리에 대한 실제 실행 성능 측정
+- DQN v3와 동일한 평가 방식
 
 평가 메트릭:
 1. Win Rate: 베이스라인보다 빠른 비율
@@ -21,10 +26,16 @@ from datetime import datetime
 from sb3_contrib import MaskablePPO
 from sb3_contrib.common.wrappers import ActionMasker
 
-sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML'))
-sys.path.append(os.path.join(os.getcwd(), 'Apollo.ML', 'RLQO'))
+# 프로젝트 루트 경로 설정
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+# PPO_v1/train/ -> PPO_v1 -> RLQO -> Apollo.ML -> Apollo
+project_root = os.path.abspath(os.path.join(current_file_dir, '..', '..', '..', '..'))
+apollo_ml_dir = os.path.join(project_root, 'Apollo.ML')
 
-from RLQO.DQN_v3.env.v3_sim_env import QueryPlanSimEnvV3
+sys.path.insert(0, project_root)
+sys.path.insert(0, apollo_ml_dir)
+
+from RLQO.DQN_v3.env.v3_db_env import QueryPlanDBEnvV3
 from RLQO.constants import SAMPLE_QUERIES
 
 
@@ -34,14 +45,21 @@ def mask_fn(env):
     return float_mask.astype(bool)
 
 
-def make_eval_env():
-    """평가용 환경 생성"""
-    env = QueryPlanSimEnvV3(
+def make_eval_env(verbose=False):
+    """
+    평가용 환경 생성 (실제 DB 환경)
+    
+    Args:
+        verbose: 진행 상황 출력 여부
+    
+    Returns:
+        env: ActionMasker로 래핑된 실제 DB 환경
+    """
+    env = QueryPlanDBEnvV3(
         query_list=SAMPLE_QUERIES,
         max_steps=10,
-        cache_path='Apollo.ML/artifacts/RLQO/cache/v2_plan_cache.pkl',
         curriculum_mode=False,  # 평가 시에는 curriculum 사용 안 함
-        verbose=False
+        verbose=verbose
     )
     
     # ActionMasker wrapper 적용
@@ -113,11 +131,11 @@ def measure_baselines(env, queries, num_runs=10, verbose=True):
 
 def evaluate_model_on_queries(model, env, queries, model_name="Model", num_runs=3, baselines=None):
     """
-    모델을 쿼리 목록에 대해 평가합니다.
+    모델을 쿼리 목록에 대해 실제 DB 환경에서 평가합니다.
     
     Args:
         model: 평가할 PPO 모델
-        env: 평가 환경 (QueryPlanSimEnvV3 with ActionMasker)
+        env: 평가 환경 (QueryPlanDBEnvV3 with ActionMasker)
         queries: 평가할 쿼리 목록
         model_name: 모델 이름 (로깅용)
         num_runs: 각 쿼리당 실행 횟수 (일관성 평가)
@@ -273,17 +291,18 @@ def evaluate_model_on_queries(model, env, queries, model_name="Model", num_runs=
 
 def compare_models(models_to_evaluate, mode='full'):
     """
-    여러 모델을 비교 평가합니다.
+    여러 모델을 실제 DB 환경에서 비교 평가합니다.
     
     Args:
         models_to_evaluate: 평가할 모델 목록
         mode: 평가 모드 ('full' 또는 'quick')
     """
     print("=" * 80)
-    print(" PPO v1 Model Evaluation")
+    print(" PPO v1 Model Evaluation (Real DB)")
     print("=" * 80)
     print(f"Mode: {mode}")
     print(f"Models to evaluate: {len(models_to_evaluate)}")
+    print(f"Environment: QueryPlanDBEnvV3 (SQL Server)")
     print("-" * 80)
     
     # 환경 생성
@@ -383,11 +402,11 @@ def compare_models(models_to_evaluate, mode='full'):
 
 
 def quick_test_ppo():
-    """PPO v1 환경 빠른 테스트"""
-    print("=== PPO v1 Quick Test ===\n")
+    """PPO v1 환경 빠른 테스트 (실제 DB)"""
+    print("=== PPO v1 Quick Test (Real DB) ===\n")
     
     # 환경 생성
-    env = make_eval_env()
+    env = make_eval_env(verbose=True)
     base_env = get_base_env(env)
     
     print(f"Action space: {env.action_space}")
