@@ -40,6 +40,16 @@
     <Folder Include="code-backup\catboost_info\learn\" />
     <Folder Include="code-backup\catboost_info\tmp\" />
     <Folder Include="RLQO\" />
+    <Folder Include="RLQO\DQN_v1\" />
+    <Folder Include="RLQO\DQN_v1\env\" />
+    <Folder Include="RLQO\DQN_v1\features\" />
+    <Folder Include="RLQO\DQN_v1\train\" />
+    <Folder Include="RLQO\DQN_v2\" />
+    <Folder Include="RLQO\DQN_v2\env\" />
+    <Folder Include="RLQO\DQN_v2\train\" />
+    <Folder Include="RLQO\DQN_v3\" />
+    <Folder Include="RLQO\DQN_v3\env\" />
+    <Folder Include="RLQO\DQN_v3\train\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="code-backup\analyze_data.py" />
@@ -67,6 +77,43 @@
     <Compile Include="code-backup\model.py" />
     <Compile Include="code-backup\plan_graph.py" />
     <Compile Include="code-backup\train.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RLQO\constants.py" />
+    <Compile Include="RLQO\DQN_v1\__init__.py" />
+    <Compile Include="RLQO\DQN_v1\evaluate_agent.py" />
+    <Compile Include="RLQO\DQN_v1\env\__init__.py" />
+    <Compile Include="RLQO\DQN_v1\env\phase1_query_plan_env.py" />
+    <Compile Include="RLQO\DQN_v1\env\phase1_reward.py" />
+    <Compile Include="RLQO\DQN_v1\env\phase2_db_env.py" />
+    <Compile Include="RLQO\DQN_v1\features\__init__.py" />
+    <Compile Include="RLQO\DQN_v1\features\phase1_features.py" />
+    <Compile Include="RLQO\DQN_v1\features\phase2_features.py" />
+    <Compile Include="RLQO\DQN_v1\train\__init__.py" />
+    <Compile Include="RLQO\DQN_v1\train\phase1_train_dqn.py" />
+    <Compile Include="RLQO\DQN_v2\__init__.py" />
+    <Compile Include="RLQO\DQN_v2\v2_collect_plans.py" />
+    <Compile Include="RLQO\DQN_v2\v2_quick_test.py" />
+    <Compile Include="RLQO\DQN_v2\env\__init__.py" />
+    <Compile Include="RLQO\DQN_v2\env\v2_db_env.py" />
+    <Compile Include="RLQO\DQN_v2\env\v2_reward.py" />
+    <Compile Include="RLQO\DQN_v2\env\v2_sim_env.py" />
+    <Compile Include="RLQO\DQN_v2\train\__init__.py" />
+    <Compile Include="RLQO\DQN_v2\train\v2_evaluate.py" />
+    <Compile Include="RLQO\DQN_v2\train\v2_train_dqn.py" />
+    <Compile Include="RLQO\DQN_v2\train\v2_visualize.py" />
+    <Compile Include="RLQO\DQN_v3\__init__.py" />
+    <Compile Include="RLQO\DQN_v3\v3_collect_plans.py" />
+    <Compile Include="RLQO\DQN_v3\v3_generate_compatibility.py" />
+    <Compile Include="RLQO\DQN_v3\env\__init__.py" />
+    <Compile Include="RLQO\DQN_v3\env\v3_db_env.py" />
+    <Compile Include="RLQO\DQN_v3\env\v3_reward.py" />
+    <Compile Include="RLQO\DQN_v3\env\v3_sim_env.py" />
+    <Compile Include="RLQO\DQN_v3\train\__init__.py" />
+    <Compile Include="RLQO\DQN_v3\train\v3_evaluate.py" />
+    <Compile Include="RLQO\DQN_v3\train\v3_train_dqn.py" />
+    <Content Include="RLQO\README.md" />
+    <Content Include="RLQO\DQN_v2\DQN_v2_README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
