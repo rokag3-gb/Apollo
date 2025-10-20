@@ -12,7 +12,7 @@ def connect(cfg: DBConfig, max_retries: int = 3, retry_delay: int = 5) -> pyodbc
     
     for attempt in range(max_retries):
         try:
-            conn = pyodbc.connect(conn_str)
+            conn = pyodbc.connect(conn_str, timeout=120)  # 120초 타임아웃
             print(f"[DB] 연결 성공 (시도 {attempt + 1}/{max_retries})")
             return conn
         except pyodbc.Error as e:
@@ -84,8 +84,8 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
     
     try:
         # [MOD] 한국어 Windows 환경을 고려하여 encoding을 'cp949'로 지정하고, 오류 발생 시에도 None이 아닌 stderr를 반환하도록 수정
-        # 타임아웃 단축 (15초) - 빠른 실패로 재시도 로직 활용
-        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore', timeout=15)
+        # 타임아웃 증가 (60초) - 긴 쿼리 실행 허용
+        result = subprocess.run(command, capture_output=True, text=True, check=False, encoding='cp949', errors='ignore', timeout=60)
 
         if result.returncode != 0:
             print(f"sqlcmd execution failed with return code {result.returncode}:")
@@ -110,7 +110,7 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
         print(f"Stderr: {e.stderr}")
         return "", ""
     except subprocess.TimeoutExpired:
-        print("sqlcmd execution timed out after 15 seconds")
+        print("sqlcmd execution timed out after 60 seconds")
         return "", ""
     except FileNotFoundError:
         print("Error: 'sqlcmd' is not in your PATH. Please install SQL Server Command Line Utilities.")

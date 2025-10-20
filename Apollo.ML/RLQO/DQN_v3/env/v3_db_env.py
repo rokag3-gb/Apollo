@@ -180,6 +180,10 @@ class QueryPlanDBEnvV3(gym.Env):
         self.current_metrics = {}
         self.verbose = verbose
         
+        # 연속 실패 추적 (DB 다운 감지)
+        self.consecutive_failures = 0
+        self.max_consecutive_failures = 10  # 10번 연속 실패 시 학습 중단
+        
         # 6. Gym 인터페이스 정의
         self.action_space = spaces.Discrete(len(self.actions))
         self.observation_space = spaces.Box(
@@ -221,6 +225,9 @@ class QueryPlanDBEnvV3(gym.Env):
                 metrics = parse_statistics(stats_io, stats_time)
                 observation = extract_features(plan_xml, metrics)
                 
+                # 성공 시 연속 실패 카운터 리셋
+                self.consecutive_failures = 0
+                
                 return observation, metrics
                 
             except Exception as e:
@@ -234,8 +241,17 @@ class QueryPlanDBEnvV3(gym.Env):
                     time.sleep(2)
                     continue
                 else:
-                    # 최대 재시도 횟수 초과 시 기본값 반환
+                    # 최대 재시도 횟수 초과 시 연속 실패 추적
+                    self.consecutive_failures += 1
                     print(f"[ERROR] 최대 재시도 횟수 초과. 기본값 반환.")
+                    print(f"[WARN] 연속 실패 횟수: {self.consecutive_failures}/{self.max_consecutive_failures}")
+                    
+                    # 연속 실패가 임계값 초과 시 학습 중단
+                    if self.consecutive_failures >= self.max_consecutive_failures:
+                        print(f"[CRITICAL] {self.max_consecutive_failures}번 연속 DB 실패!")
+                        print(f"[CRITICAL] DB 연결 불가 - 학습 중단 필요")
+                        raise RuntimeError("DB 연결 불가: 연속 실패 임계값 초과. 학습을 중단합니다.")
+                    
                     print(f"[ERROR] Failed SQL: {sql}")
                     
                     metrics = {
@@ -335,11 +351,12 @@ class QueryPlanDBEnvV3(gym.Env):
         next_obs, metrics_after = self._get_obs_from_db(modified_sql)
         
         if next_obs is None:
-            # 실행 실패 시
-            reward = -10.0
-            terminated = True
+            # 실행 실패 시 - 에피소드 종료하지 않고 계속 진행 (스킵)
+            reward = -5.0  # 페널티 완화
+            terminated = False  # 종료하지 않음
             self.current_obs = np.zeros(XGB_EXPECTED_FEATURES, dtype=np.float32)
             self.current_metrics = metrics_after
+            self.current_step += 1  # 스텝 증가
         else:
             # 5. 보상 계산 (v3: invalid_action=False)
             reward = calculate_reward_v3(
