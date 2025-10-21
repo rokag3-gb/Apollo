@@ -196,6 +196,11 @@ where   sql_text like '%usp_t_Batch_SettleAllTrades_061%'
 
 DBA_All_Sessions @SessionStatus = '(All)'
 
+
+select datediff(day, '2025-07-14', '2025-12-31') / 365.0
+select 136496 - 134448
+
+
 ------------------------------------------------------------------
 
 select * from collected_plans where est_total_subtree_cost is null;

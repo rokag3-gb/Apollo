@@ -335,7 +335,7 @@ def evaluate_model(model_path: str, n_episodes: int = 9, verbose: bool = True):
 def main():
     parser = argparse.ArgumentParser(description='PPO v2 모델 평가')
     parser.add_argument('--model', type=str, 
-                        default='Apollo.ML/artifacts/RLQO/models/ppo_v2_sim_100k.zip',
+                        default='Apollo.ML/artifacts/RLQO/models/ppo_v2_realdb_50k.zip',
                         help='평가할 모델 경로')
     parser.add_argument('--n_episodes', type=int, default=9,
                         help='평가 에피소드 수 (쿼리 수)')
