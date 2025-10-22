@@ -27,8 +27,9 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # PPO_v3/ -> RLQO -> Apollo.ML
 apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
 rlqo_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
-sys.path.append(apollo_ml_dir)
-sys.path.append(rlqo_dir)
+# Apollo.ML을 최우선으로 추가 (루트 config, db 모듈 import 위해)
+sys.path.insert(0, apollo_ml_dir)
+sys.path.insert(1, rlqo_dir)
 
 from RLQO.constants2 import SAMPLE_QUERIES
 from RLQO.DQN_v3.env.v3_db_env import apply_action_to_sql
@@ -153,19 +154,25 @@ def main():
     print("="*80 + "\n")
     
     # 1. 설정 로드
-    config = load_config('Apollo.ML/config.yaml')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # PPO_v3/ -> RLQO/ -> Apollo.ML/
+    apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+    config_path = os.path.join(apollo_ml_dir, 'config.yaml')
+    config = load_config(config_path)
     conn = connect(config.db)
     print("[OK] DB 연결 완료\n")
     
     # 2. 액션 스페이스와 호환성 매핑 로드 (PPO v3 버전)
-    action_space_path = 'Apollo.ML/artifacts/RLQO/configs/v3_action_space_ppo.json'
-    compatibility_path = 'Apollo.ML/artifacts/RLQO/configs/v3_query_action_compatibility_ppo.json'
+    action_space_path = os.path.join(apollo_ml_dir, 'artifacts', 'RLQO', 'configs', 'v3_action_space_ppo.json')
+    compatibility_path = os.path.join(apollo_ml_dir, 'artifacts', 'RLQO', 'configs', 'v3_query_action_compatibility_ppo.json')
     
     with open(action_space_path, 'r', encoding='utf-8') as f:
         actions = json.load(f)
     
     with open(compatibility_path, 'r', encoding='utf-8') as f:
-        compatibility_map = json.load(f)
+        compatibility_data = json.load(f)
+        # compatibility 키 안에 실제 매핑이 있음
+        compatibility_map = compatibility_data.get('compatibility', compatibility_data)
     
     print(f"총 쿼리 수: {len(SAMPLE_QUERIES)}")
     print(f"총 액션 수: {len(actions)}")
@@ -187,11 +194,11 @@ def main():
         if result:
             plan_cache[sql.strip()] = result
             query_difficulties[i] = result['metrics']['elapsed_time_ms']
-            print(f"  ✓ 완료: {result['metrics']['elapsed_time_ms']:.1f}ms (중앙값), "
+            print(f"  [OK] 완료: {result['metrics']['elapsed_time_ms']:.1f}ms (중앙값), "
                   f"{result['metrics']['logical_reads']:.0f} reads, "
                   f"{result['runs']}회 실행")
         else:
-            print(f"  ✗ 실패!")
+            print(f"  [FAIL] 실패!")
     
     # 5. 호환 액션 적용 버전 수집
     print("\n" + "="*80)
@@ -212,7 +219,7 @@ def main():
                     break
             
             if not action:
-                print(f"  ✗ 액션 {action_name}을 찾을 수 없음")
+                print(f"  [ERROR] 액션 {action_name}을 찾을 수 없음")
                 continue
             
             # 액션 적용된 SQL 생성
@@ -229,10 +236,10 @@ def main():
             if result:
                 plan_cache[cache_key] = result
                 total_combinations += 1
-                print(f"    ✓ 완료: {result['metrics']['elapsed_time_ms']:.1f}ms (중앙값), "
+                print(f"    [OK] 완료: {result['metrics']['elapsed_time_ms']:.1f}ms (중앙값), "
                       f"{result['metrics']['logical_reads']:.0f} reads")
             else:
-                print(f"    ✗ 실패!")
+                print(f"    [FAIL] 실패!")
     
     # 6. 결과 저장
     print("\n" + "="*80)
@@ -240,19 +247,19 @@ def main():
     print("="*80)
     
     # 캐시 파일 저장 (PPO v3 버전)
-    cache_dir = 'Apollo.ML/artifacts/RLQO/cache'
+    cache_dir = os.path.join(apollo_ml_dir, 'artifacts', 'RLQO', 'cache')
     os.makedirs(cache_dir, exist_ok=True)
     
     cache_file = os.path.join(cache_dir, 'v3_plan_cache_ppo.pkl')
     with open(cache_file, 'wb') as f:
         pickle.dump(plan_cache, f)
-    print(f"✓ 캐시 파일 저장: {cache_file}")
+    print(f"[OK] 캐시 파일 저장: {cache_file}")
     
     # 난이도 정보 저장 (PPO v3 버전)
     difficulty_file = os.path.join(cache_dir, 'v3_query_difficulties_ppo.json')
     with open(difficulty_file, 'w', encoding='utf-8') as f:
         json.dump(query_difficulties, f, indent=2, ensure_ascii=False)
-    print(f"✓ 난이도 파일 저장: {difficulty_file}")
+    print(f"[OK] 난이도 파일 저장: {difficulty_file}")
     
     # 7. 통계 출력
     print("\n" + "="*80)

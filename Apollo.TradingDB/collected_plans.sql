@@ -200,6 +200,17 @@ where   sql_text like '%usp_t_Batch_SettleAllTrades_061%'
 DBA_All_Sessions @SessionStatus = '(All)'
 
 
+KB 1,385,051
+1,447,896
+
+select 480000 + 636719 + 331177
+
+select 11000000.0 / 36
+월 원리금 305,556
+
+select 14087820.0 / 36
+월 원리금 391,329
+
 select datediff(day, '2025-07-14', '2025-12-31') / 365.0
 select 136496 - 134448
 

@@ -62,7 +62,10 @@ def get_query_statistics(conn: pyodbc.Connection, sql: str) -> tuple[str, str]:
     # 이 테스트에서는 config 값을 하드코딩하거나, 다시 로드하는 방식을 사용해야 합니다.
     # 임시방편으로 config를 다시 로드하겠습니다.
     from config import load_config
-    config = load_config('Apollo.ML/config.yaml').db
+    import os
+    # 절대 경로로 config 찾기 (어디서 호출되든 작동)
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.yaml')
+    config = load_config(config_path).db
 
     # sqlcmd 명령어 구성
     # 중요: 실제 환경에서는 비밀번호를 명령어에 직접 노출하지 않도록 주의해야 합니다.
