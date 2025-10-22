@@ -138,11 +138,11 @@ class QueryPlanDBEnvV3(gym.Env):
         self.xgb_model = joblib.load('Apollo.ML/artifacts/model.joblib')
         
         # 2. Action Space 로드 (v3: 19개 액션)
-        with open(action_space_path, 'r') as f:
+        with open(action_space_path, 'r', encoding='utf-8') as f:
             self.actions = json.load(f)
         
         # 3. 호환성 매핑 로드
-        with open(compatibility_path, 'r') as f:
+        with open(compatibility_path, 'r', encoding='utf-8') as f:
             self.compatibility_map = json.load(f)
         
         # 4. Curriculum Learning 설정

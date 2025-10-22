@@ -169,12 +169,12 @@ class QueryPlanSimEnvV3(gym.Env):
         
         # 1. 액션 스페이스 로드
         action_space_full_path = os.path.join(apollo_ml_dir, action_space_path.replace('Apollo.ML/', ''))
-        with open(action_space_full_path, 'r') as f:
+        with open(action_space_full_path, 'r', encoding='utf-8') as f:
             self.actions = json.load(f)
         
         # 2. 호환성 매핑 로드
         compatibility_full_path = os.path.join(apollo_ml_dir, compatibility_path.replace('Apollo.ML/', ''))
-        with open(compatibility_full_path, 'r') as f:
+        with open(compatibility_full_path, 'r', encoding='utf-8') as f:
             self.compatibility_map = json.load(f)
         
         # 3. XGB 모델 로드
