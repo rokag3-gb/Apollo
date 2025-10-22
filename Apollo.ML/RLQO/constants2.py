@@ -403,6 +403,7 @@ SAMPLE_QUERIES = [
         (gross - net) AS long_short_imbalance
     FROM dbo.risk_exposure_snapshot
     WHERE ts >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) - 7, 0)
+    AND ts < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)
     ORDER BY ts DESC, gross DESC;
     """,
     # WHERE CAST(ts AS DATE) >= DATEADD(DAY, -7, GETDATE())

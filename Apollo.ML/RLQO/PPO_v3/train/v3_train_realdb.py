@@ -47,18 +47,18 @@ REAL_CLIP_RANGE = 0.2
 REAL_ENT_COEF = 0.005  # 매우 낮은 탐험 (안정성 최우선)
 REAL_MAX_GRAD_NORM = 0.5
 
-# 경로 설정
+# 경로 설정 (absolute paths from project root)
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
-BASE_DIR = "Apollo.ML/artifacts/RLQO/"
+BASE_DIR = os.path.join(apollo_ml_dir, "artifacts", "RLQO")
 
 # Simulation 모델 경로 (Pre-trained)
-PRETRAINED_MODEL_PATH = f"{BASE_DIR}models/ppo_v3_sim_100k.zip"
+PRETRAINED_MODEL_PATH = os.path.join(BASE_DIR, "models", "ppo_v3_sim_100k.zip")
 
-REAL_LOG_DIR = f"{BASE_DIR}logs/ppo_v3_realdb/"
-REAL_MODEL_PATH = f"{BASE_DIR}models/ppo_v3_realdb_50k.zip"
-REAL_CHECKPOINT_DIR = f"{BASE_DIR}models/checkpoints/ppo_v3_realdb/"
+REAL_LOG_DIR = os.path.join(BASE_DIR, "logs", "ppo_v3_realdb")
+REAL_MODEL_PATH = os.path.join(BASE_DIR, "models", "ppo_v3_realdb_50k.zip")
+REAL_CHECKPOINT_DIR = os.path.join(BASE_DIR, "models", "checkpoints", "ppo_v3_realdb")
 
-TB_LOG_DIR = f"{BASE_DIR}tb/ppo_v3_realdb/"
+TB_LOG_DIR = os.path.join(BASE_DIR, "tb", "ppo_v3_realdb")
 
 # 디렉토리 생성
 for directory in [REAL_LOG_DIR, REAL_CHECKPOINT_DIR]:

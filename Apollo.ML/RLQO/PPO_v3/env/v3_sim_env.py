@@ -60,15 +60,16 @@ class QueryPlanSimEnvPPOv3(QueryPlanSimEnvV3):
         kwargs['action_space_path'] = action_space_path
         kwargs['compatibility_path'] = compatibility_path
         
-        # PPO v3 전용 캐시 파일 경로 설정
-        ppo_cache_path = os.path.join(apollo_ml_dir, 'artifacts', 'RLQO', 'cache', 'v3_plan_cache_ppo.pkl')
-        kwargs['cache_path'] = ppo_cache_path
+        # PPO v3 전용 캐시 파일 경로 설정 (상대 경로로 전달)
+        kwargs['cache_path'] = 'Apollo.ML/artifacts/RLQO/cache/v3_plan_cache_ppo.pkl'
         
         # UTF-8 인코딩으로 JSON 파일 미리 로드
         with open(action_space_path, 'r', encoding='utf-8') as f:
             actions_data = json.load(f)
         with open(compatibility_path, 'r', encoding='utf-8') as f:
-            compatibility_data = json.load(f)
+            compatibility_data_raw = json.load(f)
+            # 중첩된 구조에서 실제 compatibility 데이터 추출
+            compatibility_data = compatibility_data_raw.get('compatibility', compatibility_data_raw)
         
         super().__init__(query_list, max_steps, **kwargs)
         
@@ -181,7 +182,7 @@ class QueryPlanSimEnvPPOv3(QueryPlanSimEnvV3):
     
     def step(self, action_id):
         """
-        액션 실행 + 정규화된 보상 계산
+        액션 실행 + 정규화된 보상 계산 (캐시 기반)
         
         Args:
             action_id: 선택된 액션 ID (0-43)
@@ -196,43 +197,100 @@ class QueryPlanSimEnvPPOv3(QueryPlanSimEnvV3):
         # 이전 메트릭 저장
         self.previous_metrics = self.current_metrics.copy()
         
-        # 부모 클래스 step (XGB 시뮬레이션)
-        obs_79d, _, terminated, truncated, info = super().step(action_id)
+        # 1. 액션 정보 추출
+        action = self.actions[action_id]
+        action_name = action['name']
         
-        # 정규화된 보상 계산
+        # 2. 액션 호환성 체크
+        action_mask = self.get_action_mask()
+        invalid_action = (action_mask[action_id] == 0)
+        
+        if invalid_action:
+            # 호환되지 않는 액션 선택 시 즉시 페널티 반환
+            reward = -1.0  # 정규화된 최소 보상
+            terminated = True
+            truncated = False
+            
+            if self.verbose:
+                print(f"[INVALID] {action_name} - 호환되지 않는 액션")
+            
+            # 현재 SQL에서 힌트 추출
+            current_hints = self.state_encoder.extract_hints_from_sql(self.current_sql)
+            
+            # 18차원 state 생성
+            obs_18d = self.state_encoder.encode_from_query_and_metrics(
+                sql=self.current_sql,
+                current_metrics=self.current_metrics,
+                current_hints=current_hints,
+                prev_action_id=action_id,
+                prev_reward=reward
+            )
+            
+            info = {
+                "action": action_name,
+                "metrics": self.current_metrics,
+                "baseline_metrics": self.baseline_metrics,
+                "invalid_action": True
+            }
+            
+            return obs_18d, reward, terminated, truncated, info
+        
+        # 3. 액션 적용된 SQL 생성
+        from RLQO.DQN_v3.env.v3_db_env import apply_action_to_sql
+        modified_sql = apply_action_to_sql(self.current_sql, action)
+        
+        # 4. 캐시에서 실제 성능 데이터 가져오기
+        _, metrics_after = self._get_obs_from_cache(modified_sql)
+        
+        # 5. 정규화된 보상 계산
         reward = calculate_reward_v3_normalized(
             metrics_before=self.previous_metrics,
-            metrics_after=info['metrics'],
+            metrics_after=metrics_after,
             baseline_metrics=self.baseline_metrics,
             query_type=self.current_query_type_ppo,
             action_id=action_id
         )
         
-        # 이력 업데이트
+        # 6. 상태 업데이트
+        self.current_metrics = metrics_after
+        self.current_step += 1
+        self.current_sql = modified_sql  # SQL 업데이트 (힌트 누적)
+        
+        # 7. 이력 업데이트
         self.prev_action_id = action_id
         self.prev_reward = reward
         
-        # 현재 SQL에서 힌트 추출
+        # 8. 현재 SQL에서 힌트 추출
         current_hints = self.state_encoder.extract_hints_from_sql(self.current_sql)
         
-        # 18차원 state 생성
+        # 9. 18차원 state 생성
         obs_18d = self.state_encoder.encode_from_query_and_metrics(
             sql=self.current_sql,
-            current_metrics=info['metrics'],
+            current_metrics=metrics_after,
             current_hints=current_hints,
             prev_action_id=self.prev_action_id,
             prev_reward=self.prev_reward
         )
         
+        # 10. 종료 조건
+        terminated = False
+        truncated = (self.current_step >= self.max_steps)
+        
         if self.verbose:
-            action_name = self.actions[action_id]['name']
-            after_time = info['metrics']['elapsed_time_ms']
+            after_time = metrics_after['elapsed_time_ms']
             baseline_time = self.baseline_metrics['elapsed_time_ms']
             speedup = baseline_time / max(after_time, 0.1)
             
             print(f"[STEP {self.current_step}] Action={action_name}, "
                   f"Time={after_time:.1f}ms (Speedup={speedup:.2f}x), "
                   f"Reward={reward:.3f}")
+        
+        info = {
+            "action": action_name,
+            "metrics": metrics_after,
+            "baseline_metrics": self.baseline_metrics,
+            "invalid_action": False
+        }
         
         return obs_18d, reward, terminated, truncated, info
 

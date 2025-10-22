@@ -215,6 +215,20 @@ select datediff(day, '2025-07-14', '2025-12-31') / 365.0
 select 136496 - 134448
 
 
+SELECT  TOP 200 account_id,
+        ts,
+        gross,
+        net,
+        var_1d,
+        margin_required,
+        (gross - net) AS long_short_imbalance
+FROM    dbo.risk_exposure_snapshot
+WHERE   ts >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) - 7, 0)
+AND     ts < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)
+ORDER BY ts DESC, gross DESC;
+
+create nonclustered index idx_risk_exposure_snapshot_ts on dbo.risk_exposure_snapshot (ts);
+
 ------------------------------------------------------------------
 
 select * from collected_plans where est_total_subtree_cost is null;

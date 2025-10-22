@@ -78,7 +78,12 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
     if action_type == "BASELINE" or not action_value:
         return sql
     
-    if action_type == "HINT":
+    if action_type == "ISOLATION":
+        # ISOLATION LEVEL은 SQL 실행 전에 세션 레벨에서 설정
+        # SQL 앞에 SET TRANSACTION ISOLATION LEVEL 문 추가
+        return f"{action_value};\n{sql}"
+    
+    elif action_type == "HINT":
         # 세미콜론이 있다면 그 앞에, 없다면 맨 뒤에 힌트 추가
         if ';' in sql:
             return sql.replace(';', f' {action_value};')

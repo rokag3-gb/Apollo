@@ -65,7 +65,9 @@ class QueryPlanDBEnvPPOv3(QueryPlanDBEnvV3):
         with open(action_space_path, 'r', encoding='utf-8') as f:
             actions_data = json.load(f)
         with open(compatibility_path, 'r', encoding='utf-8') as f:
-            compatibility_data = json.load(f)
+            compatibility_data_raw = json.load(f)
+            # 중첩된 구조에서 실제 compatibility 데이터 추출
+            compatibility_data = compatibility_data_raw.get('compatibility', compatibility_data_raw)
         
         # 부모 클래스 초기화
         super().__init__(query_list, max_steps, **kwargs)
