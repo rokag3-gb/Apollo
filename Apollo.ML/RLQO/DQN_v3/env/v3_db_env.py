@@ -138,9 +138,15 @@ class QueryPlanDBEnvV3(gym.Env):
         super().__init__()
         
         # 1. DB 연결 및 모델/설정 로드
-        self.config = load_config('Apollo.ML/config.yaml')
+        # 절대 경로로 config.yaml 로드
+        current_file_dir = os.path.dirname(os.path.abspath(__file__))
+        apollo_ml_dir = os.path.abspath(os.path.join(current_file_dir, '..', '..', '..'))
+        config_path = os.path.join(apollo_ml_dir, 'config.yaml')
+        model_path = os.path.join(apollo_ml_dir, 'artifacts', 'model.joblib')
+        
+        self.config = load_config(config_path)
         self.db_connection = connect(self.config.db, max_retries=3, retry_delay=5)
-        self.xgb_model = joblib.load('Apollo.ML/artifacts/model.joblib')
+        self.xgb_model = joblib.load(model_path)
         
         # 2. Action Space 로드 (v3: 19개 액션)
         with open(action_space_path, 'r', encoding='utf-8') as f:
