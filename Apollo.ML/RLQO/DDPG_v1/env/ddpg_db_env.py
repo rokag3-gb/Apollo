@@ -10,7 +10,6 @@ import sys
 import time
 import re
 import numpy as np
-import pyodbc
 from gymnasium import spaces
 
 # 경로 설정
@@ -21,11 +20,13 @@ sys.path.insert(0, apollo_ml_dir)
 sys.path.insert(0, rlqo_dir)
 
 # Imports
+import gymnasium as gym
+
 from RLQO.DDPG_v1.config.action_decoder import ContinuousActionDecoder
 from RLQO.PPO_v3.env.v3_actionable_state import ActionableStateEncoderV3
 from RLQO.PPO_v3.env.v3_normalized_reward import calculate_reward_v3_normalized
 from config import load_config
-import gymnasium as gym
+from db import connect, get_query_statistics
 
 
 class QueryPlanRealDBEnvDDPGv1(gym.Env):
@@ -38,6 +39,39 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
     - 실제 SQL Server 실행
     - Log scale normalized reward
     """
+    
+    @staticmethod
+    def _convert_hints_for_state_encoder(hints: dict) -> dict:
+        """
+        DDPG v1의 hints를 PPO v3 state encoder가 기대하는 형식으로 변환
+        
+        Args:
+            hints: action_decoder.decode()의 출력
+        
+        Returns:
+            converted_hints: state encoder 호환 형식
+        """
+        # ISOLATION 문자열 → 숫자 변환
+        isolation_map = {
+            'default': 0,
+            'READ_COMMITTED': 1,
+            'READ_UNCOMMITTED': 2,
+            'SNAPSHOT': 3
+        }
+        isolation_str = hints.get('isolation', 'default')
+        isolation_num = isolation_map.get(isolation_str, 0)
+        
+        # OPTIMIZER_HINT 카운트 (간단히 NONE이 아니면 1)
+        optimizer_hint = hints.get('optimizer_hint', 'NONE')
+        advanced_hints = 0 if optimizer_hint == 'NONE' else 1
+        
+        return {
+            'maxdop': hints.get('maxdop', 0),
+            'fast_n': hints.get('fast_n', 0),
+            'isolation': isolation_num,  # 숫자로 변환
+            'join_hint': hints.get('join_hint', 'none'),
+            'advanced_hints': advanced_hints  # 숫자로 변환
+        }
     
     def __init__(self,
                  query_list: list,
@@ -64,17 +98,13 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
         # State encoder
         self.state_encoder = ActionableStateEncoderV3()
         
-        # DB 연결 설정
-        config = load_config()
-        self.db_config = {
-            'server': config.db.server,
-            'database': config.db.database,
-            'username': config.db.username,
-            'password': config.db.password,
-            'driver': config.db.driver
-        }
-        self.conn = None
-        self._connect_db()
+        # DB 연결 (DQN v3 방식 사용)
+        current_file_dir = os.path.dirname(os.path.abspath(__file__))
+        apollo_ml_dir_abs = os.path.abspath(os.path.join(current_file_dir, '..', '..', '..'))
+        config_path = os.path.join(apollo_ml_dir_abs, 'config.yaml')
+        
+        self.config = load_config(config_path)
+        self.conn = connect(self.config.db, max_retries=3, retry_delay=5)
         
         # Gym spaces
         self.action_space = spaces.Box(
@@ -106,24 +136,7 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
             print(f"  - Queries: {len(query_list)}")
             print(f"  - Action space: Continuous (7 dims)")
             print(f"  - Observation space: 18 dims")
-            print(f"  - Timeout: {timeout_seconds}s")
-    
-    def _connect_db(self):
-        """DB 연결"""
-        try:
-            conn_str = (
-                f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-                f"SERVER={self.db_config['server']};"
-                f"DATABASE={self.db_config['database']};"
-                f"UID={self.db_config['username']};"
-                f"PWD={self.db_config['password']};"
-            )
-            self.conn = pyodbc.connect(conn_str, timeout=self.timeout_seconds)
-            if self.verbose:
-                print(f"[INFO] DB 연결 성공: {self.db_config['server']}/{self.db_config['database']}")
-        except Exception as e:
-            print(f"[ERROR] DB 연결 실패: {e}")
-            raise
+            print(f"  - DB: {self.config.db.server}/{self.config.db.database}")
     
     def _apply_hints_to_sql(self, sql: str, hints: dict) -> str:
         """
@@ -218,57 +231,54 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
     
     def _execute_query(self, sql: str) -> dict:
         """
-        쿼리 실행 및 성능 측정
+        쿼리 실행 및 성능 측정 (db.py의 get_query_statistics 사용)
         
         Returns:
             metrics: {'elapsed_time_ms', 'logical_reads', 'cpu_time_ms'}
         """
-        cursor = self.conn.cursor()
-        
         try:
-            # STATISTICS 활성화
-            cursor.execute("SET STATISTICS TIME ON;")
-            cursor.execute("SET STATISTICS IO ON;")
+            # db.py의 get_query_statistics 사용 (DQN v3 방식)
+            stats_io, stats_time = get_query_statistics(self.conn, sql)
             
-            # 쿼리 실행 시작
-            start_time = time.time()
-            cursor.execute(sql)
-            
-            # 결과 fetch (실행 완료)
-            try:
-                rows = cursor.fetchall()
-            except:
-                pass  # 결과가 없는 경우
-            
-            elapsed_time = (time.time() - start_time) * 1000  # ms
-            
-            # STATISTICS 정보 가져오기
-            messages = []
-            try:
-                while cursor.nextset():
-                    pass
-            except:
-                pass
-            
-            # SQL Server 메시지에서 통계 추출
-            # (실제로는 pyodbc의 messages를 파싱해야 하지만 간단히 구현)
+            # Parse statistics
+            elapsed_time_ms = 0.0
             logical_reads = 0
-            cpu_time_ms = 0
+            cpu_time_ms = 0.0
             
-            # 간단한 추정 (실제로는 더 정교한 파싱 필요)
-            # 여기서는 elapsed_time을 기준으로 추정
-            logical_reads = max(1, int(elapsed_time * 10))
-            cpu_time_ms = max(0.1, elapsed_time * 0.7)
+            # Parse TIME statistics
+            if stats_time:
+                import re
+                # SQL Server execution time: ... CPU time = X ms, elapsed time = Y ms
+                time_match = re.search(r'CPU time = (\d+) ms.*?elapsed time = (\d+) ms', stats_time)
+                if time_match:
+                    cpu_time_ms = float(time_match.group(1))
+                    elapsed_time_ms = float(time_match.group(2))
+            
+            # Parse IO statistics
+            if stats_io:
+                import re
+                # Table 'XXX'. Scan count X, logical reads X, physical reads X
+                reads_match = re.search(r'logical reads (\d+)', stats_io)
+                if reads_match:
+                    logical_reads = int(reads_match.group(1))
+            
+            # 기본값 설정 (파싱 실패 시)
+            if elapsed_time_ms == 0:
+                elapsed_time_ms = 100.0
+            if logical_reads == 0:
+                logical_reads = max(1, int(elapsed_time_ms * 10))
+            if cpu_time_ms == 0:
+                cpu_time_ms = max(0.1, elapsed_time_ms * 0.7)
             
             metrics = {
-                'elapsed_time_ms': elapsed_time,
+                'elapsed_time_ms': elapsed_time_ms,
                 'logical_reads': logical_reads,
                 'cpu_time_ms': cpu_time_ms
             }
             
             return metrics
             
-        except pyodbc.Error as e:
+        except Exception as e:
             if self.verbose:
                 print(f"[ERROR] 쿼리 실행 실패: {e}")
             return {
@@ -276,16 +286,6 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
                 'logical_reads': 0,
                 'cpu_time_ms': 0
             }
-        except Exception as e:
-            if self.verbose:
-                print(f"[ERROR] 예외 발생: {e}")
-            return {
-                'elapsed_time_ms': float('inf'),
-                'logical_reads': 0,
-                'cpu_time_ms': 0
-            }
-        finally:
-            cursor.close()
     
     def reset(self, seed=None, options=None):
         """에피소드 시작"""
@@ -314,11 +314,12 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
             'use_recompile': False
         }
         
-        # 초기 state
+        # 초기 state (hints를 state encoder 형식으로 변환)
+        state_encoder_hints = self._convert_hints_for_state_encoder(self.current_hints)
         state = self.state_encoder.encode_from_query_and_metrics(
             sql=self.current_sql,
             current_metrics=self.current_metrics,
-            current_hints=self.current_hints,
+            current_hints=state_encoder_hints,
             prev_action_id=-1,
             prev_reward=0.0
         )
@@ -349,22 +350,25 @@ class QueryPlanRealDBEnvDDPGv1(gym.Env):
         modified_sql = self._apply_hints_to_sql(self.current_sql, hints)
         new_metrics = self._execute_query(modified_sql)
         
-        # 3. Reward 계산
+        # 3. Reward 계산 (PPO v3 - 파라미터 이름 맞춤)
         reward = calculate_reward_v3_normalized(
+            metrics_before=self.current_metrics,
+            metrics_after=new_metrics,
             baseline_metrics=self.baseline_metrics,
-            current_metrics=new_metrics,
-            previous_metrics=self.current_metrics
+            query_type='SIMPLE',  # DDPG는 query type 구분 안 함
+            action_id=-1  # Continuous action이므로 -1
         )
         
         # 4. State 업데이트
         self.current_metrics = new_metrics
         self.current_hints = hints
         
-        # 5. 다음 state
+        # 5. 다음 state (hints를 state encoder 형식으로 변환)
+        state_encoder_hints = self._convert_hints_for_state_encoder(hints)
         next_state = self.state_encoder.encode_from_query_and_metrics(
             sql=self.current_sql,
             current_metrics=self.current_metrics,
-            current_hints=self.current_hints,
+            current_hints=state_encoder_hints,
             prev_action_id=-1,
             prev_reward=reward
         )

@@ -43,6 +43,39 @@ class QueryPlanSimEnvDDPGv1(gym.Env):
     - Log scale normalized reward
     """
     
+    @staticmethod
+    def _convert_hints_for_state_encoder(hints: dict) -> dict:
+        """
+        DDPG v1의 hints를 PPO v3 state encoder가 기대하는 형식으로 변환
+        
+        Args:
+            hints: action_decoder.decode()의 출력
+        
+        Returns:
+            converted_hints: state encoder 호환 형식
+        """
+        # ISOLATION 문자열 → 숫자 변환
+        isolation_map = {
+            'default': 0,
+            'READ_COMMITTED': 1,
+            'READ_UNCOMMITTED': 2,
+            'SNAPSHOT': 3
+        }
+        isolation_str = hints.get('isolation', 'default')
+        isolation_num = isolation_map.get(isolation_str, 0)
+        
+        # OPTIMIZER_HINT 카운트 (간단히 NONE이 아니면 1)
+        optimizer_hint = hints.get('optimizer_hint', 'NONE')
+        advanced_hints = 0 if optimizer_hint == 'NONE' else 1
+        
+        return {
+            'maxdop': hints.get('maxdop', 0),
+            'fast_n': hints.get('fast_n', 0),
+            'isolation': isolation_num,  # 숫자로 변환
+            'join_hint': hints.get('join_hint', 'none'),
+            'advanced_hints': advanced_hints  # 숫자로 변환
+        }
+    
     def __init__(self,
                  query_list: list,
                  max_steps: int = 10,
@@ -269,11 +302,12 @@ class QueryPlanSimEnvDDPGv1(gym.Env):
             'use_recompile': False
         }
         
-        # 초기 state 생성
+        # 초기 state 생성 (hints를 state encoder 형식으로 변환)
+        state_encoder_hints = self._convert_hints_for_state_encoder(self.current_hints)
         state = self.state_encoder.encode_from_query_and_metrics(
             sql=self.current_sql,
             current_metrics=self.current_metrics,
-            current_hints=self.current_hints,
+            current_hints=state_encoder_hints,
             prev_action_id=-1,
             prev_reward=0.0
         )
@@ -311,22 +345,25 @@ class QueryPlanSimEnvDDPGv1(gym.Env):
         # 2. 시뮬레이션 실행
         new_metrics = self._simulate_query_with_hints(self.current_sql, hints)
         
-        # 3. Reward 계산 (PPO v3)
+        # 3. Reward 계산 (PPO v3 - 파라미터 이름 맞춤)
         reward = calculate_reward_v3_normalized(
+            metrics_before=self.current_metrics,
+            metrics_after=new_metrics,
             baseline_metrics=self.baseline_metrics,
-            current_metrics=new_metrics,
-            previous_metrics=self.current_metrics
+            query_type='SIMPLE',  # DDPG는 query type 구분 안 함
+            action_id=-1  # Continuous action이므로 -1
         )
         
         # 4. State 업데이트
         self.current_metrics = new_metrics
         self.current_hints = hints
         
-        # 5. 다음 state 생성
+        # 5. 다음 state 생성 (hints를 state encoder 형식으로 변환)
+        state_encoder_hints = self._convert_hints_for_state_encoder(hints)
         next_state = self.state_encoder.encode_from_query_and_metrics(
             sql=self.current_sql,
             current_metrics=self.current_metrics,
-            current_hints=self.current_hints,
+            current_hints=state_encoder_hints,
             prev_action_id=-1,  # Continuous action이므로 ID 없음
             prev_reward=reward
         )
