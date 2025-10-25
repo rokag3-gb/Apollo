@@ -185,6 +185,9 @@ def evaluate_ddpg(model_path: str, episodes: int = 3, output_file: str = None):
     
     # Save results
     if output_file:
+        # 절대 경로로 변환 (상대 경로 입력 시 현재 디렉토리 기준)
+        output_file = os.path.abspath(output_file)
+        
         output_data = {
             'timestamp': datetime.now().isoformat(),
             'model_path': model_path,
