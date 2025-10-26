@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-TD3 v1: Real DB Fine-tuning
+SAC v1: Real DB Fine-tuning
 
 Simulation 모델을 Real DB에서 50k steps fine-tuning
 """
 
 import os
 import sys
-from stable_baselines3 import TD3
+from stable_baselines3 import SAC
 from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback
-import pyodbc
 
 # Path setup
 current_dir = os.path.dirname(os.path.abspath(__file__))
-td3_v1_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sac_v1_dir = os.path.abspath(os.path.join(current_dir, '..'))
 rlqo_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
 apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
 apollo_core_dir = os.path.abspath(os.path.join(apollo_ml_dir, '..', 'Apollo.Core'))
 sys.path.insert(0, apollo_ml_dir)
 sys.path.insert(0, apollo_core_dir)
 sys.path.insert(0, rlqo_dir)
-sys.path.insert(0, td3_v1_dir)
+sys.path.insert(0, sac_v1_dir)
 
 # Imports
-from RLQO.constants2 import QUERY_LIST
-from RLQO.TD3_v1.env.td3_db_env import make_td3_db_env
-from RLQO.TD3_v1.config.td3_config import TD3_REALDB_CONFIG, MODEL_PATHS
+from RLQO.constants2 import SAMPLE_QUERIES
+from RLQO.SAC_v1.env.sac_db_env import make_sac_db_env
+from RLQO.SAC_v1.config.sac_config import SAC_REALDB_CONFIG, MODEL_PATHS
 from db import DatabaseHelper
 
 
-def train_td3_realdb():
+def train_sac_realdb():
     """
-    TD3 v1 Real DB Fine-tuning
+    SAC v1 Real DB Fine-tuning
     
     Steps:
     1. Simulation 모델 로드
@@ -41,14 +40,14 @@ def train_td3_realdb():
     """
     
     print("=" * 80)
-    print("TD3 v1 Real DB Fine-tuning")
+    print("SAC v1 Real DB Fine-tuning")
     print("=" * 80)
     
     # 0. Check simulation model exists
     sim_model_path = MODEL_PATHS['sim']
     if not os.path.exists(sim_model_path):
         print(f"\n❌ Error: Simulation model not found at {sim_model_path}")
-        print("Please run td3_train_sim.py first!")
+        print("Please run sac_train_sim.py first!")
         return
     
     # 1. Create DB helper
@@ -63,25 +62,26 @@ def train_td3_realdb():
     
     # 2. Create environments
     print("\n[2/5] Creating Real DB environments...")
-    train_env = make_td3_db_env(QUERY_LIST, db_helper, max_steps=10, verbose=False)
-    eval_env = make_td3_db_env(QUERY_LIST, db_helper, max_steps=10, verbose=False)
+    train_env = make_sac_db_env(SAMPLE_QUERIES, db_helper, max_steps=10, verbose=False)
+    eval_env = make_sac_db_env(SAMPLE_QUERIES, db_helper, max_steps=10, verbose=False)
     
     print(f"Action space: {train_env.action_space}")
     print(f"Observation space: {train_env.observation_space}")
     
     # 3. Load simulation model
     print("\n[3/5] Loading simulation model...")
-    model = TD3.load(sim_model_path, env=train_env)
+    model = SAC.load(sim_model_path, env=train_env)
     print(f"✅ Model loaded from: {sim_model_path}")
     
     # Update config for fine-tuning
-    model.learning_rate = TD3_REALDB_CONFIG['learning_rate']
-    model.learning_starts = TD3_REALDB_CONFIG['learning_starts']
+    model.learning_rate = SAC_REALDB_CONFIG['learning_rate']
+    model.learning_starts = SAC_REALDB_CONFIG['learning_starts']
     
     print("Fine-tuning Configuration:")
-    print(f"  - Learning Rate: {TD3_REALDB_CONFIG['learning_rate']}")
-    print(f"  - Learning Starts: {TD3_REALDB_CONFIG['learning_starts']}")
-    print(f"  - Total Steps: {TD3_REALDB_CONFIG['total_timesteps']:,}")
+    print(f"  - Learning Rate: {SAC_REALDB_CONFIG['learning_rate']}")
+    print(f"  - Learning Starts: {SAC_REALDB_CONFIG['learning_starts']}")
+    print(f"  - Total Steps: {SAC_REALDB_CONFIG['total_timesteps']:,}")
+    print(f"  - Entropy Coef: auto (adaptive)")
     
     # 4. Setup callbacks
     print("\n[4/5] Setting up callbacks...")
@@ -90,18 +90,18 @@ def train_td3_realdb():
     os.makedirs(checkpoint_dir, exist_ok=True)
     
     checkpoint_callback = CheckpointCallback(
-        save_freq=TD3_REALDB_CONFIG['save_freq'],
+        save_freq=SAC_REALDB_CONFIG['save_freq'],
         save_path=checkpoint_dir,
-        name_prefix='td3_v1_realdb'
+        name_prefix='sac_v1_realdb'
     )
     
     eval_callback = EvalCallback(
         eval_env,
         best_model_save_path=checkpoint_dir + "best/",
         log_path=checkpoint_dir + "logs/",
-        eval_freq=TD3_REALDB_CONFIG['eval_freq'],
-        n_eval_episodes=TD3_REALDB_CONFIG['n_eval_episodes'],
-        deterministic=True,
+        eval_freq=SAC_REALDB_CONFIG['eval_freq'],
+        n_eval_episodes=SAC_REALDB_CONFIG['n_eval_episodes'],
+        deterministic=False,  # SAC uses stochastic policy
         render=False
     )
     
@@ -109,16 +109,16 @@ def train_td3_realdb():
     print("\n" + "=" * 80)
     print("Starting Fine-tuning on Real DB...")
     print("=" * 80)
-    print(f"Total timesteps: {TD3_REALDB_CONFIG['total_timesteps']:,}")
+    print(f"Total timesteps: {SAC_REALDB_CONFIG['total_timesteps']:,}")
     print(f"Expected duration: ~2-4 hours (depends on DB performance)")
     print("⚠️  Warning: This will execute many queries on your database!")
     print("=" * 80)
     
     try:
         model.learn(
-            total_timesteps=TD3_REALDB_CONFIG['total_timesteps'],
+            total_timesteps=SAC_REALDB_CONFIG['total_timesteps'],
             callback=[checkpoint_callback, eval_callback],
-            log_interval=TD3_REALDB_CONFIG['log_interval'],
+            log_interval=SAC_REALDB_CONFIG['log_interval'],
             reset_num_timesteps=False  # Continue from simulation training
         )
         
@@ -144,9 +144,9 @@ def train_td3_realdb():
         db_helper.close()
     
     print("\nNext step: Evaluate model")
-    print("Run: python train/td3_evaluate.py")
+    print("Run: python train/sac_evaluate.py")
 
 
 if __name__ == '__main__':
-    train_td3_realdb()
+    train_sac_realdb()
 

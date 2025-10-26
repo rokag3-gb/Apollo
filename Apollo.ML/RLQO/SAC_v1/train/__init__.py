@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-TD3 v1 Configuration
+SAC v1 Training Scripts
 """
 
