@@ -1,0 +1,1073 @@
+{
+  "timestamp": "2025-10-26T13:21:44.793517",
+  "model_path": "Apollo.ML/artifacts/RLQO/models/ddpg_v1_realdb_50k.zip",
+  "episodes": 3,
+  "overall": {
+    "mean_speedup": 1.8817777777777775,
+    "median_speedup": 1.0,
+    "max_speedup": 19.25,
+    "min_speedup": 1.0,
+    "std_speedup": 3.1721196180804307,
+    "mean_improvement_pct": 88.17777777777778
+  },
+  "distribution": {
+    "excellent": 12,
+    "good": 0,
+    "neutral": 78,
+    "degraded": 0
+  },
+  "query_summary": [
+    {
+      "query_idx": 0,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 1,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 2,
+      "avg_speedup": 17.863333333333333,
+      "std_speedup": 0.9914747713493383
+    },
+    {
+      "query_idx": 3,
+      "avg_speedup": 4.036666666666666,
+      "std_speedup": 0.06798692684790371
+    },
+    {
+      "query_idx": 4,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 5,
+      "avg_speedup": 5.996666666666666,
+      "std_speedup": 0.03771236166328257
+    },
+    {
+      "query_idx": 6,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 7,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 8,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 9,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 10,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 11,
+      "avg_speedup": 1.0266666666666666,
+      "std_speedup": 0.03771236166328257
+    },
+    {
+      "query_idx": 12,
+      "avg_speedup": 1.0166666666666666,
+      "std_speedup": 0.016996731711975962
+    },
+    {
+      "query_idx": 13,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 14,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 15,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 16,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 17,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 18,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 19,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 20,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 21,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 22,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 23,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 24,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 25,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 26,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 27,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    },
+    {
+      "query_idx": 28,
+      "avg_speedup": 2.513333333333333,
+      "std_speedup": 0.012472191289246403
+    },
+    {
+      "query_idx": 29,
+      "avg_speedup": 1.0,
+      "std_speedup": 0.0
+    }
+  ],
+  "detailed_results": [
+    {
+      "episode": 1,
+      "query_idx": 0,
+      "baseline_time_ms": 18.0,
+      "best_time_ms": 18.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 1,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 2,
+      "baseline_time_ms": 1735.0,
+      "best_time_ms": 100.0,
+      "speedup": 17.35,
+      "improvement_pct": 1635.0000000000002,
+      "total_reward": 8.495163956468039,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 1,
+      "query_idx": 3,
+      "baseline_time_ms": 397.0,
+      "best_time_ms": 100.0,
+      "speedup": 3.97,
+      "improvement_pct": 297.0,
+      "total_reward": 7.117487800565864,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160"
+    },
+    {
+      "episode": 1,
+      "query_idx": 4,
+      "baseline_time_ms": 2.0,
+      "best_time_ms": 2.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 5,
+      "baseline_time_ms": 597.0,
+      "best_time_ms": 100.0,
+      "speedup": 5.97,
+      "improvement_pct": 497.0,
+      "total_reward": 7.804776464021642,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 1,
+      "query_idx": 6,
+      "baseline_time_ms": 29.0,
+      "best_time_ms": 29.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -8.89076752382888,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 7,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 8,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 9,
+      "baseline_time_ms": 3.0,
+      "best_time_ms": 3.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 10,
+      "baseline_time_ms": 4.0,
+      "best_time_ms": 4.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 11,
+      "baseline_time_ms": 97.0,
+      "best_time_ms": 97.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 2.306243141418298,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 12,
+      "baseline_time_ms": 104.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.04,
+      "improvement_pct": 4.0000000000000036,
+      "total_reward": 2.5151517633750125,
+      "best_action": "MAXDOP=9, FAST=100, ISOLATION=SNAPSHOT, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 1,
+      "query_idx": 13,
+      "baseline_time_ms": 88.0,
+      "best_time_ms": 88.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.1062013703775222,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 14,
+      "baseline_time_ms": 23.0,
+      "best_time_ms": 23.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.947148097072488,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 15,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 16,
+      "baseline_time_ms": 26.0,
+      "best_time_ms": 26.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.053464948626554,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 17,
+      "baseline_time_ms": 23.0,
+      "best_time_ms": 23.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.947148097072488,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 18,
+      "baseline_time_ms": 24.0,
+      "best_time_ms": 24.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.630463613909509,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 19,
+      "baseline_time_ms": 1.0,
+      "best_time_ms": 1.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 20,
+      "baseline_time_ms": 6.0,
+      "best_time_ms": 6.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 21,
+      "baseline_time_ms": 2.0,
+      "best_time_ms": 2.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 22,
+      "baseline_time_ms": 58.0,
+      "best_time_ms": 58.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.010095407753558105,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 23,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 24,
+      "baseline_time_ms": 26.0,
+      "best_time_ms": 26.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.053464948626554,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 25,
+      "baseline_time_ms": 53.0,
+      "best_time_ms": 53.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.9269435068488728,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 26,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.9252884987684435,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 27,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 0.18364220150745958,
+      "best_action": null
+    },
+    {
+      "episode": 1,
+      "query_idx": 28,
+      "baseline_time_ms": 251.0,
+      "best_time_ms": 100.0,
+      "speedup": 2.51,
+      "improvement_pct": 150.99999999999997,
+      "total_reward": 5.980059829289449,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 1,
+      "query_idx": 29,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 0,
+      "baseline_time_ms": 16.0,
+      "best_time_ms": 16.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 1,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 2,
+      "baseline_time_ms": 1925.0,
+      "best_time_ms": 100.0,
+      "speedup": 19.25,
+      "improvement_pct": 1825.0,
+      "total_reward": 8.614112886378164,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 2,
+      "query_idx": 3,
+      "baseline_time_ms": 413.0,
+      "best_time_ms": 100.0,
+      "speedup": 4.13,
+      "improvement_pct": 313.0,
+      "total_reward": 7.188082529464928,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160"
+    },
+    {
+      "episode": 2,
+      "query_idx": 4,
+      "baseline_time_ms": 2.0,
+      "best_time_ms": 2.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 5,
+      "baseline_time_ms": 605.0,
+      "best_time_ms": 100.0,
+      "speedup": 6.05,
+      "improvement_pct": 505.0,
+      "total_reward": 7.825737828340459,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 2,
+      "query_idx": 6,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -9.725135240013396,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 7,
+      "baseline_time_ms": 26.0,
+      "best_time_ms": 26.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.053464948626554,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 8,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 9,
+      "baseline_time_ms": 3.0,
+      "best_time_ms": 3.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 10,
+      "baseline_time_ms": 4.0,
+      "best_time_ms": 4.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 11,
+      "baseline_time_ms": 108.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.08,
+      "improvement_pct": 8.000000000000007,
+      "total_reward": 2.625793138016852,
+      "best_action": "MAXDOP=9, FAST=100, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 2,
+      "query_idx": 12,
+      "baseline_time_ms": 90.0,
+      "best_time_ms": 90.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 2.0747274394450783,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 13,
+      "baseline_time_ms": 86.0,
+      "best_time_ms": 86.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.1794590051521766,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 14,
+      "baseline_time_ms": 24.0,
+      "best_time_ms": 24.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.630463613909509,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 15,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 16,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 17,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 18,
+      "baseline_time_ms": 23.0,
+      "best_time_ms": 23.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.947148097072488,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 19,
+      "baseline_time_ms": 1.0,
+      "best_time_ms": 1.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 20,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 21,
+      "baseline_time_ms": 1.0,
+      "best_time_ms": 1.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 22,
+      "baseline_time_ms": 54.0,
+      "best_time_ms": 54.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.2876964735427062,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 23,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 24,
+      "baseline_time_ms": 24.0,
+      "best_time_ms": 24.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.630463613909509,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 25,
+      "baseline_time_ms": 57.0,
+      "best_time_ms": 57.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.6418862649441771,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 26,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.9252884987684435,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 27,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 0.18364220150745958,
+      "best_action": null
+    },
+    {
+      "episode": 2,
+      "query_idx": 28,
+      "baseline_time_ms": 250.0,
+      "best_time_ms": 100.0,
+      "speedup": 2.5,
+      "improvement_pct": 150.0,
+      "total_reward": 5.971651194548091,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 2,
+      "query_idx": 29,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 0,
+      "baseline_time_ms": 17.0,
+      "best_time_ms": 17.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 1,
+      "baseline_time_ms": 7.0,
+      "best_time_ms": 7.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 2,
+      "baseline_time_ms": 1699.0,
+      "best_time_ms": 100.0,
+      "speedup": 16.99,
+      "improvement_pct": 1598.9999999999998,
+      "total_reward": 8.470761844828186,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 3,
+      "query_idx": 3,
+      "baseline_time_ms": 401.0,
+      "best_time_ms": 100.0,
+      "speedup": 4.01,
+      "improvement_pct": 301.0,
+      "total_reward": 7.135486902157119,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160"
+    },
+    {
+      "episode": 3,
+      "query_idx": 4,
+      "baseline_time_ms": 2.0,
+      "best_time_ms": 2.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 5,
+      "baseline_time_ms": 597.0,
+      "best_time_ms": 100.0,
+      "speedup": 5.97,
+      "improvement_pct": 497.0,
+      "total_reward": 7.804776464021642,
+      "best_action": "MAXDOP=1, FAST=100, JOIN=FORCE_ORDER, COMPAT_160"
+    },
+    {
+      "episode": 3,
+      "query_idx": 6,
+      "baseline_time_ms": 31.0,
+      "best_time_ms": 31.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -8.537012358210594,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 7,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 8,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 9,
+      "baseline_time_ms": 4.0,
+      "best_time_ms": 4.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 10,
+      "baseline_time_ms": 3.0,
+      "best_time_ms": 3.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 11,
+      "baseline_time_ms": 96.0,
+      "best_time_ms": 96.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 2.274648723927763,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 12,
+      "baseline_time_ms": 101.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.01,
+      "improvement_pct": 1.0000000000000009,
+      "total_reward": 2.4281374829548374,
+      "best_action": "MAXDOP=9, FAST=100, ISOLATION=SNAPSHOT, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 3,
+      "query_idx": 13,
+      "baseline_time_ms": 82.0,
+      "best_time_ms": 82.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.3335631051804768,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 14,
+      "baseline_time_ms": 26.0,
+      "best_time_ms": 26.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.053464948626554,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 15,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 16,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 17,
+      "baseline_time_ms": 25.0,
+      "best_time_ms": 25.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.333220133764965,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 18,
+      "baseline_time_ms": 26.0,
+      "best_time_ms": 26.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.053464948626554,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 19,
+      "baseline_time_ms": 1.0,
+      "best_time_ms": 1.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 20,
+      "baseline_time_ms": 6.0,
+      "best_time_ms": 6.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 21,
+      "baseline_time_ms": 2.0,
+      "best_time_ms": 2.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 22,
+      "baseline_time_ms": 56.0,
+      "best_time_ms": 56.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.14525563616668735,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 23,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 1.9999999999999998,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 24,
+      "baseline_time_ms": 24.0,
+      "best_time_ms": 24.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -7.630463613909509,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 25,
+      "baseline_time_ms": 50.0,
+      "best_time_ms": 50.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -1.162413028519682,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 26,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -0.9252884987684435,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 27,
+      "baseline_time_ms": 100.0,
+      "best_time_ms": 100.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": 0.18364220150745958,
+      "best_action": null
+    },
+    {
+      "episode": 3,
+      "query_idx": 28,
+      "baseline_time_ms": 253.0,
+      "best_time_ms": 100.0,
+      "speedup": 2.53,
+      "improvement_pct": 152.99999999999997,
+      "total_reward": 5.996741586055076,
+      "best_action": "MAXDOP=1, FAST=100, ISOLATION=SNAPSHOT, JOIN=FORCE_ORDER, OPT=ASSUME_MIN_SELECTIVITY_FOR_FILTER_ESTIMATES, COMPAT_160, RECOMPILE"
+    },
+    {
+      "episode": 3,
+      "query_idx": 29,
+      "baseline_time_ms": 6.0,
+      "best_time_ms": 6.0,
+      "speedup": 1.0,
+      "improvement_pct": 0.0,
+      "total_reward": -10.0,
+      "best_action": null
+    }
+  ]
+}
