@@ -29,6 +29,40 @@ from RLQO.DDPG_v1.env.ddpg_db_env import QueryPlanRealDBEnvDDPGv1
 sys.path.insert(0, os.path.join(apollo_ml_dir, 'RLQO'))
 from constants2 import SAMPLE_QUERIES
 
+# Query names mapping
+QUERY_NAMES = {
+    0: '계좌별 일별 거래 통계',
+    1: '거래소별 종목별 평균 체결가격과 거래량',
+    2: '대용량 테이블 전체 스캔',
+    3: '2-way JOIN (대용량)',
+    4: '3-way JOIN + ORDER BY',
+    5: 'NOT EXISTS (서브쿼리)',
+    6: 'RAND() 함수',
+    7: '주문 체결률과 평균 슬리피지 분석',
+    8: '포지션 수익률 분석',
+    9: '당일 거래량 상위 종목',
+    10: '당일 거래대금 상위 종목',
+    11: '전일 종가 대비 등락률 상위 종목',
+    12: '계좌별 포지션 평가',
+    13: '미체결 주문 목록',
+    14: '최근 대량 주문 검색',
+    15: '최근 거래 모니터링',
+    16: '주문과 체결 내역 함께 조회',
+    17: '체결 내역이 있는 주문만 조회 (EXISTS)',
+    18: '체결 내역이 있는 주문만 조회 (IN)',
+    19: '계좌별 현금 잔액 조회',
+    20: '거래소별 종목 수 및 통계',
+    21: '종목별 최근 가격 이력',
+    22: '고객별 계좌 및 잔액 요약',
+    23: '리스크 노출도 스냅샷 조회',
+    24: '계좌별 주문 소스 분포',
+    25: '종목 타입별 거래 통계',
+    26: '마진 계좌 상태 조회',
+    27: '컴플라이언스 경고 현황',
+    28: '거래 원장 집계 vs 포지션 검증',
+    29: '종목별 시세 변동성 분석'
+}
+
 
 def evaluate_ddpg(model_path: str, episodes: int = 3, output_file: str = None):
     """
@@ -112,6 +146,7 @@ def evaluate_ddpg(model_path: str, episodes: int = 3, output_file: str = None):
             result = {
                 'episode': episode + 1,
                 'query_idx': query_idx,
+                'query_name': QUERY_NAMES.get(query_idx, f'Query {query_idx}'),
                 'baseline_time_ms': baseline_time,
                 'best_time_ms': best_time,
                 'speedup': speedup,
@@ -123,8 +158,14 @@ def evaluate_ddpg(model_path: str, episodes: int = 3, output_file: str = None):
             results.append(result)
             query_results[query_idx].append(speedup)
             
-            print(f"  Query {query_idx:2d}: {baseline_time:6.1f}ms → {best_time:6.1f}ms "
-                  f"(Speedup: {speedup:.3f}x, +{(speedup-1)*100:+.1f}%)")
+            # 출력 형식 개선
+            query_name = QUERY_NAMES.get(query_idx, f'Query {query_idx}')
+            action_str = best_action if best_action else 'NO_ACTION'
+            print(f"  Query {query_idx:2d} [{query_name[:30]:30s}]: "
+                  f"{baseline_time:6.1f}ms → {best_time:6.1f}ms "
+                  f"(Speedup: {speedup:.3f}x, {(speedup-1)*100:+.1f}%)")
+            if best_action:
+                print(f"           Action: {action_str}")
     
     env.close()
     
@@ -158,30 +199,85 @@ def evaluate_ddpg(model_path: str, episodes: int = 3, output_file: str = None):
     print(f"  - 저하 (<0.9x): {len(degraded)} ({len(degraded)/len(df)*100:.1f}%)")
     
     # Query-wise statistics
-    print(f"\n쿼리별 평균 성능:")
+    print(f"\n쿼리별 평균 성능 (쿼리 이름 및 액션 포함):")
+    print(f"{'='*120}")
     query_summary = []
+    
+    # 각 쿼리의 대표 액션 찾기 (첫 번째 에피소드에서)
+    query_actions = {}
+    for result in results:
+        if result['episode'] == 1:
+            query_actions[result['query_idx']] = result['best_action']
+    
     for query_idx in range(len(SAMPLE_QUERIES)):
         query_speedups = query_results[query_idx]
         avg_speedup = np.mean(query_speedups)
         std_speedup = np.std(query_speedups)
+        improvement_pct = (avg_speedup - 1.0) * 100
+        
         query_summary.append({
             'query_idx': query_idx,
+            'query_name': QUERY_NAMES.get(query_idx, f'Query {query_idx}'),
             'avg_speedup': avg_speedup,
-            'std_speedup': std_speedup
+            'std_speedup': std_speedup,
+            'improvement_pct': improvement_pct,
+            'action': query_actions.get(query_idx, 'NO_ACTION')
         })
-        print(f"  Query {query_idx:2d}: {avg_speedup:.3f}x ± {std_speedup:.3f}")
+        
+        query_name = QUERY_NAMES.get(query_idx, f'Query {query_idx}')
+        action_str = query_actions.get(query_idx, None)
+        
+        # 성능 아이콘
+        if avg_speedup >= 2.0:
+            icon = '🚀'
+        elif avg_speedup >= 1.2:
+            icon = '✅'
+        elif avg_speedup >= 0.9:
+            icon = '  '
+        else:
+            icon = '⚠️'
+        
+        print(f"{icon} Query {query_idx:2d} [{query_name[:35]:35s}]: "
+              f"{avg_speedup:6.3f}x ± {std_speedup:.3f} ({improvement_pct:+6.1f}%)")
+        
+        if action_str and action_str != 'NO_ACTION':
+            # 액션 문자열 줄바꿈 처리
+            if len(action_str) > 100:
+                print(f"           Action: {action_str[:100]}...")
+                print(f"                   {action_str[100:]}")
+            else:
+                print(f"           Action: {action_str}")
+    
+    print(f"{'='*120}")
     
     # Top 5 best queries
     print(f"\n상위 5개 쿼리 (평균 Speedup):")
     top_queries = sorted(query_summary, key=lambda x: x['avg_speedup'], reverse=True)[:5]
     for i, q in enumerate(top_queries, 1):
-        print(f"  {i}. Query {q['query_idx']:2d}: {q['avg_speedup']:.3f}x")
+        query_name = q['query_name']
+        action_str = q['action'] if q['action'] and q['action'] != 'NO_ACTION' else 'NO_ACTION'
+        print(f"  {i}. Query {q['query_idx']:2d} [{query_name[:30]:30s}]: {q['avg_speedup']:.3f}x ({q['improvement_pct']:+.1f}%)")
+        if action_str != 'NO_ACTION':
+            print(f"      → {action_str}")
     
     # Top 5 worst queries
     print(f"\n하위 5개 쿼리 (평균 Speedup):")
     worst_queries = sorted(query_summary, key=lambda x: x['avg_speedup'])[:5]
     for i, q in enumerate(worst_queries, 1):
-        print(f"  {i}. Query {q['query_idx']:2d}: {q['avg_speedup']:.3f}x")
+        query_name = q['query_name']
+        action_str = q['action'] if q['action'] and q['action'] != 'NO_ACTION' else 'NO_ACTION'
+        print(f"  {i}. Query {q['query_idx']:2d} [{query_name[:30]:30s}]: {q['avg_speedup']:.3f}x ({q['improvement_pct']:+.1f}%)")
+    
+    # 액션이 적용된 쿼리 요약
+    print(f"\n액션이 적용된 쿼리 요약:")
+    action_applied = [q for q in query_summary if q['action'] and q['action'] != 'NO_ACTION']
+    if action_applied:
+        print(f"총 {len(action_applied)}개 쿼리에 최적화 적용:")
+        for q in sorted(action_applied, key=lambda x: x['avg_speedup'], reverse=True):
+            print(f"  • Query {q['query_idx']:2d} [{q['query_name'][:30]:30s}]: {q['avg_speedup']:.3f}x")
+            print(f"    → {q['action']}")
+    else:
+        print(f"  (액션이 적용된 쿼리 없음)")
     
     # Save results
     if output_file:

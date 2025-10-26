@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+"""
+TD3 v1: Real DB Fine-tuning
+
+Simulation 모델을 Real DB에서 50k steps fine-tuning
+"""
+
+import os
+import sys
+from stable_baselines3 import TD3
+from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback
+import pyodbc
+
+# Path setup
+current_dir = os.path.dirname(os.path.abspath(__file__))
+td3_v1_dir = os.path.abspath(os.path.join(current_dir, '..'))
+rlqo_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+apollo_core_dir = os.path.abspath(os.path.join(apollo_ml_dir, '..', 'Apollo.Core'))
+sys.path.insert(0, apollo_ml_dir)
+sys.path.insert(0, apollo_core_dir)
+sys.path.insert(0, rlqo_dir)
+sys.path.insert(0, td3_v1_dir)
+
+# Imports
+from RLQO.constants2 import QUERY_LIST
+from RLQO.TD3_v1.env.td3_db_env import make_td3_db_env
+from RLQO.TD3_v1.config.td3_config import TD3_REALDB_CONFIG, MODEL_PATHS
+from db import DatabaseHelper
+
+
+def train_td3_realdb():
+    """
+    TD3 v1 Real DB Fine-tuning
+    
+    Steps:
+    1. Simulation 모델 로드
+    2. Real DB 환경 생성
+    3. 50k steps fine-tuning
+    4. 모델 저장
+    """
+    
+    print("=" * 80)
+    print("TD3 v1 Real DB Fine-tuning")
+    print("=" * 80)
+    
+    # 0. Check simulation model exists
+    sim_model_path = MODEL_PATHS['sim']
+    if not os.path.exists(sim_model_path):
+        print(f"\n❌ Error: Simulation model not found at {sim_model_path}")
+        print("Please run td3_train_sim.py first!")
+        return
+    
+    # 1. Create DB helper
+    print("\n[1/5] Connecting to database...")
+    try:
+        db_helper = DatabaseHelper()
+        print("✅ Database connection established")
+    except Exception as e:
+        print(f"❌ Database connection failed: {e}")
+        print("Please check your database configuration in Apollo.Core/Credential/Secret.py")
+        return
+    
+    # 2. Create environments
+    print("\n[2/5] Creating Real DB environments...")
+    train_env = make_td3_db_env(QUERY_LIST, db_helper, max_steps=10, verbose=False)
+    eval_env = make_td3_db_env(QUERY_LIST, db_helper, max_steps=10, verbose=False)
+    
+    print(f"Action space: {train_env.action_space}")
+    print(f"Observation space: {train_env.observation_space}")
+    
+    # 3. Load simulation model
+    print("\n[3/5] Loading simulation model...")
+    model = TD3.load(sim_model_path, env=train_env)
+    print(f"✅ Model loaded from: {sim_model_path}")
+    
+    # Update config for fine-tuning
+    model.learning_rate = TD3_REALDB_CONFIG['learning_rate']
+    model.learning_starts = TD3_REALDB_CONFIG['learning_starts']
+    
+    print("Fine-tuning Configuration:")
+    print(f"  - Learning Rate: {TD3_REALDB_CONFIG['learning_rate']}")
+    print(f"  - Learning Starts: {TD3_REALDB_CONFIG['learning_starts']}")
+    print(f"  - Total Steps: {TD3_REALDB_CONFIG['total_timesteps']:,}")
+    
+    # 4. Setup callbacks
+    print("\n[4/5] Setting up callbacks...")
+    
+    checkpoint_dir = MODEL_PATHS['checkpoint_dir'] + "realdb/"
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    checkpoint_callback = CheckpointCallback(
+        save_freq=TD3_REALDB_CONFIG['save_freq'],
+        save_path=checkpoint_dir,
+        name_prefix='td3_v1_realdb'
+    )
+    
+    eval_callback = EvalCallback(
+        eval_env,
+        best_model_save_path=checkpoint_dir + "best/",
+        log_path=checkpoint_dir + "logs/",
+        eval_freq=TD3_REALDB_CONFIG['eval_freq'],
+        n_eval_episodes=TD3_REALDB_CONFIG['n_eval_episodes'],
+        deterministic=True,
+        render=False
+    )
+    
+    # 5. Fine-tune
+    print("\n" + "=" * 80)
+    print("Starting Fine-tuning on Real DB...")
+    print("=" * 80)
+    print(f"Total timesteps: {TD3_REALDB_CONFIG['total_timesteps']:,}")
+    print(f"Expected duration: ~2-4 hours (depends on DB performance)")
+    print("⚠️  Warning: This will execute many queries on your database!")
+    print("=" * 80)
+    
+    try:
+        model.learn(
+            total_timesteps=TD3_REALDB_CONFIG['total_timesteps'],
+            callback=[checkpoint_callback, eval_callback],
+            log_interval=TD3_REALDB_CONFIG['log_interval'],
+            reset_num_timesteps=False  # Continue from simulation training
+        )
+        
+        # 6. Save final model
+        print("\n" + "=" * 80)
+        print("Fine-tuning completed!")
+        print("=" * 80)
+        
+        model_path = MODEL_PATHS['realdb']
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        model.save(model_path)
+        print(f"Model saved: {model_path}")
+        
+    except Exception as e:
+        print(f"\n❌ Training error: {e}")
+        print("Saving current model...")
+        model.save(MODEL_PATHS['realdb'] + ".interrupted")
+    
+    finally:
+        # 7. Close environments
+        train_env.close()
+        eval_env.close()
+        db_helper.close()
+    
+    print("\nNext step: Evaluate model")
+    print("Run: python train/td3_evaluate.py")
+
+
+if __name__ == '__main__':
+    train_td3_realdb()
+
