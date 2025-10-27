@@ -15,10 +15,10 @@ rlqo_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.insert(0, rlqo_dir)
 
 # Import DDPG v1 Real DB Environment
-from RLQO.DDPG_v1.env.ddpg_db_env import QueryPlanDbEnvDDPGv1
+from RLQO.DDPG_v1.env.ddpg_db_env import QueryPlanRealDBEnvDDPGv1
 
 
-class QueryPlanDbEnvSACv1(QueryPlanDbEnvDDPGv1):
+class QueryPlanDbEnvSACv1(QueryPlanRealDBEnvDDPGv1):
     """
     SAC v1 Real DB Environment
     
@@ -47,13 +47,12 @@ class QueryPlanDbEnvSACv1(QueryPlanDbEnvDDPGv1):
 
 
 # Convenience function
-def make_sac_db_env(query_list, db_helper, max_steps=10, verbose=True):
+def make_sac_db_env(query_list, max_steps=10, verbose=True):
     """
     SAC v1 Real DB 환경 생성
     
     Args:
         query_list: 30개 쿼리 리스트
-        db_helper: DB 연결 헬퍼
         max_steps: 에피소드당 최대 스텝
         verbose: 로그 출력 여부
     
@@ -62,7 +61,6 @@ def make_sac_db_env(query_list, db_helper, max_steps=10, verbose=True):
     """
     return QueryPlanDbEnvSACv1(
         query_list=query_list,
-        db_helper=db_helper,
         max_steps=max_steps,
         verbose=verbose
     )

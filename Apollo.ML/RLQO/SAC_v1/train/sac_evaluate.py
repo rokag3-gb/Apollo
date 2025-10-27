@@ -27,7 +27,6 @@ sys.path.insert(0, sac_v1_dir)
 from RLQO.constants2 import SAMPLE_QUERIES
 from RLQO.SAC_v1.env.sac_db_env import make_sac_db_env
 from RLQO.SAC_v1.config.sac_config import SAC_EVAL_CONFIG, MODEL_PATHS
-from db import DatabaseHelper
 
 
 def evaluate_sac(model_path: str = None, output_path: str = None):
@@ -55,14 +54,13 @@ def evaluate_sac(model_path: str = None, output_path: str = None):
         print(f"\n❌ Error: Model not found at {model_path}")
         return
     
-    # 2. Create DB helper and environment
-    print("\n[1/4] Connecting to database...")
+    # 2. Create environment (DB connection handled inside)
+    print("\n[1/4] Creating Real DB environment...")
     try:
-        db_helper = DatabaseHelper()
-        env = make_sac_db_env(SAMPLE_QUERIES, db_helper, max_steps=10, verbose=True)
-        print("✅ Database connection established")
+        env = make_sac_db_env(SAMPLE_QUERIES, max_steps=10, verbose=True)
+        print("✅ Environment created successfully")
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
+        print(f"❌ Environment creation failed: {e}")
         return
     
     # 3. Load model

@@ -25,7 +25,6 @@ sys.path.insert(0, sac_v1_dir)
 from RLQO.constants2 import SAMPLE_QUERIES
 from RLQO.SAC_v1.env.sac_db_env import make_sac_db_env
 from RLQO.SAC_v1.config.sac_config import SAC_REALDB_CONFIG, MODEL_PATHS
-from db import DatabaseHelper
 
 
 def train_sac_realdb():
@@ -50,26 +49,16 @@ def train_sac_realdb():
         print("Please run sac_train_sim.py first!")
         return
     
-    # 1. Create DB helper
-    print("\n[1/5] Connecting to database...")
-    try:
-        db_helper = DatabaseHelper()
-        print("✅ Database connection established")
-    except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        print("Please check your database configuration in Apollo.Core/Credential/Secret.py")
-        return
-    
-    # 2. Create environments
-    print("\n[2/5] Creating Real DB environments...")
-    train_env = make_sac_db_env(SAMPLE_QUERIES, db_helper, max_steps=10, verbose=False)
-    eval_env = make_sac_db_env(SAMPLE_QUERIES, db_helper, max_steps=10, verbose=False)
+    # 1. Create environments (DB connection handled inside environment)
+    print("\n[1/4] Creating Real DB environments...")
+    train_env = make_sac_db_env(SAMPLE_QUERIES, max_steps=10, verbose=False)
+    eval_env = make_sac_db_env(SAMPLE_QUERIES, max_steps=10, verbose=False)
     
     print(f"Action space: {train_env.action_space}")
     print(f"Observation space: {train_env.observation_space}")
     
-    # 3. Load simulation model
-    print("\n[3/5] Loading simulation model...")
+    # 2. Load simulation model
+    print("\n[2/4] Loading pre-trained simulation model...")
     model = SAC.load(sim_model_path, env=train_env)
     print(f"✅ Model loaded from: {sim_model_path}")
     
@@ -83,8 +72,8 @@ def train_sac_realdb():
     print(f"  - Total Steps: {SAC_REALDB_CONFIG['total_timesteps']:,}")
     print(f"  - Entropy Coef: auto (adaptive)")
     
-    # 4. Setup callbacks
-    print("\n[4/5] Setting up callbacks...")
+    # 3. Setup callbacks
+    print("\n[3/4] Setting up callbacks...")
     
     checkpoint_dir = MODEL_PATHS['checkpoint_dir'] + "realdb/"
     os.makedirs(checkpoint_dir, exist_ok=True)
@@ -105,7 +94,7 @@ def train_sac_realdb():
         render=False
     )
     
-    # 5. Fine-tune
+    # 4. Fine-tune
     print("\n" + "=" * 80)
     print("Starting Fine-tuning on Real DB...")
     print("=" * 80)
