@@ -57,10 +57,31 @@ def train_sac_realdb():
     print(f"Action space: {train_env.action_space}")
     print(f"Observation space: {train_env.observation_space}")
     
-    # 2. Load simulation model
-    print("\n[2/4] Loading pre-trained simulation model...")
-    model = SAC.load(sim_model_path, env=train_env)
-    print(f"✅ Model loaded from: {sim_model_path}")
+    # 2. Load simulation model OR latest checkpoint (resume capability)
+    print("\n[2/4] Loading pre-trained model...")
+    
+    checkpoint_dir = MODEL_PATHS['checkpoint_dir'] + "realdb/"
+    
+    # Check for existing checkpoints
+    checkpoint_files = []
+    if os.path.exists(checkpoint_dir):
+        checkpoint_files = [f for f in os.listdir(checkpoint_dir) 
+                           if f.startswith('sac_v1_realdb_') and f.endswith('_steps.zip')]
+    
+    if checkpoint_files:
+        # Sort by timesteps and get the latest
+        checkpoint_files.sort(key=lambda x: int(x.split('_')[3]))  # Extract timesteps number
+        latest_checkpoint = os.path.join(checkpoint_dir, checkpoint_files[-1])
+        model = SAC.load(latest_checkpoint, env=train_env)
+        timesteps_completed = int(checkpoint_files[-1].split('_')[3])
+        print(f"✅ Resuming from checkpoint: {latest_checkpoint}")
+        print(f"   Already completed: {timesteps_completed:,} timesteps")
+        print(f"   (Sim 100k + RealDB {timesteps_completed - 100000:,})")
+    else:
+        # No checkpoint found, load simulation model
+        model = SAC.load(sim_model_path, env=train_env)
+        print(f"✅ Starting from simulation model: {sim_model_path}")
+        print(f"   Starting Real DB fine-tuning from scratch")
     
     # Update config for fine-tuning
     model.learning_rate = SAC_REALDB_CONFIG['learning_rate']
