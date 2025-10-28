@@ -80,25 +80,61 @@ def evaluate_ensemble_v2(
         print("[ERROR] No models loaded!")
         return
     
-    # 2. 환경 로드 (평가용으로 PPO v3 환경 사용 - 18차원, 대부분 모델 호환)
-    print("\n[2/5] Loading evaluation environment...")
-    from RLQO.PPO_v3.env.v3_db_env import QueryPlanDBEnvPPOv3
-    from sb3_contrib.common.wrappers import ActionMasker
-    
+    # 2. 각 모델의 환경 로드 (Ensemble v1 방식)
+    print("\n[2/5] Loading environments for each model...")
     queries = SAMPLE_QUERIES[:n_queries]
-    ppo_env = QueryPlanDBEnvPPOv3(
-        query_list=queries,
-        max_steps=1,  # 1-step evaluation
-        curriculum_mode=False,
-        verbose=False
-    )
+    envs = {}
     
-    # ActionMasker 적용
-    def mask_fn(env_instance):
-        float_mask = env_instance.get_action_mask()
-        return float_mask.astype(bool)
+    # DQN v4 환경
+    if 'dqn_v4' in ensemble.loaded_models:
+        from RLQO.DQN_v4.env.v4_db_env import QueryPlanDBEnvV4
+        envs['dqn_v4'] = QueryPlanDBEnvV4(
+            query_list=queries,
+            max_steps=1,
+            curriculum_mode=False,
+            verbose=False
+        )
+        print("  [OK] DQN v4 environment loaded")
     
-    env = ActionMasker(ppo_env, mask_fn)
+    # PPO v3 환경
+    if 'ppo_v3' in ensemble.loaded_models:
+        from RLQO.PPO_v3.env.v3_db_env import QueryPlanDBEnvPPOv3
+        ppo_env = QueryPlanDBEnvPPOv3(
+            query_list=queries,
+            max_steps=1,
+            curriculum_mode=False,
+            verbose=False
+        )
+        
+        def mask_fn(env_instance):
+            float_mask = env_instance.get_action_mask()
+            return float_mask.astype(bool)
+        
+        envs['ppo_v3'] = ActionMasker(ppo_env, mask_fn)
+        print("  [OK] PPO v3 environment loaded")
+    
+    # DDPG v1 환경
+    if 'ddpg_v1' in ensemble.loaded_models:
+        from RLQO.DDPG_v1.env.ddpg_db_env import QueryPlanRealDBEnvDDPGv1
+        envs['ddpg_v1'] = QueryPlanRealDBEnvDDPGv1(
+            query_list=queries,
+            max_steps=1,
+            verbose=False
+        )
+        print("  [OK] DDPG v1 environment loaded")
+    
+    # SAC v1 환경
+    if 'sac_v1' in ensemble.loaded_models:
+        from RLQO.SAC_v1.env.sac_db_env import make_sac_db_env
+        envs['sac_v1'] = make_sac_db_env(
+            query_list=queries,
+            max_steps=1,
+            verbose=False
+        )
+        print("  [OK] SAC v1 environment loaded")
+    
+    # Baseline 측정용 환경 (DQN v4 우선, 없으면 첫 번째 환경)
+    baseline_env = envs.get('dqn_v4') or list(envs.values())[0]
     
     # 3. 평가 실행
     print(f"\n[3/5] Running evaluation on {n_queries} queries...")
@@ -113,13 +149,35 @@ def evaluate_ensemble_v2(
         print(f"\n--- Query {query_idx} ({query_type}) ---")
         
         for episode in range(n_episodes):
-            # Reset environment
-            # PPO 환경의 query_index 설정
-            env.unwrapped.current_query_ix = query_idx
-            obs, info = env.reset()
+            # 각 환경 reset (query_idx 설정)
+            observations = {}
+            action_masks = {}
+            baseline_ms = 0
             
-            baseline_ms = info.get('baseline_ms', 0)
-            action_mask = env.unwrapped.get_action_mask()
+            for model_name, env in envs.items():
+                # Query index 설정
+                if hasattr(env, 'unwrapped'):
+                    env.unwrapped.current_query_ix = query_idx
+                    obs, info = env.reset()
+                    # Action mask는 discrete action space만 사용
+                    if hasattr(env.unwrapped, 'get_action_mask'):
+                        action_masks[model_name] = env.unwrapped.get_action_mask()
+                    else:
+                        action_masks[model_name] = None
+                elif hasattr(env, 'current_query_ix'):
+                    env.current_query_ix = query_idx
+                    obs, info = env.reset()
+                    # Action mask는 discrete action space만 사용
+                    action_masks[model_name] = getattr(env, 'get_action_mask', lambda: None)()
+                else:
+                    obs, info = env.reset(options={'query_index': query_idx})
+                    action_masks[model_name] = info.get('action_mask', None)
+                
+                observations[model_name] = obs
+                
+                # Baseline은 첫 환경에서만 가져옴 (환경마다 키 이름이 다름)
+                if baseline_ms == 0:
+                    baseline_ms = info.get('baseline_ms') or info.get('baseline_time', 0)
             
             # Query info for validator
             query_info = {
@@ -128,18 +186,21 @@ def evaluate_ensemble_v2(
                 'query_idx': query_idx
             }
             
-            # Ensemble prediction
-            action, pred_info = ensemble.predict(
-                observation=obs,
+            # Ensemble prediction (각 모델에게 자신의 observation 전달)
+            action, pred_info = ensemble.predict_with_multi_env(
+                observations=observations,
+                action_masks=action_masks,
                 query_type=query_type,
-                query_info=query_info,
-                action_mask=action_mask
+                query_info=query_info
             )
             
-            # Execute action
-            obs, reward, terminated, truncated, step_info = env.step(action)
+            # 하나의 환경에서만 action 실행 (baseline 환경)
+            obs, reward, terminated, truncated, step_info = baseline_env.step(action)
             
-            optimized_ms = step_info.get('optimized_ms', baseline_ms)
+            # 환경마다 키 이름이 다름 (optimized_ms, current_time 등)
+            optimized_ms = (step_info.get('optimized_ms') or 
+                           step_info.get('current_time') or 
+                           step_info.get('elapsed_time_ms', baseline_ms))
             speedup = baseline_ms / optimized_ms if optimized_ms > 0 else 0
             
             # Record result for validator learning
@@ -258,7 +319,8 @@ def evaluate_ensemble_v2(
     ensemble.print_stats()
     
     # 환경 정리
-    env.close()
+    for env in envs.values():
+        env.close()
     
     print("\n[SUCCESS] Evaluation completed!")
     

@@ -20,14 +20,17 @@ class QueryTypeRouter:
     - SIMPLE 쿼리에서 액션 자제 (NO_ACTION 선호)
     """
     
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False, enable_filtering: bool = False):
         """
         Args:
             verbose: 필터링 과정 로깅 여부
+            enable_filtering: 필터링 활성화 여부 (기본 False - v2에서 비활성화)
         """
         self.verbose = verbose
+        self.enable_filtering = enable_filtering
         
-        # 쿼리 타입별 허용 액션 정의
+        # 쿼리 타입별 허용 액션 정의 (DQN v4 action space 기준)
+        # PPO v3는 44개 액션이므로 이 필터링이 적용되지 않음
         self.allowed_actions = {
             'TOP': [14, 15, 16, 17, 18],      # FAST_10/50/100/200, NO_ACTION
             'JOIN_HEAVY': [3, 4, 5, 6, 18],   # HASH/LOOP/MERGE/FORCE, NO_ACTION
@@ -36,7 +39,7 @@ class QueryTypeRouter:
             'SIMPLE': [18],                    # NO_ACTION만 (최소 개입)
             'SUBQUERY': [3, 4, 5, 7, 13, 18], # JOIN 힌트 + OPTIMIZE + RECOMPILE
             'WINDOW': [0, 1, 2, 7, 18],       # MAXDOP + OPTIMIZE_FOR_UNKNOWN
-            'DEFAULT': list(range(19)),        # 모든 액션 허용
+            'DEFAULT': list(range(100)),       # 모든 액션 허용 (PPO 포함)
         }
         
         # TOP 쿼리 특별 규칙
@@ -76,6 +79,10 @@ class QueryTypeRouter:
         if query_type not in self.filter_stats['filtered_by_type']:
             self.filter_stats['filtered_by_type'][query_type] = 0
         self.filter_stats['filtered_by_type'][query_type] += 1
+        
+        # v2: 필터링 비활성화 (PPO action space 불일치 문제)
+        if not self.enable_filtering:
+            return predictions, confidences if confidences else {}
         
         # 허용 액션 목록 가져오기
         allowed = self.allowed_actions.get(query_type, self.allowed_actions['DEFAULT'])

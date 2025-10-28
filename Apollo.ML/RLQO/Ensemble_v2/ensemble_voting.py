@@ -83,7 +83,8 @@ class VotingEnsembleV2:
         
         # v2 신규 컴포넌트
         self.action_converter = ContinuousToDiscreteConverter(verbose=False)
-        self.query_router = QueryTypeRouter(verbose=verbose) if use_query_router else None
+        # Router는 비활성화 모드로 생성 (PPO action space 불일치 문제)
+        self.query_router = QueryTypeRouter(verbose=verbose, enable_filtering=False) if use_query_router else None
         self.action_validator = ActionValidator(
             min_baseline_for_maxdop=ACTION_VALIDATOR_CONFIG['min_baseline_for_maxdop'],
             failure_rate_threshold=ACTION_VALIDATOR_CONFIG['failure_rate_threshold'],
@@ -164,6 +165,121 @@ class VotingEnsembleV2:
         
         if len(self.loaded_models) == 0:
             raise RuntimeError("No models loaded successfully!")
+    
+    def predict_with_multi_env(
+        self,
+        observations: Dict[str, np.ndarray],
+        action_masks: Dict[str, Optional[np.ndarray]],
+        query_type: str = 'DEFAULT',
+        query_info: Optional[Dict] = None
+    ) -> Tuple[int, Dict]:
+        """
+        Multi-Environment Ensemble 예측: 각 모델이 자신의 환경에서 observation을 받음
+        
+        Args:
+            observations: {model_name: observation}
+            action_masks: {model_name: action_mask}
+            query_type: 쿼리 타입
+            query_info: 쿼리 정보
+        
+        Returns:
+            final_action: 최종 선택된 액션
+            info: 상세 정보
+        """
+        predictions = {}
+        confidences = {}
+        
+        # 각 모델로부터 예측 수집
+        for model_name in self.loaded_models:
+            if model_name not in observations:
+                continue
+            
+            try:
+                model = self.models[model_name]
+                model_type = self.model_types[model_name]
+                observation = observations[model_name]
+                action_mask = action_masks.get(model_name, None)
+                
+                if model_type == 'discrete':
+                    # DQN, PPO: discrete action
+                    if model_name == 'ppo_v3' and action_mask is not None:
+                        action, _ = model.predict(observation, action_masks=action_mask, deterministic=True)
+                    else:
+                        action, _ = model.predict(observation, deterministic=True)
+                    
+                    # Confidence 계산
+                    confidence = self._get_discrete_confidence(model, observation, action, model_name, action_mask)
+                    
+                    predictions[model_name] = int(action)
+                    confidences[model_name] = confidence
+                
+                elif model_type == 'continuous':
+                    # DDPG, SAC: continuous action → discrete action으로 변환 (v2 개선)
+                    action, _ = model.predict(observation, deterministic=True)
+                    
+                    # v2: 개선된 변환 로직 사용
+                    discrete_action = self.action_converter.convert(action)
+                    
+                    # Confidence 계산
+                    confidence = self._get_continuous_confidence(model, observation, action, model_name)
+                    
+                    predictions[model_name] = discrete_action
+                    confidences[model_name] = confidence
+                    
+            except Exception as e:
+                if self.verbose:
+                    print(f"[WARN] {model_name} prediction failed: {e}")
+                continue
+        
+        # Confidence threshold 적용
+        filtered_predictions = {
+            k: v for k, v in predictions.items()
+            if confidences[k] >= self.confidence_threshold
+        }
+        filtered_confidences = {
+            k: v for k, v in confidences.items()
+            if v >= self.confidence_threshold
+        }
+        
+        # Action Validator 적용 (v2 신규)
+        if self.use_action_validator and self.action_validator and query_info:
+            filtered_predictions, filtered_confidences = self.action_validator.filter_unsafe_actions(
+                filtered_predictions, filtered_confidences, query_info
+            )
+        
+        # Query Type Router 적용 (v2 신규)
+        if self.use_query_router and self.query_router:
+            filtered_predictions, filtered_confidences = self.query_router.filter_actions_for_query(
+                query_type, filtered_predictions, filtered_confidences
+            )
+            
+            # TOP 쿼리에 대해 NO_ACTION boost
+            filtered_confidences = self.query_router.boost_no_action_for_top(
+                query_type, filtered_predictions, filtered_confidences
+            )
+        
+        # 투표 전략에 따라 최종 액션 선택
+        if len(filtered_predictions) == 0:
+            final_action = 18  # NO_ACTION (모든 모델이 threshold 이하)
+        else:
+            final_action = self._apply_voting_strategy(
+                filtered_predictions,
+                filtered_confidences,
+                query_type
+            )
+        
+        # 상세 정보 반환
+        info = {
+            'predictions': predictions,
+            'confidences': confidences,
+            'filtered_predictions': filtered_predictions,
+            'filtered_confidences': filtered_confidences,
+            'final_action': final_action,
+            'voting_strategy': self.voting_strategy,
+            'query_type': query_type,
+        }
+        
+        return final_action, info
     
     def predict(
         self,

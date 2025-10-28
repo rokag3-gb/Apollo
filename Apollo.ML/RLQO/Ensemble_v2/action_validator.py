@@ -72,23 +72,23 @@ class ActionValidator:
         query_type = query_info.get('type', 'UNKNOWN')
         baseline_ms = query_info.get('baseline_ms', 0)
         
-        # 규칙 1: Baseline < min_baseline → MAXDOP 계열 제외
-        if baseline_ms < self.min_baseline_for_maxdop and action_id in [0, 1, 2]:
+        # 규칙 1: Baseline < min_baseline → MAXDOP 계열 제외 (Baseline이 유효할 때만)
+        if baseline_ms > 0 and baseline_ms < self.min_baseline_for_maxdop and action_id in [0, 1, 2]:
             reason = f"Baseline too fast ({baseline_ms:.1f}ms) for MAXDOP"
             self._record_rejection(reason)
             return False, reason
         
-        # 규칙 2: TOP 쿼리 → LOOP_JOIN 제외
-        if query_type == 'TOP' and action_id == 4:
-            reason = "LOOP_JOIN not recommended for TOP queries"
-            self._record_rejection(reason)
-            return False, reason
+        # 규칙 2: TOP 쿼리 → LOOP_JOIN 제외 (v2에서 완화 - 비활성화)
+        # if query_type == 'TOP' and action_id == 4:
+        #     reason = "LOOP_JOIN not recommended for TOP queries"
+        #     self._record_rejection(reason)
+        #     return False, reason
         
-        # 규칙 3: SIMPLE 쿼리 → NO_ACTION만 허용
-        if query_type == 'SIMPLE' and action_id != 18:
-            reason = "Only NO_ACTION allowed for SIMPLE queries"
-            self._record_rejection(reason)
-            return False, reason
+        # 규칙 3: SIMPLE 쿼리 → NO_ACTION만 허용 (v2에서 완화 - 비활성화)
+        # if query_type == 'SIMPLE' and action_id != 18:
+        #     reason = "Only NO_ACTION allowed for SIMPLE queries"
+        #     self._record_rejection(reason)
+        #     return False, reason
         
         # 규칙 4: 과거 실패율 > threshold → 제외
         if self.enable_failure_tracking:

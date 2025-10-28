@@ -124,8 +124,8 @@ def query_type_based_vote(predictions: Dict[str, int], type_weights: Dict[str, f
 def safety_first_vote(
     predictions: Dict[str, int],
     confidences: Dict[str, float],
-    safety_threshold: float = 0.4,
-    disagreement_threshold: float = 0.5
+    safety_threshold: float = 0.2,
+    disagreement_threshold: float = 0.25
 ) -> int:
     """
     Safety-First Voting: 안전성 우선 투표 (v2 신규)
@@ -138,8 +138,8 @@ def safety_first_vote(
     Args:
         predictions: {model_name: action}
         confidences: {model_name: confidence}
-        safety_threshold: 평균 confidence 임계값 (default: 0.4)
-        disagreement_threshold: 동의율 임계값 (default: 0.5)
+        safety_threshold: 평균 confidence 임계값 (default: 0.2, v2 완화)
+        disagreement_threshold: 동의율 임계값 (default: 0.25, v2 완화)
     
     Returns:
         action: 안전성 우선 투표 결과
