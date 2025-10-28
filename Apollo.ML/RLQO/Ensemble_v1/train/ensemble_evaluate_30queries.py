@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Ensemble v1: Multi-Environment Evaluation
+Ensemble v1: 30-Query Evaluation (3 Models)
 
-각 모델이 자신의 환경을 사용하도록 수정된 평가 스크립트
+PPO v3, DDPG v1, SAC v1 3개 모델로 30개 쿼리 평가
+(DQN v3는 9개 쿼리로만 학습되어 제외)
 """
 
 import os
@@ -31,14 +32,15 @@ from RLQO.constants2 import SAMPLE_QUERIES
 from RLQO.PPO_v3.config.query_action_mapping_v3 import QUERY_TYPES
 from RLQO.Ensemble_v1.config.ensemble_config import EVAL_CONFIG, OUTPUT_FILES, MODEL_PATHS, MODEL_ENV_TYPES
 
-from stable_baselines3 import DQN, DDPG, SAC
+from stable_baselines3 import DDPG, SAC
 from sb3_contrib import MaskablePPO
 from sb3_contrib.common.wrappers import ActionMasker
 
 
-class MultiEnvironmentEnsemble:
+class ThreeModelEnsemble:
     """
-    각 모델이 독립적인 환경을 사용하는 Ensemble
+    PPO v3, DDPG v1, SAC v1 3개 모델로 구성된 Ensemble
+    각 모델이 독립적인 환경을 사용
     """
     
     def __init__(self, voting_strategy: str = 'weighted', verbose: bool = True):
@@ -51,33 +53,12 @@ class MultiEnvironmentEnsemble:
         
     def load_models_and_envs(self, queries: List[str], max_steps: int = 1):
         """
-        모델과 각 모델의 환경을 로드합니다.
+        3개 모델과 각 모델의 환경을 로드합니다.
         """
         if self.verbose:
             print("=" * 80)
-            print("Loading Models and Environments")
+            print("Loading 3 Models and Environments (PPO v3, DDPG v1, SAC v1)")
             print("=" * 80)
-        
-        # DQN v3
-        try:
-            from RLQO.DQN_v3.env.v3_db_env import QueryPlanDBEnvV3
-            
-            if os.path.exists(MODEL_PATHS['dqn_v3']):
-                self.models['dqn_v3'] = DQN.load(MODEL_PATHS['dqn_v3'])
-                self.envs['dqn_v3'] = QueryPlanDBEnvV3(
-                    query_list=queries,
-                    max_steps=max_steps,
-                    verbose=False
-                )
-                self.loaded_models.append('dqn_v3')
-                if self.verbose:
-                    print(f"✓ DQN v3 loaded with QueryPlanDBEnvV3")
-            else:
-                if self.verbose:
-                    print(f"✗ DQN v3 not found")
-        except Exception as e:
-            if self.verbose:
-                print(f"✗ DQN v3 load failed: {e}")
         
         # PPO v3
         try:
@@ -100,13 +81,13 @@ class MultiEnvironmentEnsemble:
                 self.envs['ppo_v3'] = ActionMasker(ppo_env, mask_fn)
                 self.loaded_models.append('ppo_v3')
                 if self.verbose:
-                    print(f"✓ PPO v3 loaded with QueryPlanDBEnvPPOv3")
+                    print(f"[OK] PPO v3 loaded with QueryPlanDBEnvPPOv3")
             else:
                 if self.verbose:
-                    print(f"✗ PPO v3 not found")
+                    print(f"[X] PPO v3 not found at {MODEL_PATHS['ppo_v3']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ PPO v3 load failed: {e}")
+                print(f"[X] PPO v3 load failed: {e}")
         
         # DDPG v1
         try:
@@ -121,13 +102,13 @@ class MultiEnvironmentEnsemble:
                 )
                 self.loaded_models.append('ddpg_v1')
                 if self.verbose:
-                    print(f"✓ DDPG v1 loaded with QueryPlanRealDBEnvDDPGv1")
+                    print(f"[OK] DDPG v1 loaded with QueryPlanRealDBEnvDDPGv1")
             else:
                 if self.verbose:
-                    print(f"✗ DDPG v1 not found")
+                    print(f"[X] DDPG v1 not found at {MODEL_PATHS['ddpg_v1']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ DDPG v1 load failed: {e}")
+                print(f"[X] DDPG v1 load failed: {e}")
         
         # SAC v1
         try:
@@ -142,17 +123,17 @@ class MultiEnvironmentEnsemble:
                 )
                 self.loaded_models.append('sac_v1')
                 if self.verbose:
-                    print(f"✓ SAC v1 loaded with make_sac_db_env")
+                    print(f"[OK] SAC v1 loaded with make_sac_db_env")
             else:
                 if self.verbose:
-                    print(f"✗ SAC v1 not found")
+                    print(f"[X] SAC v1 not found at {MODEL_PATHS['sac_v1']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ SAC v1 load failed: {e}")
+                print(f"[X] SAC v1 load failed: {e}")
         
         if self.verbose:
             print("=" * 80)
-            print(f"Loaded {len(self.loaded_models)}/4 models: {self.loaded_models}")
+            print(f"Loaded {len(self.loaded_models)}/3 models: {self.loaded_models}")
             print("=" * 80 + "\n")
         
         if len(self.loaded_models) == 0:
@@ -197,12 +178,6 @@ class MultiEnvironmentEnsemble:
                     # Confidence: policy probability
                     confidence = self._get_ppo_confidence(model, obs, action, action_mask)
                 
-                elif model_name == 'dqn_v3':
-                    # DQN
-                    action, _ = model.predict(obs, deterministic=True)
-                    # Confidence: Q-value
-                    confidence = self._get_dqn_confidence(model, obs, action)
-                
                 elif model_name in ['ddpg_v1', 'sac_v1']:
                     # DDPG, SAC
                     continuous_action, _ = model.predict(obs, deterministic=True)
@@ -223,18 +198,6 @@ class MultiEnvironmentEnsemble:
         final_action = self._apply_voting_strategy(predictions, confidences)
         
         return final_action, predictions, confidences, observations, baseline_time
-    
-    def _get_dqn_confidence(self, model, obs, action):
-        """DQN confidence"""
-        try:
-            q_values = model.q_net(model.policy.obs_to_tensor(obs)[0])
-            q_values = q_values.detach().cpu().numpy().flatten()
-            max_q = np.max(q_values)
-            selected_q = q_values[action]
-            confidence = selected_q / (max_q + 1e-8)
-            return float(np.clip(confidence, 0, 1))
-        except:
-            return 0.5
     
     def _get_ppo_confidence(self, model, obs, action, action_mask):
         """PPO confidence"""
@@ -326,7 +289,7 @@ class MultiEnvironmentEnsemble:
         """
         모든 환경에 동일한 액션을 적용하고 baseline 대비 성능 측정
         
-        DQN 환경을 대표로 사용 (실제 DB 실행)
+        첫 번째 모델의 환경을 대표로 사용 (실제 DB 실행)
         """
         env = self.envs[self.loaded_models[0]]  # 첫 번째 모델의 환경 사용
         
@@ -344,26 +307,27 @@ class MultiEnvironmentEnsemble:
                 pass
 
 
-def evaluate_ensemble_multienv(
+def evaluate_3model_ensemble(
     voting_strategy: str = 'weighted',
     n_queries: int = 30,
     n_episodes: int = 10,
     verbose: bool = True
 ):
     """
-    Multi-Environment Ensemble 평가
+    3-Model Ensemble 평가 (PPO v3, DDPG v1, SAC v1)
     """
     
     if verbose:
         print("=" * 80)
-        print(f"Multi-Environment Ensemble: {voting_strategy.upper()}")
+        print(f"3-Model Ensemble Evaluation: {voting_strategy.upper()}")
         print("=" * 80)
-        print(f"Queries: {n_queries}")
+        print(f"Models: PPO v3, DDPG v1, SAC v1")
+        print(f"Queries: {n_queries} (Q0-Q{n_queries-1})")
         print(f"Episodes: {n_episodes}")
         print("=" * 80 + "\n")
     
     # Create ensemble
-    ensemble = MultiEnvironmentEnsemble(voting_strategy=voting_strategy, verbose=verbose)
+    ensemble = ThreeModelEnsemble(voting_strategy=voting_strategy, verbose=verbose)
     ensemble.load_models_and_envs(SAMPLE_QUERIES[:n_queries], max_steps=1)
     
     # Results
@@ -372,7 +336,7 @@ def evaluate_ensemble_multienv(
         'voting_strategy': voting_strategy,
         'n_queries': n_queries,
         'n_episodes': n_episodes,
-        'loaded_models': ensemble.loaded_models,
+        'models': ensemble.loaded_models,
         'query_results': {},
         'detailed_results': [],
         'action_counts': defaultdict(int),
@@ -386,7 +350,7 @@ def evaluate_ensemble_multienv(
         print(f"{'Query':<8} {'Episode':<10} {'Type':<15} {'Baseline(ms)':<15} {'Optimized(ms)':<15} {'Speedup':<10} {'Action':<8}")
         print("-" * 100)
     
-    # Evaluate (baseline measured on first episode)
+    # Evaluate
     for q_idx in range(n_queries):
         query_type = QUERY_TYPES.get(q_idx, 'UNKNOWN')
         query_speedups = []
@@ -395,7 +359,7 @@ def evaluate_ensemble_multienv(
         
         for episode in range(n_episodes):
             try:
-                # Predict with ensemble (each model uses its own env)
+                # Predict with ensemble
                 action, predictions, confidences, observations, episode_baseline = ensemble.predict(q_idx, episode)
                 
                 # Get baseline from first episode
@@ -470,18 +434,20 @@ def evaluate_ensemble_multienv(
             'win_rate': float(np.mean([s > 1.0 for s in total_speedups])),
             'safe_rate': float(np.mean([s >= 0.9 for s in total_speedups])),
             'mean_agreement': float(np.mean(results['model_agreement'])),
+            'total_evaluations': len(total_speedups),
         }
         
         if verbose:
             print("\n" + "=" * 80)
             print("Evaluation Summary")
             print("=" * 80)
-            print(f"Mean Speedup:   {results['summary']['mean_speedup']:.3f}x")
-            print(f"Median Speedup: {results['summary']['median_speedup']:.3f}x")
-            print(f"Max Speedup:    {results['summary']['max_speedup']:.3f}x")
-            print(f"Win Rate:       {results['summary']['win_rate']*100:.1f}%")
-            print(f"Safe Rate:      {results['summary']['safe_rate']*100:.1f}%")
-            print(f"Model Agreement: {results['summary']['mean_agreement']*100:.1f}%")
+            print(f"Total Evaluations: {results['summary']['total_evaluations']}")
+            print(f"Mean Speedup:      {results['summary']['mean_speedup']:.3f}x")
+            print(f"Median Speedup:    {results['summary']['median_speedup']:.3f}x")
+            print(f"Max Speedup:       {results['summary']['max_speedup']:.3f}x")
+            print(f"Win Rate:          {results['summary']['win_rate']*100:.1f}%")
+            print(f"Safe Rate:         {results['summary']['safe_rate']*100:.1f}%")
+            print(f"Model Agreement:   {results['summary']['mean_agreement']*100:.1f}%")
             print("=" * 80 + "\n")
     
     return results
@@ -490,16 +456,24 @@ def evaluate_ensemble_multienv(
 def main():
     """Main evaluation"""
     
-    # Full evaluation
-    results = evaluate_ensemble_multienv(
+    print("=" * 80)
+    print("3-Model Ensemble: 30 Query Evaluation")
+    print("=" * 80)
+    print("Models: PPO v3, DDPG v1, SAC v1")
+    print("Queries: 30 (constants2.py)")
+    print("Note: DQN v3 excluded (trained on 9 queries only)")
+    print("=" * 80 + "\n")
+    
+    # Full evaluation (30 queries × 10 episodes = 300 evaluations)
+    results = evaluate_3model_ensemble(
         voting_strategy='weighted',
-        n_queries=30,  # Full 30 queries
-        n_episodes=10, # Full 10 episodes
+        n_queries=30,
+        n_episodes=10,
         verbose=True
     )
     
     # Save results
-    output_file = os.path.join(os.path.dirname(__file__), '..', 'results', 'multienv_full_results.json')
+    output_file = os.path.join(os.path.dirname(__file__), '..', 'results', 'ensemble_3models_30queries.json')
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     
     with open(output_file, 'w', encoding='utf-8') as f:
