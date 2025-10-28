@@ -14,6 +14,7 @@ ARTIFACTS_DIR = os.path.join(PROJECT_ROOT, 'Apollo.ML', 'artifacts', 'RLQO', 'mo
 # 모델 경로 (Real DB Fine-tuned 모델)
 MODEL_PATHS = {
     'dqn_v3': os.path.join(ARTIFACTS_DIR, 'dqn_v3_final.zip'),
+    'dqn_v4': os.path.join(ARTIFACTS_DIR, 'dqn_v4_final.zip'),  # NEW: 30 queries support
     'ppo_v3': os.path.join(ARTIFACTS_DIR, 'ppo_v3_realdb_50k.zip'),
     'ddpg_v1': os.path.join(ARTIFACTS_DIR, 'ddpg_v1_realdb_50k.zip'),
     'sac_v1': os.path.join(ARTIFACTS_DIR, 'sac_v1_realdb_50k.zip'),
@@ -21,16 +22,18 @@ MODEL_PATHS = {
 
 # 모델별 환경 타입 (각 모델이 사용하는 환경)
 MODEL_ENV_TYPES = {
-    'dqn_v3': 'dqn',    # QueryPlanDBEnvV3 (79-dim observation)
-    'ppo_v3': 'ppo',    # QueryPlanDBEnvPPOv3 (18-dim observation)
-    'ddpg_v1': 'ddpg',  # QueryPlanRealDBEnvDDPGv1 (18-dim observation)
-    'sac_v1': 'sac',    # make_sac_db_env (18-dim observation)
+    'dqn_v3': 'dqn_v3',  # QueryPlanDBEnvV3 (79-dim observation, 9 queries)
+    'dqn_v4': 'dqn_v4',  # QueryPlanDBEnvV4 (79-dim observation, 30 queries)
+    'ppo_v3': 'ppo',     # QueryPlanDBEnvPPOv3 (18-dim observation)
+    'ddpg_v1': 'ddpg',   # QueryPlanRealDBEnvDDPGv1 (18-dim observation)
+    'sac_v1': 'sac',     # make_sac_db_env (18-dim observation)
 }
 
 # 모델 타입 정의
 MODEL_TYPES = {
-    'dqn_v3': 'discrete',   # DQN - Discrete action space
-    'ppo_v3': 'discrete',   # PPO - Discrete action space (with masking)
+    'dqn_v3': 'discrete',    # DQN v3 - Discrete action space (9 queries)
+    'dqn_v4': 'discrete',    # DQN v4 - Discrete action space (30 queries)
+    'ppo_v3': 'discrete',    # PPO - Discrete action space (with masking)
     'ddpg_v1': 'continuous', # DDPG - Continuous action space
     'sac_v1': 'continuous',  # SAC - Continuous action space
 }
@@ -45,12 +48,14 @@ VOTING_STRATEGIES = {
 }
 
 # 모델별 기본 성능 가중치 (평가 보고서 기반)
-# DQN v3: Mean Speedup ~1.15x
+# DQN v3: Mean Speedup ~1.15x (9 queries)
+# DQN v4: Mean Speedup ~1.30x (30 queries, 추정)
 # PPO v3: Mean Speedup ~1.20x
 # DDPG v1: Mean Speedup ~1.88x
-# SAC v1: Mean Speedup ~1.50x (추정)
+# SAC v1: Mean Speedup ~1.50x
 PERFORMANCE_WEIGHTS = {
     'dqn_v3': 1.15,
+    'dqn_v4': 1.30,
     'ppo_v3': 1.20,
     'ddpg_v1': 1.88,
     'sac_v1': 1.50,
