@@ -19,6 +19,14 @@ MODEL_PATHS = {
     'sac_v1': os.path.join(ARTIFACTS_DIR, 'sac_v1_realdb_50k.zip'),
 }
 
+# 모델별 환경 타입 (각 모델이 사용하는 환경)
+MODEL_ENV_TYPES = {
+    'dqn_v3': 'dqn',    # QueryPlanDBEnvV3 (79-dim observation)
+    'ppo_v3': 'ppo',    # QueryPlanDBEnvPPOv3 (18-dim observation)
+    'ddpg_v1': 'ddpg',  # QueryPlanRealDBEnvDDPGv1 (18-dim observation)
+    'sac_v1': 'sac',    # make_sac_db_env (18-dim observation)
+}
+
 # 모델 타입 정의
 MODEL_TYPES = {
     'dqn_v3': 'discrete',   # DQN - Discrete action space
