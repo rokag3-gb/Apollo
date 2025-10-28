@@ -162,9 +162,9 @@ class QueryPlanSimEnvV4(gym.Env):
     def __init__(self, 
                  query_list: list[str],
                  max_steps=10,
-                 action_space_path='Apollo.ML/artifacts/RLQO/configs/v3_action_space.json',
-                 compatibility_path='Apollo.ML/artifacts/RLQO/configs/v3_query_action_compatibility.json',
-                 cache_path='Apollo.ML/artifacts/RLQO/cache/v2_plan_cache.pkl',
+                 action_space_path='Apollo.ML/artifacts/RLQO/configs/v4_action_space.json',
+                 compatibility_path='Apollo.ML/artifacts/RLQO/configs/v4_query_action_compatibility.json',
+                 cache_path='Apollo.ML/artifacts/RLQO/cache/v4_plan_cache.pkl',
                  curriculum_mode=False,
                  verbose=True):
         super().__init__()

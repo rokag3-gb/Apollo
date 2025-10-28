@@ -133,8 +133,8 @@ class QueryPlanDBEnvV4(gym.Env):
     def __init__(self, 
                  query_list: list[str], 
                  max_steps=10,
-                 action_space_path='Apollo.ML/artifacts/RLQO/configs/v3_action_space.json',
-                 compatibility_path='Apollo.ML/artifacts/RLQO/configs/v3_query_action_compatibility.json',
+                 action_space_path='Apollo.ML/artifacts/RLQO/configs/v4_action_space.json',
+                 compatibility_path='Apollo.ML/artifacts/RLQO/configs/v4_query_action_compatibility.json',
                  curriculum_mode=False,
                  verbose=True):
         super().__init__()
