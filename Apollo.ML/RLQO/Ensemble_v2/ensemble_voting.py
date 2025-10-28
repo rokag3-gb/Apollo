@@ -42,6 +42,7 @@ from RLQO.Ensemble_v2.voting_strategies import (
 from RLQO.Ensemble_v2.action_converter import ContinuousToDiscreteConverter
 from RLQO.Ensemble_v2.query_type_router import QueryTypeRouter
 from RLQO.Ensemble_v2.action_validator import ActionValidator
+from RLQO.Ensemble_v2.ppo_action_mapper import PPOToDQNActionMapper
 
 
 class VotingEnsembleV2:
@@ -83,6 +84,7 @@ class VotingEnsembleV2:
         
         # v2 신규 컴포넌트
         self.action_converter = ContinuousToDiscreteConverter(verbose=False)
+        self.ppo_action_mapper = PPOToDQNActionMapper(verbose=False)  # PPO 44→DQN 19 액션 매핑
         # Router는 비활성화 모드로 생성 (PPO action space 불일치 문제)
         self.query_router = QueryTypeRouter(verbose=verbose, enable_filtering=False) if use_query_router else None
         self.action_validator = ActionValidator(
@@ -210,7 +212,14 @@ class VotingEnsembleV2:
                     # Confidence 계산
                     confidence = self._get_discrete_confidence(model, observation, action, model_name, action_mask)
                     
-                    predictions[model_name] = int(action)
+                    # v2: PPO v3의 44개 액션을 DQN v4의 19개 액션으로 매핑
+                    if model_name == 'ppo_v3':
+                        original_action = int(action)
+                        mapped_action = self.ppo_action_mapper.convert(original_action)
+                        predictions[model_name] = mapped_action
+                    else:
+                        predictions[model_name] = int(action)
+                    
                     confidences[model_name] = confidence
                 
                 elif model_type == 'continuous':
@@ -526,6 +535,9 @@ class VotingEnsembleV2:
         if self.action_converter:
             stats['action_converter'] = self.action_converter.get_stats()
         
+        if self.ppo_action_mapper:
+            stats['ppo_action_mapper'] = self.ppo_action_mapper.get_stats()
+        
         if self.query_router:
             stats['query_router'] = self.query_router.get_stats()
         
@@ -545,6 +557,10 @@ class VotingEnsembleV2:
         if self.action_converter:
             print()
             self.action_converter.print_stats()
+        
+        if self.ppo_action_mapper:
+            print()
+            self.ppo_action_mapper.print_stats()
         
         if self.query_router:
             print()
