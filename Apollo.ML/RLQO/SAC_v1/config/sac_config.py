@@ -36,7 +36,7 @@ SAC_CONFIG = {
     
     # Logging
     "verbose": 1,
-    "tensorboard_log": "./artifacts/RLQO/tb/sac_v1/",
+    "tensorboard_log": "./Apollo.ML/artifacts/RLQO/tb/sac_v1/",
 }
 
 # Simulation Training Config
@@ -70,9 +70,9 @@ SAC_EVAL_CONFIG = {
 
 # Model Save Paths
 MODEL_PATHS = {
-    "sim": "artifacts/RLQO/models/sac_v1_sim_100k.zip",
-    "realdb": "artifacts/RLQO/models/sac_v1_realdb_50k.zip",
-    "checkpoint_dir": "artifacts/RLQO/models/checkpoints/sac_v1/",
+    "sim": "Apollo.ML/artifacts/RLQO/models/sac_v1_sim_100k.zip",
+    "realdb": "Apollo.ML/artifacts/RLQO/models/sac_v1_realdb_50k.zip",
+    "checkpoint_dir": "Apollo.ML/artifacts/RLQO/models/checkpoints/sac_v1/",
 }
 
 # Environment Config

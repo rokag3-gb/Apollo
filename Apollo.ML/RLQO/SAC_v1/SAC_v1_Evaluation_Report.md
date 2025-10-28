@@ -421,7 +421,7 @@ SAC v1은 **Apollo 프로젝트 역대 최고 성능 모델**입니다:
 - **Simulation 모델**: `Apollo.ML/artifacts/RLQO/models/sac_v1_sim_100k.zip`
 
 ### 평가 결과
-- **Real DB 평가** (최신): `sac_v1_realdb_eval.json`
+- **Real DB 평가** (최신): `Apollo.ML/sac_v1_realdb_eval.json`
 
 ### 학습 로그
 - **Simulation 로그**: `Apollo.ML/artifacts/RLQO/logs/sac_v1_sim/`

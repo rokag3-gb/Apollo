@@ -1,0 +1,7947 @@
+{
+  "majority": {
+    "timestamp": "2025-10-28T11:08:10.773807",
+    "voting_strategy": "majority",
+    "n_queries": 30,
+    "n_episodes": 10,
+    "baselines": {
+      "0": 17.0,
+      "1": 8.5,
+      "2": 1689.5,
+      "3": 388.5,
+      "4": 2.0,
+      "5": 557.0,
+      "6": 24.0,
+      "7": 23.5,
+      "8": 25.0,
+      "9": -1,
+      "10": 7.0,
+      "11": -1,
+      "12": 6.0,
+      "13": -1,
+      "14": 6.0,
+      "15": 6.0,
+      "16": -1,
+      "17": 6.0,
+      "18": 6.0,
+      "19": 6.0,
+      "20": 7.0,
+      "21": 6.0,
+      "22": 6.0,
+      "23": 6.0,
+      "24": 6.5,
+      "25": 5.5,
+      "26": 5.5,
+      "27": 5.0,
+      "28": 6.0,
+      "29": 6.0
+    },
+    "query_results": {
+      "0": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9708597615834458,
+        "median_speedup": 1.0,
+        "std_speedup": 0.12886991992244473,
+        "min_speedup": 0.6538461538461539,
+        "max_speedup": 1.1333333333333333,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "1": {
+        "query_type": "CTE",
+        "mean_speedup": 1.1535714285714285,
+        "median_speedup": 1.2142857142857142,
+        "std_speedup": 0.074359510048775,
+        "min_speedup": 1.0625,
+        "max_speedup": 1.2142857142857142,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "2": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 1.0192116335723367,
+        "median_speedup": 1.033700604688526,
+        "std_speedup": 0.04462416506837585,
+        "min_speedup": 0.9192056583242655,
+        "max_speedup": 1.0733799237611181,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "3": {
+        "query_type": "TOP",
+        "mean_speedup": 1.0417600599830095,
+        "median_speedup": 1.0346663687816502,
+        "std_speedup": 0.04087630590618128,
+        "min_speedup": 0.9761306532663316,
+        "max_speedup": 1.1036931818181819,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "4": {
+        "query_type": "TOP",
+        "mean_speedup": 0.9333333333333332,
+        "median_speedup": 1.0,
+        "std_speedup": 0.13333333333333336,
+        "min_speedup": 0.6666666666666666,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "5": {
+        "query_type": "SUBQUERY",
+        "mean_speedup": 1.0081499084738066,
+        "median_speedup": 1.017372810675563,
+        "std_speedup": 0.03510899574626785,
+        "min_speedup": 0.9221854304635762,
+        "max_speedup": 1.048964218455744,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "6": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.8375538061217573,
+        "median_speedup": 0.905982905982906,
+        "std_speedup": 0.15266095508553915,
+        "min_speedup": 0.43636363636363634,
+        "max_speedup": 0.96,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "7": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9736852386743691,
+        "median_speedup": 0.9791666666666666,
+        "std_speedup": 0.050658149267554846,
+        "min_speedup": 0.9038461538461539,
+        "max_speedup": 1.0681818181818181,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "29": {
+        "query_type": "AGGREGATE",
+        "mean_speedup": 1.0061538461538462,
+        "median_speedup": 1.0,
+        "std_speedup": 0.20237641418345043,
+        "min_speedup": 0.46153846153846156,
+        "max_speedup": 1.2,
+        "episodes": 10,
+        "most_common_action": 1
+      }
+    },
+    "detailed_results": [
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 17.0,
+        "optimized_ms": 18.0,
+        "speedup": 0.9444444444444444,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 17.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.6538461538461539,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 17.0,
+        "optimized_ms": 15.0,
+        "speedup": 1.1333333333333333,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 0,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 1,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 2,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 3,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 4,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 5,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 6,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 7,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 8,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 9,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1574.0,
+        "speedup": 1.0733799237611181,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1607.0,
+        "speedup": 1.0513378967019291,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1646.0,
+        "speedup": 1.0264277035236937,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1609.0,
+        "speedup": 1.0500310752019888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1647.0,
+        "speedup": 1.0258044930176078,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1838.0,
+        "speedup": 0.9192056583242655,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1623.0,
+        "speedup": 1.040973505853358,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1616.0,
+        "speedup": 1.0454826732673268,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1694.0,
+        "speedup": 0.9973435655253837,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1756.0,
+        "speedup": 0.962129840546697,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 388.5,
+        "optimized_ms": 387.0,
+        "speedup": 1.003875968992248,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 388.5,
+        "optimized_ms": 388.0,
+        "speedup": 1.0012886597938144,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 388.5,
+        "optimized_ms": 373.0,
+        "speedup": 1.0415549597855227,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 388.5,
+        "optimized_ms": 379.0,
+        "speedup": 1.025065963060686,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 388.5,
+        "optimized_ms": 352.0,
+        "speedup": 1.1036931818181819,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 388.5,
+        "optimized_ms": 378.0,
+        "speedup": 1.0277777777777777,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 388.5,
+        "optimized_ms": 354.0,
+        "speedup": 1.097457627118644,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 388.5,
+        "optimized_ms": 359.0,
+        "speedup": 1.0821727019498608,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 388.5,
+        "optimized_ms": 398.0,
+        "speedup": 0.9761306532663316,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 388.5,
+        "optimized_ms": 367.0,
+        "speedup": 1.05858310626703,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 0,
+        "baseline_ms": 557.0,
+        "optimized_ms": 531.0,
+        "speedup": 1.048964218455744,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 1,
+        "baseline_ms": 557.0,
+        "optimized_ms": 604.0,
+        "speedup": 0.9221854304635762,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 2,
+        "baseline_ms": 557.0,
+        "optimized_ms": 536.0,
+        "speedup": 1.039179104477612,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 3,
+        "baseline_ms": 557.0,
+        "optimized_ms": 550.0,
+        "speedup": 1.0127272727272727,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 4,
+        "baseline_ms": 557.0,
+        "optimized_ms": 539.0,
+        "speedup": 1.033395176252319,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 5,
+        "baseline_ms": 557.0,
+        "optimized_ms": 553.0,
+        "speedup": 1.0072332730560578,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 6,
+        "baseline_ms": 557.0,
+        "optimized_ms": 543.0,
+        "speedup": 1.0257826887661141,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 7,
+        "baseline_ms": 557.0,
+        "optimized_ms": 569.0,
+        "speedup": 0.9789103690685413,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 8,
+        "baseline_ms": 557.0,
+        "optimized_ms": 562.0,
+        "speedup": 0.9911032028469751,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 9,
+        "baseline_ms": 557.0,
+        "optimized_ms": 545.0,
+        "speedup": 1.0220183486238532,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 24.0,
+        "optimized_ms": 34.0,
+        "speedup": 0.7058823529411765,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 24.0,
+        "optimized_ms": 27.0,
+        "speedup": 0.8888888888888888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 24.0,
+        "optimized_ms": 55.0,
+        "speedup": 0.43636363636363634,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 24.0,
+        "optimized_ms": 29.0,
+        "speedup": 0.8275862068965517,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 24.0,
+        "optimized_ms": 29.0,
+        "speedup": 0.8275862068965517,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 23.5,
+        "optimized_ms": 26.0,
+        "speedup": 0.9038461538461539,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 23.5,
+        "optimized_ms": 26.0,
+        "speedup": 0.9038461538461539,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 0,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 1,
+        "baseline_ms": 6.0,
+        "optimized_ms": 13.0,
+        "speedup": 0.46153846153846156,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 2,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 3,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 4,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 5,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 6,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 7,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 8,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 9,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      }
+    ],
+    "action_counts": {
+      "1": 60,
+      "10": 30
+    },
+    "model_agreement": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "mean_speedup": 0.9938087796074816,
+      "median_speedup": 1.0,
+      "std_speedup": 0.1372218571665771,
+      "min_speedup": 0.43636363636363634,
+      "max_speedup": 1.2142857142857142,
+      "win_rate": 0.4777777777777778,
+      "safe_rate": 0.8777777777777778,
+      "total_evaluations": 90,
+      "mean_agreement": 1.0
+    }
+  },
+  "weighted": {
+    "timestamp": "2025-10-28T11:11:59.678992",
+    "voting_strategy": "weighted",
+    "n_queries": 30,
+    "n_episodes": 10,
+    "baselines": {
+      "0": 17.0,
+      "1": 8.5,
+      "2": 1689.5,
+      "3": 388.5,
+      "4": 2.0,
+      "5": 557.0,
+      "6": 24.0,
+      "7": 23.5,
+      "8": 25.0,
+      "9": -1,
+      "10": 7.0,
+      "11": -1,
+      "12": 6.0,
+      "13": -1,
+      "14": 6.0,
+      "15": 6.0,
+      "16": -1,
+      "17": 6.0,
+      "18": 6.0,
+      "19": 6.0,
+      "20": 7.0,
+      "21": 6.0,
+      "22": 6.0,
+      "23": 6.0,
+      "24": 6.5,
+      "25": 5.5,
+      "26": 5.5,
+      "27": 5.0,
+      "28": 6.0,
+      "29": 6.0
+    },
+    "query_results": {
+      "0": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.8130819835346264,
+        "median_speedup": 0.8337320574162679,
+        "std_speedup": 0.2395350126758145,
+        "min_speedup": 0.2073170731707317,
+        "max_speedup": 1.0625,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "1": {
+        "query_type": "CTE",
+        "mean_speedup": 0.888314393939394,
+        "median_speedup": 0.9444444444444444,
+        "std_speedup": 0.16588856583696127,
+        "min_speedup": 0.53125,
+        "max_speedup": 1.0625,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "2": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.6966923279201648,
+        "median_speedup": 0.6955537258130918,
+        "std_speedup": 0.0037458812895835927,
+        "min_speedup": 0.6924180327868853,
+        "max_speedup": 0.7051335559265443,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "3": {
+        "query_type": "TOP",
+        "mean_speedup": 0.9392596024275578,
+        "median_speedup": 0.9533871511676923,
+        "std_speedup": 0.05356191238309431,
+        "min_speedup": 0.8464052287581699,
+        "max_speedup": 1.0223684210526316,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "4": {
+        "query_type": "TOP",
+        "mean_speedup": 0.8833333333333332,
+        "median_speedup": 1.0,
+        "std_speedup": 0.18333333333333335,
+        "min_speedup": 0.5,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "5": {
+        "query_type": "SUBQUERY",
+        "mean_speedup": 0.892843008242364,
+        "median_speedup": 0.9072262853110717,
+        "std_speedup": 0.06016331229439615,
+        "min_speedup": 0.7567934782608695,
+        "max_speedup": 0.9737762237762237,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "6": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.945717567456698,
+        "median_speedup": 1.0217391304347827,
+        "std_speedup": 0.20673009995383385,
+        "min_speedup": 0.38095238095238093,
+        "max_speedup": 1.0909090909090908,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "7": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9517499999999999,
+        "median_speedup": 0.9791666666666666,
+        "std_speedup": 0.05822543592699747,
+        "min_speedup": 0.7833333333333333,
+        "max_speedup": 0.9791666666666666,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "29": {
+        "query_type": "AGGREGATE",
+        "mean_speedup": 0.9714285714285715,
+        "median_speedup": 1.0,
+        "std_speedup": 0.05714285714285716,
+        "min_speedup": 0.8571428571428571,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      }
+    },
+    "detailed_results": [
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 17.0,
+        "optimized_ms": 22.0,
+        "speedup": 0.7727272727272727,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 17.0,
+        "optimized_ms": 23.0,
+        "speedup": 0.7391304347826086,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 17.0,
+        "optimized_ms": 82.0,
+        "speedup": 0.2073170731707317,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 17.0,
+        "optimized_ms": 23.0,
+        "speedup": 0.7391304347826086,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 17.0,
+        "optimized_ms": 18.0,
+        "speedup": 0.9444444444444444,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 17.0,
+        "optimized_ms": 24.0,
+        "speedup": 0.7083333333333334,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 0,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 1,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 2,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 3,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 4,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 5,
+        "baseline_ms": 8.5,
+        "optimized_ms": 10.0,
+        "speedup": 0.85,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 6,
+        "baseline_ms": 8.5,
+        "optimized_ms": 12.0,
+        "speedup": 0.7083333333333334,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 7,
+        "baseline_ms": 8.5,
+        "optimized_ms": 16.0,
+        "speedup": 0.53125,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 8,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 9,
+        "baseline_ms": 8.5,
+        "optimized_ms": 11.0,
+        "speedup": 0.7727272727272727,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2422.0,
+        "speedup": 0.6975639966969447,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2430.0,
+        "speedup": 0.6952674897119342,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2440.0,
+        "speedup": 0.6924180327868853,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2429.0,
+        "speedup": 0.6955537258130918,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2433.0,
+        "speedup": 0.6944101931771476,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2439.0,
+        "speedup": 0.6927019270192702,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2429.0,
+        "speedup": 0.6955537258130918,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2425.0,
+        "speedup": 0.6967010309278351,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2408.0,
+        "speedup": 0.7016196013289037,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2396.0,
+        "speedup": 0.7051335559265443,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 388.5,
+        "optimized_ms": 436.0,
+        "speedup": 0.8910550458715596,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 388.5,
+        "optimized_ms": 409.0,
+        "speedup": 0.9498777506112469,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 388.5,
+        "optimized_ms": 422.0,
+        "speedup": 0.9206161137440758,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 388.5,
+        "optimized_ms": 395.0,
+        "speedup": 0.9835443037974684,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 388.5,
+        "optimized_ms": 404.0,
+        "speedup": 0.9616336633663366,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 388.5,
+        "optimized_ms": 392.0,
+        "speedup": 0.9910714285714286,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 388.5,
+        "optimized_ms": 380.0,
+        "speedup": 1.0223684210526316,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 388.5,
+        "optimized_ms": 406.0,
+        "speedup": 0.9568965517241379,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 388.5,
+        "optimized_ms": 459.0,
+        "speedup": 0.8464052287581699,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 388.5,
+        "optimized_ms": 447.0,
+        "speedup": 0.8691275167785235,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 2.0,
+        "optimized_ms": 4.0,
+        "speedup": 0.5,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 0,
+        "baseline_ms": 557.0,
+        "optimized_ms": 619.0,
+        "speedup": 0.8998384491114702,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 1,
+        "baseline_ms": 557.0,
+        "optimized_ms": 609.0,
+        "speedup": 0.9146141215106732,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 2,
+        "baseline_ms": 557.0,
+        "optimized_ms": 593.0,
+        "speedup": 0.93929173693086,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 3,
+        "baseline_ms": 557.0,
+        "optimized_ms": 736.0,
+        "speedup": 0.7567934782608695,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 4,
+        "baseline_ms": 557.0,
+        "optimized_ms": 629.0,
+        "speedup": 0.8855325914149443,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 5,
+        "baseline_ms": 557.0,
+        "optimized_ms": 587.0,
+        "speedup": 0.948892674616695,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 6,
+        "baseline_ms": 557.0,
+        "optimized_ms": 608.0,
+        "speedup": 0.9161184210526315,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 7,
+        "baseline_ms": 557.0,
+        "optimized_ms": 572.0,
+        "speedup": 0.9737762237762237,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 8,
+        "baseline_ms": 557.0,
+        "optimized_ms": 670.0,
+        "speedup": 0.8313432835820895,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 9,
+        "baseline_ms": 557.0,
+        "optimized_ms": 646.0,
+        "speedup": 0.8622291021671826,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 24.0,
+        "optimized_ms": 27.0,
+        "speedup": 0.8888888888888888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 24.0,
+        "optimized_ms": 63.0,
+        "speedup": 0.38095238095238093,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 24.0,
+        "optimized_ms": 24.0,
+        "speedup": 1.0,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 24.0,
+        "optimized_ms": 23.0,
+        "speedup": 1.0434782608695652,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 24.0,
+        "optimized_ms": 28.0,
+        "speedup": 0.8571428571428571,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 23.5,
+        "optimized_ms": 30.0,
+        "speedup": 0.7833333333333333,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 0,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 1,
+        "baseline_ms": 6.0,
+        "optimized_ms": 7.0,
+        "speedup": 0.8571428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 2,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 3,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 4,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 5,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 6,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 7,
+        "baseline_ms": 6.0,
+        "optimized_ms": 7.0,
+        "speedup": 0.8571428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 8,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 9,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      }
+    ],
+    "action_counts": {
+      "1": 60,
+      "10": 30
+    },
+    "model_agreement": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "mean_speedup": 0.8869356431425233,
+      "median_speedup": 0.9444444444444444,
+      "std_speedup": 0.16111839999632305,
+      "min_speedup": 0.2073170731707317,
+      "max_speedup": 1.0909090909090908,
+      "win_rate": 0.12222222222222222,
+      "safe_rate": 0.5888888888888889,
+      "total_evaluations": 90,
+      "mean_agreement": 1.0
+    }
+  },
+  "equal": {
+    "timestamp": "2025-10-28T11:15:58.081801",
+    "voting_strategy": "equal",
+    "n_queries": 30,
+    "n_episodes": 10,
+    "baselines": {
+      "0": 17.0,
+      "1": 8.5,
+      "2": 1689.5,
+      "3": 388.5,
+      "4": 2.0,
+      "5": 557.0,
+      "6": 24.0,
+      "7": 23.5,
+      "8": 25.0,
+      "9": -1,
+      "10": 7.0,
+      "11": -1,
+      "12": 6.0,
+      "13": -1,
+      "14": 6.0,
+      "15": 6.0,
+      "16": -1,
+      "17": 6.0,
+      "18": 6.0,
+      "19": 6.0,
+      "20": 7.0,
+      "21": 6.0,
+      "22": 6.0,
+      "23": 6.0,
+      "24": 6.5,
+      "25": 5.5,
+      "26": 5.5,
+      "27": 5.0,
+      "28": 6.0,
+      "29": 6.0
+    },
+    "query_results": {
+      "0": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.916274154589372,
+        "median_speedup": 1.0,
+        "std_speedup": 0.1398439636683518,
+        "min_speedup": 0.6071428571428571,
+        "max_speedup": 1.0625,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "1": {
+        "query_type": "CTE",
+        "mean_speedup": 0.9717965367965368,
+        "median_speedup": 0.9444444444444444,
+        "std_speedup": 0.16129986906159396,
+        "min_speedup": 0.7083333333333334,
+        "max_speedup": 1.2142857142857142,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "2": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.6852157528817495,
+        "median_speedup": 0.6914264934203584,
+        "std_speedup": 0.018703360064792868,
+        "min_speedup": 0.6327715355805243,
+        "max_speedup": 0.6984291029350972,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "3": {
+        "query_type": "TOP",
+        "mean_speedup": 1.0318029875692427,
+        "median_speedup": 1.05,
+        "std_speedup": 0.05123746422931184,
+        "min_speedup": 0.9294258373205742,
+        "max_speedup": 1.088235294117647,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "4": {
+        "query_type": "TOP",
+        "mean_speedup": 0.9333333333333332,
+        "median_speedup": 1.0,
+        "std_speedup": 0.13333333333333336,
+        "min_speedup": 0.6666666666666666,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "5": {
+        "query_type": "SUBQUERY",
+        "mean_speedup": 1.0011607980302286,
+        "median_speedup": 1.012730620597093,
+        "std_speedup": 0.03750087238188907,
+        "min_speedup": 0.8969404186795491,
+        "max_speedup": 1.0411214953271029,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "6": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.9779502236893542,
+        "median_speedup": 0.98,
+        "std_speedup": 0.09780813056000616,
+        "min_speedup": 0.8,
+        "max_speedup": 1.0909090909090908,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "7": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 1.0107238775717036,
+        "median_speedup": 1.0217391304347827,
+        "std_speedup": 0.04541373339141329,
+        "min_speedup": 0.9038461538461539,
+        "max_speedup": 1.0681818181818181,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "29": {
+        "query_type": "AGGREGATE",
+        "mean_speedup": 1.0314285714285714,
+        "median_speedup": 1.0,
+        "std_speedup": 0.12285714285714285,
+        "min_speedup": 0.8571428571428571,
+        "max_speedup": 1.2,
+        "episodes": 10,
+        "most_common_action": 1
+      }
+    },
+    "detailed_results": [
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 17.0,
+        "optimized_ms": 21.0,
+        "speedup": 0.8095238095238095,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 17.0,
+        "optimized_ms": 23.0,
+        "speedup": 0.7391304347826086,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 17.0,
+        "optimized_ms": 28.0,
+        "speedup": 0.6071428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 17.0,
+        "optimized_ms": 18.0,
+        "speedup": 0.9444444444444444,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 0,
+        "baseline_ms": 8.5,
+        "optimized_ms": 10.0,
+        "speedup": 0.85,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 1,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 2,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 3,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 4,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 5,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 6,
+        "baseline_ms": 8.5,
+        "optimized_ms": 11.0,
+        "speedup": 0.7727272727272727,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 7,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 8,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 9,
+        "baseline_ms": 8.5,
+        "optimized_ms": 12.0,
+        "speedup": 0.7083333333333334,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2419.0,
+        "speedup": 0.6984291029350972,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2442.0,
+        "speedup": 0.6918509418509419,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2445.0,
+        "speedup": 0.691002044989775,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2448.0,
+        "speedup": 0.6901552287581699,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2456.0,
+        "speedup": 0.6879071661237784,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2509.0,
+        "speedup": 0.6733758469509765,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2670.0,
+        "speedup": 0.6327715355805243,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2424.0,
+        "speedup": 0.6969884488448845,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2431.0,
+        "speedup": 0.6949814890991362,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 2432.0,
+        "speedup": 0.6946957236842105,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 388.5,
+        "optimized_ms": 370.0,
+        "speedup": 1.05,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 388.5,
+        "optimized_ms": 407.0,
+        "speedup": 0.9545454545454546,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 388.5,
+        "optimized_ms": 359.0,
+        "speedup": 1.0821727019498608,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 388.5,
+        "optimized_ms": 365.0,
+        "speedup": 1.0643835616438355,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 388.5,
+        "optimized_ms": 364.0,
+        "speedup": 1.0673076923076923,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 388.5,
+        "optimized_ms": 376.0,
+        "speedup": 1.0332446808510638,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 388.5,
+        "optimized_ms": 357.0,
+        "speedup": 1.088235294117647,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 388.5,
+        "optimized_ms": 370.0,
+        "speedup": 1.05,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 388.5,
+        "optimized_ms": 418.0,
+        "speedup": 0.9294258373205742,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 388.5,
+        "optimized_ms": 389.0,
+        "speedup": 0.9987146529562982,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 0,
+        "baseline_ms": 557.0,
+        "optimized_ms": 621.0,
+        "speedup": 0.8969404186795491,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 1,
+        "baseline_ms": 557.0,
+        "optimized_ms": 545.0,
+        "speedup": 1.0220183486238532,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 2,
+        "baseline_ms": 557.0,
+        "optimized_ms": 557.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 3,
+        "baseline_ms": 557.0,
+        "optimized_ms": 548.0,
+        "speedup": 1.0164233576642336,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 4,
+        "baseline_ms": 557.0,
+        "optimized_ms": 562.0,
+        "speedup": 0.9911032028469751,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 5,
+        "baseline_ms": 557.0,
+        "optimized_ms": 535.0,
+        "speedup": 1.0411214953271029,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 6,
+        "baseline_ms": 557.0,
+        "optimized_ms": 551.0,
+        "speedup": 1.0108892921960073,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 7,
+        "baseline_ms": 557.0,
+        "optimized_ms": 560.0,
+        "speedup": 0.9946428571428572,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 8,
+        "baseline_ms": 557.0,
+        "optimized_ms": 549.0,
+        "speedup": 1.0145719489981786,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 9,
+        "baseline_ms": 557.0,
+        "optimized_ms": 544.0,
+        "speedup": 1.0238970588235294,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 24.0,
+        "optimized_ms": 24.0,
+        "speedup": 1.0,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 24.0,
+        "optimized_ms": 28.0,
+        "speedup": 0.8571428571428571,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 24.0,
+        "optimized_ms": 23.0,
+        "speedup": 1.0434782608695652,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 24.0,
+        "optimized_ms": 30.0,
+        "speedup": 0.8,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 23.5,
+        "optimized_ms": 26.0,
+        "speedup": 0.9038461538461539,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 23.5,
+        "optimized_ms": 23.0,
+        "speedup": 1.0217391304347827,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 0,
+        "baseline_ms": 6.0,
+        "optimized_ms": 7.0,
+        "speedup": 0.8571428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 1,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 2,
+        "baseline_ms": 6.0,
+        "optimized_ms": 7.0,
+        "speedup": 0.8571428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 3,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 4,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 5,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 6,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 7,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 8,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 9,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      }
+    ],
+    "action_counts": {
+      "1": 60,
+      "10": 30
+    },
+    "model_agreement": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "mean_speedup": 0.9510762484322325,
+      "median_speedup": 1.0,
+      "std_speedup": 0.1440890266659764,
+      "min_speedup": 0.6071428571428571,
+      "max_speedup": 1.2142857142857142,
+      "win_rate": 0.35555555555555557,
+      "safe_rate": 0.7444444444444445,
+      "total_evaluations": 90,
+      "mean_agreement": 1.0
+    }
+  },
+  "performance": {
+    "timestamp": "2025-10-28T11:19:51.357403",
+    "voting_strategy": "performance",
+    "n_queries": 30,
+    "n_episodes": 10,
+    "baselines": {
+      "0": 17.0,
+      "1": 8.5,
+      "2": 1689.5,
+      "3": 388.5,
+      "4": 2.0,
+      "5": 557.0,
+      "6": 24.0,
+      "7": 23.5,
+      "8": 25.0,
+      "9": -1,
+      "10": 7.0,
+      "11": -1,
+      "12": 6.0,
+      "13": -1,
+      "14": 6.0,
+      "15": 6.0,
+      "16": -1,
+      "17": 6.0,
+      "18": 6.0,
+      "19": 6.0,
+      "20": 7.0,
+      "21": 6.0,
+      "22": 6.0,
+      "23": 6.0,
+      "24": 6.5,
+      "25": 5.5,
+      "26": 5.5,
+      "27": 5.0,
+      "28": 6.0,
+      "29": 6.0
+    },
+    "query_results": {
+      "0": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9182038429406851,
+        "median_speedup": 0.9195906432748537,
+        "std_speedup": 0.1101924510341357,
+        "min_speedup": 0.7083333333333334,
+        "max_speedup": 1.0625,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "1": {
+        "query_type": "CTE",
+        "mean_speedup": 1.0284632034632035,
+        "median_speedup": 1.0625,
+        "std_speedup": 0.12659871523883764,
+        "min_speedup": 0.7727272727272727,
+        "max_speedup": 1.2142857142857142,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "2": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 1.0530965897039917,
+        "median_speedup": 1.0552783629837703,
+        "std_speedup": 0.013874895748967707,
+        "min_speedup": 1.0183845690174804,
+        "max_speedup": 1.0679519595448799,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "3": {
+        "query_type": "TOP",
+        "mean_speedup": 0.9810020011339994,
+        "median_speedup": 0.9898490749756572,
+        "std_speedup": 0.039496862991417775,
+        "min_speedup": 0.886986301369863,
+        "max_speedup": 1.030503978779841,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "4": {
+        "query_type": "TOP",
+        "mean_speedup": 0.9333333333333332,
+        "median_speedup": 1.0,
+        "std_speedup": 0.13333333333333336,
+        "min_speedup": 0.6666666666666666,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "5": {
+        "query_type": "SUBQUERY",
+        "mean_speedup": 0.9877094412202811,
+        "median_speedup": 0.9885591271866004,
+        "std_speedup": 0.03127561378241836,
+        "min_speedup": 0.93929173693086,
+        "max_speedup": 1.0314814814814814,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "6": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.9844646441348092,
+        "median_speedup": 1.0,
+        "std_speedup": 0.09198114405666871,
+        "min_speedup": 0.8275862068965517,
+        "max_speedup": 1.0909090909090908,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "7": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9920470177970178,
+        "median_speedup": 0.9791666666666666,
+        "std_speedup": 0.09535374232899267,
+        "min_speedup": 0.8703703703703703,
+        "max_speedup": 1.175,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "29": {
+        "query_type": "AGGREGATE",
+        "mean_speedup": 0.9269264069264068,
+        "median_speedup": 1.0,
+        "std_speedup": 0.1802035916893724,
+        "min_speedup": 0.5454545454545454,
+        "max_speedup": 1.2,
+        "episodes": 10,
+        "most_common_action": 1
+      }
+    },
+    "detailed_results": [
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 17.0,
+        "optimized_ms": 24.0,
+        "speedup": 0.7083333333333334,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 17.0,
+        "optimized_ms": 18.0,
+        "speedup": 0.9444444444444444,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 17.0,
+        "optimized_ms": 20.0,
+        "speedup": 0.85,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 17.0,
+        "optimized_ms": 20.0,
+        "speedup": 0.85,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 17.0,
+        "optimized_ms": 21.0,
+        "speedup": 0.8095238095238095,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 0,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 1,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 2,
+        "baseline_ms": 8.5,
+        "optimized_ms": 11.0,
+        "speedup": 0.7727272727272727,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 3,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 4,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 5,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 6,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 7,
+        "baseline_ms": 8.5,
+        "optimized_ms": 9.0,
+        "speedup": 0.9444444444444444,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 8,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 9,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1602.0,
+        "speedup": 1.0546192259675407,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1612.0,
+        "speedup": 1.0480769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1659.0,
+        "speedup": 1.0183845690174804,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1588.0,
+        "speedup": 1.0639168765743072,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1582.0,
+        "speedup": 1.0679519595448799,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1622.0,
+        "speedup": 1.0416152897657214,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1592.0,
+        "speedup": 1.0612437185929648,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1586.0,
+        "speedup": 1.0652585119798235,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1600.0,
+        "speedup": 1.0559375,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1603.0,
+        "speedup": 1.0539613225202744,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 388.5,
+        "optimized_ms": 395.0,
+        "speedup": 0.9835443037974684,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 388.5,
+        "optimized_ms": 438.0,
+        "speedup": 0.886986301369863,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 388.5,
+        "optimized_ms": 389.0,
+        "speedup": 0.9987146529562982,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 388.5,
+        "optimized_ms": 399.0,
+        "speedup": 0.9736842105263158,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 388.5,
+        "optimized_ms": 414.0,
+        "speedup": 0.9384057971014492,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 388.5,
+        "optimized_ms": 384.0,
+        "speedup": 1.01171875,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 388.5,
+        "optimized_ms": 377.0,
+        "speedup": 1.030503978779841,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 388.5,
+        "optimized_ms": 397.0,
+        "speedup": 0.9785894206549118,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 388.5,
+        "optimized_ms": 384.0,
+        "speedup": 1.01171875,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 388.5,
+        "optimized_ms": 390.0,
+        "speedup": 0.9961538461538462,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 2.0,
+        "optimized_ms": 3.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 0,
+        "baseline_ms": 557.0,
+        "optimized_ms": 588.0,
+        "speedup": 0.9472789115646258,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 1,
+        "baseline_ms": 557.0,
+        "optimized_ms": 569.0,
+        "speedup": 0.9789103690685413,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 2,
+        "baseline_ms": 557.0,
+        "optimized_ms": 558.0,
+        "speedup": 0.9982078853046595,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 3,
+        "baseline_ms": 557.0,
+        "optimized_ms": 593.0,
+        "speedup": 0.93929173693086,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 4,
+        "baseline_ms": 557.0,
+        "optimized_ms": 581.0,
+        "speedup": 0.9586919104991394,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 5,
+        "baseline_ms": 557.0,
+        "optimized_ms": 550.0,
+        "speedup": 1.0127272727272727,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 6,
+        "baseline_ms": 557.0,
+        "optimized_ms": 540.0,
+        "speedup": 1.0314814814814814,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 7,
+        "baseline_ms": 557.0,
+        "optimized_ms": 546.0,
+        "speedup": 1.02014652014652,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 8,
+        "baseline_ms": 557.0,
+        "optimized_ms": 547.0,
+        "speedup": 1.0182815356489945,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 9,
+        "baseline_ms": 557.0,
+        "optimized_ms": 573.0,
+        "speedup": 0.9720767888307156,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 24.0,
+        "optimized_ms": 23.0,
+        "speedup": 1.0434782608695652,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 24.0,
+        "optimized_ms": 24.0,
+        "speedup": 1.0,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 24.0,
+        "optimized_ms": 22.0,
+        "speedup": 1.0909090909090908,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 24.0,
+        "optimized_ms": 29.0,
+        "speedup": 0.8275862068965517,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 24.0,
+        "optimized_ms": 27.0,
+        "speedup": 0.8888888888888888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 24.0,
+        "optimized_ms": 24.0,
+        "speedup": 1.0,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 24.0,
+        "optimized_ms": 27.0,
+        "speedup": 0.8888888888888888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 23.5,
+        "optimized_ms": 27.0,
+        "speedup": 0.8703703703703703,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 23.5,
+        "optimized_ms": 20.0,
+        "speedup": 1.175,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 23.5,
+        "optimized_ms": 27.0,
+        "speedup": 0.8703703703703703,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 23.5,
+        "optimized_ms": 21.0,
+        "speedup": 1.119047619047619,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 0,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 1,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 2,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 3,
+        "baseline_ms": 6.0,
+        "optimized_ms": 7.0,
+        "speedup": 0.8571428571428571,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 4,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 5,
+        "baseline_ms": 6.0,
+        "optimized_ms": 11.0,
+        "speedup": 0.5454545454545454,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 6,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 7,
+        "baseline_ms": 6.0,
+        "optimized_ms": 9.0,
+        "speedup": 0.6666666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 8,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 9,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      }
+    ],
+    "action_counts": {
+      "1": 60,
+      "10": 30
+    },
+    "model_agreement": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "mean_speedup": 0.9783607200726364,
+      "median_speedup": 1.0,
+      "std_speedup": 0.11324051581801657,
+      "min_speedup": 0.5454545454545454,
+      "max_speedup": 1.2142857142857142,
+      "win_rate": 0.36666666666666664,
+      "safe_rate": 0.8111111111111111,
+      "total_evaluations": 90,
+      "mean_agreement": 1.0
+    }
+  },
+  "query_type": {
+    "timestamp": "2025-10-28T11:23:25.240769",
+    "voting_strategy": "query_type",
+    "n_queries": 30,
+    "n_episodes": 10,
+    "baselines": {
+      "0": 17.0,
+      "1": 8.5,
+      "2": 1689.5,
+      "3": 388.5,
+      "4": 2.0,
+      "5": 557.0,
+      "6": 24.0,
+      "7": 23.5,
+      "8": 25.0,
+      "9": -1,
+      "10": 7.0,
+      "11": -1,
+      "12": 6.0,
+      "13": -1,
+      "14": 6.0,
+      "15": 6.0,
+      "16": -1,
+      "17": 6.0,
+      "18": 6.0,
+      "19": 6.0,
+      "20": 7.0,
+      "21": 6.0,
+      "22": 6.0,
+      "23": 6.0,
+      "24": 6.5,
+      "25": 5.5,
+      "26": 5.5,
+      "27": 5.0,
+      "28": 6.0,
+      "29": 6.0
+    },
+    "query_results": {
+      "0": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.956030701754386,
+        "median_speedup": 1.0,
+        "std_speedup": 0.09581407380039295,
+        "min_speedup": 0.7083333333333334,
+        "max_speedup": 1.0625,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "1": {
+        "query_type": "CTE",
+        "mean_speedup": 1.0768796992481202,
+        "median_speedup": 1.1383928571428572,
+        "std_speedup": 0.22170106387199429,
+        "min_speedup": 0.4473684210526316,
+        "max_speedup": 1.2142857142857142,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "2": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 1.0684641172759428,
+        "median_speedup": 1.0733955211831567,
+        "std_speedup": 0.01597779063703346,
+        "min_speedup": 1.0352328431372548,
+        "max_speedup": 1.0850995504174694,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "3": {
+        "query_type": "TOP",
+        "mean_speedup": 1.004111231024117,
+        "median_speedup": 1.0143672284031413,
+        "std_speedup": 0.07822143608376503,
+        "min_speedup": 0.7896341463414634,
+        "max_speedup": 1.0912921348314606,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "4": {
+        "query_type": "TOP",
+        "mean_speedup": 1.0,
+        "median_speedup": 1.0,
+        "std_speedup": 0.0,
+        "min_speedup": 1.0,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "5": {
+        "query_type": "SUBQUERY",
+        "mean_speedup": 0.9921977983660234,
+        "median_speedup": 0.989370898536093,
+        "std_speedup": 0.030488203091283066,
+        "min_speedup": 0.9424703891708968,
+        "max_speedup": 1.0609523809523809,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "6": {
+        "query_type": "SIMPLE",
+        "mean_speedup": 0.9232185592185594,
+        "median_speedup": 0.9415384615384615,
+        "std_speedup": 0.05659882094137653,
+        "min_speedup": 0.8,
+        "max_speedup": 1.0,
+        "episodes": 10,
+        "most_common_action": 10
+      },
+      "7": {
+        "query_type": "JOIN_HEAVY",
+        "mean_speedup": 0.9883281625781624,
+        "median_speedup": 0.9791666666666666,
+        "std_speedup": 0.07142370935851365,
+        "min_speedup": 0.8703703703703703,
+        "max_speedup": 1.119047619047619,
+        "episodes": 10,
+        "most_common_action": 1
+      },
+      "29": {
+        "query_type": "AGGREGATE",
+        "mean_speedup": 1.06,
+        "median_speedup": 1.0,
+        "std_speedup": 0.09165151389911678,
+        "min_speedup": 1.0,
+        "max_speedup": 1.2,
+        "episodes": 10,
+        "most_common_action": 1
+      }
+    },
+    "detailed_results": [
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 17.0,
+        "optimized_ms": 24.0,
+        "speedup": 0.7083333333333334,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 17.0,
+        "optimized_ms": 16.0,
+        "speedup": 1.0625,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 17.0,
+        "optimized_ms": 19.0,
+        "speedup": 0.8947368421052632,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 0,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 17.0,
+        "optimized_ms": 17.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 0,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 1,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 2,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 3,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 4,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 5,
+        "baseline_ms": 8.5,
+        "optimized_ms": 19.0,
+        "speedup": 0.4473684210526316,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 6,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 7,
+        "baseline_ms": 8.5,
+        "optimized_ms": 7.0,
+        "speedup": 1.2142857142857142,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 8,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 1,
+        "query_type": "CTE",
+        "episode": 9,
+        "baseline_ms": 8.5,
+        "optimized_ms": 8.0,
+        "speedup": 1.0625,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1632.0,
+        "speedup": 1.0352328431372548,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1581.0,
+        "speedup": 1.0686274509803921,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1557.0,
+        "speedup": 1.0850995504174694,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1562.0,
+        "speedup": 1.0816261203585147,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1598.0,
+        "speedup": 1.0572590738423029,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1613.0,
+        "speedup": 1.0474271543707379,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1567.0,
+        "speedup": 1.078174856413529,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1580.0,
+        "speedup": 1.0693037974683544,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1558.0,
+        "speedup": 1.084403080872914,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 2,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 1689.5,
+        "optimized_ms": 1568.0,
+        "speedup": 1.077487244897959,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 388.5,
+        "optimized_ms": 356.0,
+        "speedup": 1.0912921348314606,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 388.5,
+        "optimized_ms": 365.0,
+        "speedup": 1.0643835616438355,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 388.5,
+        "optimized_ms": 382.0,
+        "speedup": 1.0170157068062826,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 388.5,
+        "optimized_ms": 368.0,
+        "speedup": 1.0557065217391304,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 388.5,
+        "optimized_ms": 492.0,
+        "speedup": 0.7896341463414634,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 388.5,
+        "optimized_ms": 392.0,
+        "speedup": 0.9910714285714286,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 388.5,
+        "optimized_ms": 392.0,
+        "speedup": 0.9910714285714286,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 388.5,
+        "optimized_ms": 384.0,
+        "speedup": 1.01171875,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 388.5,
+        "optimized_ms": 389.0,
+        "speedup": 0.9987146529562982,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 3,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 388.5,
+        "optimized_ms": 377.0,
+        "speedup": 1.030503978779841,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 0,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 1,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 2,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 3,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 4,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 5,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 6,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 7,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 8,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 4,
+        "query_type": "TOP",
+        "episode": 9,
+        "baseline_ms": 2.0,
+        "optimized_ms": 2.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 0,
+        "baseline_ms": 557.0,
+        "optimized_ms": 525.0,
+        "speedup": 1.0609523809523809,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 1,
+        "baseline_ms": 557.0,
+        "optimized_ms": 560.0,
+        "speedup": 0.9946428571428572,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 2,
+        "baseline_ms": 557.0,
+        "optimized_ms": 571.0,
+        "speedup": 0.9754816112084063,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 3,
+        "baseline_ms": 557.0,
+        "optimized_ms": 566.0,
+        "speedup": 0.9840989399293286,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 4,
+        "baseline_ms": 557.0,
+        "optimized_ms": 574.0,
+        "speedup": 0.9703832752613241,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 5,
+        "baseline_ms": 557.0,
+        "optimized_ms": 572.0,
+        "speedup": 0.9737762237762237,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 6,
+        "baseline_ms": 557.0,
+        "optimized_ms": 559.0,
+        "speedup": 0.9964221824686941,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 7,
+        "baseline_ms": 557.0,
+        "optimized_ms": 546.0,
+        "speedup": 1.02014652014652,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 8,
+        "baseline_ms": 557.0,
+        "optimized_ms": 555.0,
+        "speedup": 1.0036036036036036,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 5,
+        "query_type": "SUBQUERY",
+        "episode": 9,
+        "baseline_ms": 557.0,
+        "optimized_ms": 591.0,
+        "speedup": 0.9424703891708968,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 0,
+        "baseline_ms": 24.0,
+        "optimized_ms": 24.0,
+        "speedup": 1.0,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 1,
+        "baseline_ms": 24.0,
+        "optimized_ms": 27.0,
+        "speedup": 0.8888888888888888,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 2,
+        "baseline_ms": 24.0,
+        "optimized_ms": 28.0,
+        "speedup": 0.8571428571428571,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 3,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 4,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 5,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 6,
+        "baseline_ms": 24.0,
+        "optimized_ms": 30.0,
+        "speedup": 0.8,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 7,
+        "baseline_ms": 24.0,
+        "optimized_ms": 26.0,
+        "speedup": 0.9230769230769231,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 8,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 6,
+        "query_type": "SIMPLE",
+        "episode": 9,
+        "baseline_ms": 24.0,
+        "optimized_ms": 25.0,
+        "speedup": 0.96,
+        "action": 10,
+        "predictions": {
+          "dqn_v3": 10
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 0,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 1,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 2,
+        "baseline_ms": 23.5,
+        "optimized_ms": 21.0,
+        "speedup": 1.119047619047619,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 3,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 4,
+        "baseline_ms": 23.5,
+        "optimized_ms": 25.0,
+        "speedup": 0.94,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 5,
+        "baseline_ms": 23.5,
+        "optimized_ms": 22.0,
+        "speedup": 1.0681818181818181,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 6,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 7,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 8,
+        "baseline_ms": 23.5,
+        "optimized_ms": 24.0,
+        "speedup": 0.9791666666666666,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 7,
+        "query_type": "JOIN_HEAVY",
+        "episode": 9,
+        "baseline_ms": 23.5,
+        "optimized_ms": 27.0,
+        "speedup": 0.8703703703703703,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 0,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 1,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 2,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 3,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 4,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 5,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 6,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 7,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 8,
+        "baseline_ms": 6.0,
+        "optimized_ms": 6.0,
+        "speedup": 1.0,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      },
+      {
+        "query_idx": 29,
+        "query_type": "AGGREGATE",
+        "episode": 9,
+        "baseline_ms": 6.0,
+        "optimized_ms": 5.0,
+        "speedup": 1.2,
+        "action": 1,
+        "predictions": {
+          "dqn_v3": 1
+        },
+        "confidences": {
+          "dqn_v3": 1.0
+        }
+      }
+    ],
+    "action_counts": {
+      "1": 60,
+      "10": 30
+    },
+    "model_agreement": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "mean_speedup": 1.0076922521628124,
+      "median_speedup": 1.0,
+      "std_speedup": 0.10752150619617899,
+      "min_speedup": 0.4473684210526316,
+      "max_speedup": 1.2142857142857142,
+      "win_rate": 0.3888888888888889,
+      "safe_rate": 0.9,
+      "total_evaluations": 90,
+      "mean_agreement": 1.0
+    }
+  }
+}

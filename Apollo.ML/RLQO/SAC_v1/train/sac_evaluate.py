@@ -47,7 +47,7 @@ def evaluate_sac(model_path: str = None, output_path: str = None):
         model_path = MODEL_PATHS['realdb']
     
     if output_path is None:
-        output_path = "sac_v1_realdb_eval.json"
+        output_path = "Apollo.ML/sac_v1_realdb_eval.json"
     
     if not os.path.exists(model_path):
         print(f"\n[ERROR] Model not found at {model_path}")
