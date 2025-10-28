@@ -47,26 +47,25 @@ def evaluate_sac(model_path: str = None, output_path: str = None):
         model_path = MODEL_PATHS['realdb']
     
     if output_path is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"sac_v1_eval_{timestamp}.json"
+        output_path = "sac_v1_realdb_eval.json"
     
     if not os.path.exists(model_path):
-        print(f"\n❌ Error: Model not found at {model_path}")
+        print(f"\n[ERROR] Model not found at {model_path}")
         return
     
     # 2. Create environment (DB connection handled inside)
     print("\n[1/4] Creating Real DB environment...")
     try:
         env = make_sac_db_env(SAMPLE_QUERIES, max_steps=10, verbose=True)
-        print("✅ Environment created successfully")
+        print("[OK] Environment created successfully")
     except Exception as e:
-        print(f"❌ Environment creation failed: {e}")
+        print(f"[ERROR] Environment creation failed: {e}")
         return
     
     # 3. Load model
     print("\n[2/4] Loading model...")
     model = SAC.load(model_path)
-    print(f"✅ Model loaded from: {model_path}")
+    print(f"[OK] Model loaded from: {model_path}")
     print(f"Policy type: Stochastic (SAC)")
     
     # 4. Evaluate
@@ -95,38 +94,46 @@ def evaluate_sac(model_path: str = None, output_path: str = None):
             print(f"{'='*80}")
             
             for query_idx in range(SAC_EVAL_CONFIG['n_queries']):
-                # Reset environment
+                # Reset to specific query
+                env.current_query_ix = query_idx
                 obs, info = env.reset()
-                env.current_query_idx = query_idx
                 
-                # Get baseline
-                baseline_time = info.get('baseline_time_ms', 0)
+                baseline_time = info['baseline_time']
+                best_time = baseline_time
+                best_action = None
+                total_reward = 0.0
                 
-                # Get action from model
-                # SAC uses stochastic policy even during evaluation
-                action, _states = model.predict(
-                    obs, 
-                    deterministic=SAC_EVAL_CONFIG['deterministic']
-                )
-                
-                # Execute
-                next_obs, reward, terminated, truncated, info = env.step(action)
+                # Run episode (max 10 steps)
+                for step in range(10):
+                    # SAC uses stochastic policy
+                    action, _ = model.predict(obs, deterministic=SAC_EVAL_CONFIG['deterministic'])
+                    
+                    obs, reward, terminated, truncated, info = env.step(action)
+                    total_reward += reward
+                    
+                    if info['current_time'] < best_time:
+                        best_time = info['current_time']
+                        best_action = info['action_description']
+                    
+                    if terminated or truncated:
+                        break
                 
                 # Record results
+                speedup = baseline_time / best_time if best_time > 0 else 1.0
                 result = {
                     'episode': episode + 1,
                     'query_idx': query_idx,
                     'baseline_time_ms': baseline_time,
-                    'optimized_time_ms': info.get('execution_time_ms', baseline_time),
-                    'speedup': baseline_time / info.get('execution_time_ms', baseline_time) if info.get('execution_time_ms', baseline_time) > 0 else 1.0,
-                    'reward': reward,
-                    'action': action.tolist()
+                    'optimized_time_ms': best_time,
+                    'speedup': speedup,
+                    'reward': total_reward,
+                    'action': best_action
                 }
                 
                 results['detailed_results'].append(result)
                 
-                print(f"Query {query_idx}: {baseline_time}ms → {result['optimized_time_ms']}ms "
-                      f"(Speedup: {result['speedup']:.2f}x)")
+                print(f"Query {query_idx}: {baseline_time:.0f}ms → {best_time:.0f}ms "
+                      f"(Speedup: {speedup:.2f}x, Reward: {total_reward:.2f})")
         
         # 5. Calculate summary statistics
         print("\n[4/4] Calculating summary statistics...")
@@ -175,13 +182,12 @@ def evaluate_sac(model_path: str = None, output_path: str = None):
         print(f"  Policy: Stochastic (Maximum Entropy)")
         
     except Exception as e:
-        print(f"\n❌ Evaluation error: {e}")
+        print(f"\n[ERROR] Evaluation error: {e}")
         import traceback
         traceback.print_exc()
     
     finally:
         env.close()
-        db_helper.close()
 
 
 if __name__ == '__main__':
