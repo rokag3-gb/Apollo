@@ -107,13 +107,13 @@ class VotingEnsembleV2:
                 self.models['dqn_v4'] = DQN.load(self.model_paths['dqn_v4'])
                 self.loaded_models.append('dqn_v4')
                 if self.verbose:
-                    print(f"✓ DQN v4 loaded: {self.model_paths['dqn_v4']}")
+                    print(f"[OK] DQN v4 loaded: {self.model_paths['dqn_v4']}")
             else:
                 if self.verbose:
-                    print(f"✗ DQN v4 not found: {self.model_paths['dqn_v4']}")
+                    print(f"[X] DQN v4 not found: {self.model_paths['dqn_v4']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ DQN v4 load failed: {e}")
+                print(f"[X] DQN v4 load failed: {e}")
         
         # PPO v3
         try:
@@ -121,13 +121,13 @@ class VotingEnsembleV2:
                 self.models['ppo_v3'] = MaskablePPO.load(self.model_paths['ppo_v3'])
                 self.loaded_models.append('ppo_v3')
                 if self.verbose:
-                    print(f"✓ PPO v3 loaded: {self.model_paths['ppo_v3']}")
+                    print(f"[OK] PPO v3 loaded: {self.model_paths['ppo_v3']}")
             else:
                 if self.verbose:
-                    print(f"✗ PPO v3 not found: {self.model_paths['ppo_v3']}")
+                    print(f"[X] PPO v3 not found: {self.model_paths['ppo_v3']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ PPO v3 load failed: {e}")
+                print(f"[X] PPO v3 load failed: {e}")
         
         # DDPG v1
         try:
@@ -135,13 +135,13 @@ class VotingEnsembleV2:
                 self.models['ddpg_v1'] = DDPG.load(self.model_paths['ddpg_v1'])
                 self.loaded_models.append('ddpg_v1')
                 if self.verbose:
-                    print(f"✓ DDPG v1 loaded: {self.model_paths['ddpg_v1']}")
+                    print(f"[OK] DDPG v1 loaded: {self.model_paths['ddpg_v1']}")
             else:
                 if self.verbose:
-                    print(f"✗ DDPG v1 not found: {self.model_paths['ddpg_v1']}")
+                    print(f"[X] DDPG v1 not found: {self.model_paths['ddpg_v1']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ DDPG v1 load failed: {e}")
+                print(f"[X] DDPG v1 load failed: {e}")
         
         # SAC v1
         try:
@@ -149,13 +149,13 @@ class VotingEnsembleV2:
                 self.models['sac_v1'] = SAC.load(self.model_paths['sac_v1'])
                 self.loaded_models.append('sac_v1')
                 if self.verbose:
-                    print(f"✓ SAC v1 loaded: {self.model_paths['sac_v1']}")
+                    print(f"[OK] SAC v1 loaded: {self.model_paths['sac_v1']}")
             else:
                 if self.verbose:
-                    print(f"✗ SAC v1 not found: {self.model_paths['sac_v1']}")
+                    print(f"[X] SAC v1 not found: {self.model_paths['sac_v1']}")
         except Exception as e:
             if self.verbose:
-                print(f"✗ SAC v1 load failed: {e}")
+                print(f"[X] SAC v1 load failed: {e}")
         
         if self.verbose:
             print("=" * 80)

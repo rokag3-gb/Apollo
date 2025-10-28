@@ -80,17 +80,25 @@ def evaluate_ensemble_v2(
         print("[ERROR] No models loaded!")
         return
     
-    # 2. 환경 로드 (평가용으로 DQN v4 환경 사용)
+    # 2. 환경 로드 (평가용으로 PPO v3 환경 사용 - 18차원, 대부분 모델 호환)
     print("\n[2/5] Loading evaluation environment...")
-    from RLQO.DQN_v4.env.v4_db_env import QueryPlanDBEnvV4
+    from RLQO.PPO_v3.env.v3_db_env import QueryPlanDBEnvPPOv3
+    from sb3_contrib.common.wrappers import ActionMasker
     
     queries = SAMPLE_QUERIES[:n_queries]
-    env = QueryPlanDBEnvV4(
+    ppo_env = QueryPlanDBEnvPPOv3(
         query_list=queries,
         max_steps=1,  # 1-step evaluation
         curriculum_mode=False,
         verbose=False
     )
+    
+    # ActionMasker 적용
+    def mask_fn(env_instance):
+        float_mask = env_instance.get_action_mask()
+        return float_mask.astype(bool)
+    
+    env = ActionMasker(ppo_env, mask_fn)
     
     # 3. 평가 실행
     print(f"\n[3/5] Running evaluation on {n_queries} queries...")
@@ -106,10 +114,12 @@ def evaluate_ensemble_v2(
         
         for episode in range(n_episodes):
             # Reset environment
-            obs, info = env.reset(options={'query_index': query_idx})
+            # PPO 환경의 query_index 설정
+            env.unwrapped.current_query_ix = query_idx
+            obs, info = env.reset()
             
             baseline_ms = info.get('baseline_ms', 0)
-            action_mask = info.get('action_mask', None)
+            action_mask = env.unwrapped.get_action_mask()
             
             # Query info for validator
             query_info = {
@@ -135,38 +145,38 @@ def evaluate_ensemble_v2(
             # Record result for validator learning
             ensemble.record_action_result(query_type, action, speedup)
             
-            # Save result
+            # Save result (numpy 타입을 Python 기본 타입으로 변환)
             result = {
-                'query_idx': query_idx,
+                'query_idx': int(query_idx),
                 'query_type': query_type,
-                'episode': episode,
-                'baseline_ms': baseline_ms,
-                'optimized_ms': optimized_ms,
-                'speedup': speedup,
-                'action': action,
-                'reward': reward,
-                'predictions': pred_info['predictions'],
-                'confidences': pred_info['confidences'],
-                'filtered_predictions': pred_info['filtered_predictions'],
-                'filtered_confidences': pred_info['filtered_confidences'],
+                'episode': int(episode),
+                'baseline_ms': float(baseline_ms),
+                'optimized_ms': float(optimized_ms),
+                'speedup': float(speedup),
+                'action': int(action),
+                'reward': float(reward),
+                'predictions': {k: int(v) for k, v in pred_info['predictions'].items()},
+                'confidences': {k: float(v) for k, v in pred_info['confidences'].items()},
+                'filtered_predictions': {k: int(v) for k, v in pred_info['filtered_predictions'].items()},
+                'filtered_confidences': {k: float(v) for k, v in pred_info['filtered_confidences'].items()},
             }
             
             query_results.append(result)
             all_results.append(result)
         
-        # Query summary
+        # Query summary (numpy 타입 변환)
         speedups = [r['speedup'] for r in query_results]
         summary = {
-            'query_idx': query_idx,
+            'query_idx': int(query_idx),
             'query_type': query_type,
-            'baseline_ms': query_results[0]['baseline_ms'],
-            'mean_speedup': np.mean(speedups),
-            'median_speedup': np.median(speedups),
-            'min_speedup': np.min(speedups),
-            'max_speedup': np.max(speedups),
-            'episodes': n_episodes,
-            'win_rate': sum(1 for s in speedups if s > 1.0) / len(speedups),
-            'safe_rate': sum(1 for s in speedups if s >= 0.9) / len(speedups),
+            'baseline_ms': float(query_results[0]['baseline_ms']),
+            'mean_speedup': float(np.mean(speedups)),
+            'median_speedup': float(np.median(speedups)),
+            'min_speedup': float(np.min(speedups)),
+            'max_speedup': float(np.max(speedups)),
+            'episodes': int(n_episodes),
+            'win_rate': float(sum(1 for s in speedups if s > 1.0) / len(speedups)),
+            'safe_rate': float(sum(1 for s in speedups if s >= 0.9) / len(speedups)),
         }
         
         query_summaries.append(summary)
@@ -182,31 +192,31 @@ def evaluate_ensemble_v2(
     
     overall_stats = {
         'timestamp': datetime.now().isoformat(),
-        'n_queries': n_queries,
-        'n_episodes': n_episodes,
+        'n_queries': int(n_queries),
+        'n_episodes': int(n_episodes),
         'voting_strategy': voting_strategy,
         'loaded_models': ensemble.loaded_models,
-        'total_episodes': len(all_results),
+        'total_episodes': int(len(all_results)),
         'mean_speedup': float(np.mean(all_speedups)),
         'median_speedup': float(np.median(all_speedups)),
         'min_speedup': float(np.min(all_speedups)),
         'max_speedup': float(np.max(all_speedups)),
-        'win_rate': sum(1 for s in all_speedups if s > 1.0) / len(all_speedups),
-        'safe_rate': sum(1 for s in all_speedups if s >= 0.9) / len(all_speedups),
+        'win_rate': float(sum(1 for s in all_speedups if s > 1.0) / len(all_speedups)),
+        'safe_rate': float(sum(1 for s in all_speedups if s >= 0.9) / len(all_speedups)),
     }
     
-    # 쿼리 타입별 통계
+    # 쿼리 타입별 통계 (numpy 타입 변환)
     type_stats = {}
     for qtype in set(r['query_type'] for r in all_results):
         type_results = [r for r in all_results if r['query_type'] == qtype]
         type_speedups = [r['speedup'] for r in type_results]
         
         type_stats[qtype] = {
-            'episodes': len(type_results),
+            'episodes': int(len(type_results)),
             'mean_speedup': float(np.mean(type_speedups)),
             'median_speedup': float(np.median(type_speedups)),
-            'win_rate': sum(1 for s in type_speedups if s > 1.0) / len(type_speedups),
-            'safe_rate': sum(1 for s in type_speedups if s >= 0.9) / len(type_speedups),
+            'win_rate': float(sum(1 for s in type_speedups if s > 1.0) / len(type_speedups)),
+            'safe_rate': float(sum(1 for s in type_speedups if s >= 0.9) / len(type_speedups)),
         }
     
     overall_stats['by_query_type'] = type_stats

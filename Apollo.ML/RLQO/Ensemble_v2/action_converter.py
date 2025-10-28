@@ -16,6 +16,8 @@ from typing import Dict, Any
 # Path setup
 current_dir = os.path.dirname(os.path.abspath(__file__))
 rlqo_dir = os.path.abspath(os.path.join(current_dir, '..'))
+apollo_ml_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+sys.path.insert(0, apollo_ml_dir)
 sys.path.insert(0, rlqo_dir)
 
 from RLQO.DDPG_v1.config.action_decoder import ContinuousActionDecoder

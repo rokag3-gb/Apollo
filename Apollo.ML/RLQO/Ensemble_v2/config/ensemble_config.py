@@ -10,12 +10,12 @@ import os
 
 # 프로젝트 루트 경로
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..'))
-ARTIFACTS_DIR = os.path.join(PROJECT_ROOT, 'Apollo.ML', 'artifacts', 'RLQOmodels')
+ARTIFACTS_DIR = os.path.join(PROJECT_ROOT, 'Apollo.ML', 'artifacts', 'RLQO', 'models')
 
 # 모델 경로 (Real DB Fine-tuned 모델)
 MODEL_PATHS = {
-    'dqn_v4': os.path.join(ARTIFACTS_DIR, 'dqn_v4_realdb_partial.zip'),
-    'ppo_v3': os.path.join(ARTIFACTS_DIR, 'ppo_v3_realdb_partial.zip'),
+    'dqn_v4': os.path.join(ARTIFACTS_DIR, 'dqn_v4_final.zip'),
+    'ppo_v3': os.path.join(ARTIFACTS_DIR, 'ppo_v3_realdb_50k.zip'),
     'ddpg_v1': os.path.join(ARTIFACTS_DIR, 'ddpg_v1_realdb_50k.zip'),
     'sac_v1': os.path.join(ARTIFACTS_DIR, 'sac_v1_realdb_50k.zip'),
 }
