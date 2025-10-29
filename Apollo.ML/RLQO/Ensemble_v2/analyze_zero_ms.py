@@ -28,3 +28,4 @@ if zero_results:
     for query, count in query_counts.most_common(10):
         print(f"  Query {query}: {count} times")
 
+

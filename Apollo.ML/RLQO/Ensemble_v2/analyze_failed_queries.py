@@ -63,3 +63,4 @@ if baseline_zeros:
     for r in baseline_zeros[:5]:
         print(f"  Query {r['query_idx']}, Episode {r['episode']}: Baseline 0ms → {r['optimized_ms']:.0f}ms")
 
+

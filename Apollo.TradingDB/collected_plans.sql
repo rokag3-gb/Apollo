@@ -225,7 +225,9 @@ SELECT  TOP 200 account_id,
 FROM    dbo.risk_exposure_snapshot
 WHERE   ts >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) - 7, 0)
 AND     ts < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)
-ORDER BY ts DESC, gross DESC;
+ORDER BY ts DESC, gross DESC
+OPTION (RECOMPILE, LOOP JOIN)
+;
 
 create nonclustered index idx_risk_exposure_snapshot_ts on dbo.risk_exposure_snapshot (ts);
 
