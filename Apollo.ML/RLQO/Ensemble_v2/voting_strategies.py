@@ -125,7 +125,7 @@ def safety_first_vote(
     predictions: Dict[str, int],
     confidences: Dict[str, float],
     safety_threshold: float = 0.2,
-    disagreement_threshold: float = 0.25
+    disagreement_threshold: float = 0.1
 ) -> int:
     """
     Safety-First Voting: 안전성 우선 투표 (v2 신규)
@@ -139,7 +139,7 @@ def safety_first_vote(
         predictions: {model_name: action}
         confidences: {model_name: confidence}
         safety_threshold: 평균 confidence 임계값 (default: 0.2, v2 완화)
-        disagreement_threshold: 동의율 임계값 (default: 0.25, v2 완화)
+        disagreement_threshold: 동의율 임계값 (default: 0.1, v2 추가 완화)
     
     Returns:
         action: 안전성 우선 투표 결과

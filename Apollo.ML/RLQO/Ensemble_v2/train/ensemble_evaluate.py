@@ -177,7 +177,11 @@ def evaluate_ensemble_v2(
                 
                 # Baseline은 첫 환경에서만 가져옴 (환경마다 키 이름이 다름)
                 if baseline_ms == 0:
-                    baseline_ms = info.get('baseline_ms') or info.get('baseline_time', 0)
+                    # DQN v4: info['metrics']['elapsed_time_ms']
+                    # PPO v3 등: info['baseline_ms'] or info['baseline_time']
+                    baseline_ms = (info.get('baseline_ms') or 
+                                  info.get('baseline_time') or 
+                                  info.get('metrics', {}).get('elapsed_time_ms', 0))
             
             # Query info for validator
             query_info = {
@@ -198,9 +202,11 @@ def evaluate_ensemble_v2(
             obs, reward, terminated, truncated, step_info = baseline_env.step(action)
             
             # 환경마다 키 이름이 다름 (optimized_ms, current_time 등)
+            # DQN v4: step_info['metrics']['elapsed_time_ms']
+            # PPO v3 등: step_info['optimized_ms'] or step_info['current_time']
             optimized_ms = (step_info.get('optimized_ms') or 
                            step_info.get('current_time') or 
-                           step_info.get('elapsed_time_ms', baseline_ms))
+                           step_info.get('metrics', {}).get('elapsed_time_ms', baseline_ms))
             speedup = baseline_ms / optimized_ms if optimized_ms > 0 else 0
             
             # Record result for validator learning

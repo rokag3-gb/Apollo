@@ -71,37 +71,83 @@ def parse_statistics(stats_io: str, stats_time: str) -> dict:
     return metrics
 
 def apply_action_to_sql(sql: str, action: dict) -> str:
-    """주어진 SQL에 Action(힌트/재작성)을 적용합니다."""
+    """
+    주어진 SQL에 Action(힌트/재작성)을 적용합니다.
+    
+    v2 추가: 모든 쿼리에 OPTION (RECOMPILE) 추가하여 플랜 캐시 방지
+    """
     action_type = action.get('type')
     action_value = action.get('value')
     
-    # NO_ACTION인 경우 원본 반환
+    # Helper function: OPTION (RECOMPILE) 추가
+    def add_recompile_hint(sql_str: str, additional_hint: str = "") -> str:
+        """
+        SQL에 OPTION (RECOMPILE) 추가. 이미 OPTION 절이 있으면 그 안에 추가.
+        
+        Args:
+            sql_str: 원본 SQL
+            additional_hint: 추가할 다른 힌트 (예: "MAXDOP 4")
+        
+        Returns:
+            RECOMPILE이 추가된 SQL
+        """
+        # 세미콜론 제거 (나중에 다시 추가)
+        sql_clean = sql_str.rstrip().rstrip(';')
+        
+        # 이미 OPTION 절이 있는지 확인 (대소문자 무시)
+        option_pattern = r'\bOPTION\s*\('
+        option_match = re.search(option_pattern, sql_clean, re.IGNORECASE)
+        
+        if option_match:
+            # OPTION 절이 이미 있음 → RECOMPILE을 맨 앞에 추가
+            # "OPTION (" → "OPTION (RECOMPILE, "
+            if additional_hint:
+                replacement = f"OPTION (RECOMPILE, {additional_hint}, "
+            else:
+                replacement = "OPTION (RECOMPILE, "
+            
+            sql_with_recompile = re.sub(
+                option_pattern, 
+                replacement, 
+                sql_clean, 
+                count=1, 
+                flags=re.IGNORECASE
+            )
+        else:
+            # OPTION 절이 없음 → 새로 추가
+            if additional_hint:
+                sql_with_recompile = f"{sql_clean} OPTION (RECOMPILE, {additional_hint})"
+            else:
+                sql_with_recompile = f"{sql_clean} OPTION (RECOMPILE)"
+        
+        # 세미콜론 추가
+        return sql_with_recompile + ";"
+    
+    # NO_ACTION인 경우에도 RECOMPILE 추가 (캐시 방지)
     if action_type == "BASELINE" or not action_value:
-        return sql
+        return add_recompile_hint(sql)
     
     if action_type == "ISOLATION":
         # ISOLATION LEVEL은 SQL 실행 전에 세션 레벨에서 설정
         # SQL 앞에 SET TRANSACTION ISOLATION LEVEL 문 추가
-        return f"{action_value};\n{sql}"
+        sql_with_isolation = f"{action_value};\n{sql}"
+        return add_recompile_hint(sql_with_isolation)
     
     elif action_type == "HINT":
-        # 세미콜론이 있다면 그 앞에, 없다면 맨 뒤에 힌트 추가
-        if ';' in sql:
-            return sql.replace(';', f' {action_value};')
-        else:
-            return f"{sql} {action_value}"
+        # 힌트 적용하면서 RECOMPILE도 추가
+        return add_recompile_hint(sql, action_value)
     
     elif action_type == "TABLE_HINT":
         # NOLOCK 등의 테이블 힌트를 FROM 절 테이블에 추가
         # 예: "FROM dbo.table_name" -> "FROM dbo.table_name (NOLOCK)"
         
         # TABLE_HINT는 CTE 쿼리와 호환되지 않으므로 적용하지 않음
-        # CTE가 있으면 원본 SQL 반환
+        # CTE가 있으면 RECOMPILE만 추가하고 반환
         # CTE 패턴: WITH로 시작하고 AS (가 있는 경우
         # 공백, 줄바꿈, 탭 등을 모두 고려
         if re.search(r'\bWITH\s+\w+\s+AS\s*\(', sql, re.IGNORECASE | re.DOTALL):
-            # CTE가 있는 경우: TABLE_HINT를 적용하지 않고 원본 반환
-            return sql
+            # CTE가 있는 경우: TABLE_HINT를 적용하지 않고 RECOMPILE만 추가
+            return add_recompile_hint(sql)
         
         # CTE가 없는 경우에만 TABLE_HINT 적용
         # FROM 절의 첫 번째 테이블에 힌트 추가
@@ -115,9 +161,11 @@ def apply_action_to_sql(sql: str, action: dict) -> str:
             return f"{table_part} ({action_value}){alias_part}"
         
         modified_sql = re.sub(pattern, add_table_hint, sql, count=1, flags=re.IGNORECASE)
-        return modified_sql
+        # TABLE_HINT 적용 후 RECOMPILE 추가
+        return add_recompile_hint(modified_sql)
     
-    return sql
+    # 기본: RECOMPILE 추가
+    return add_recompile_hint(sql)
 
 # --- Gym Environment ---
 
