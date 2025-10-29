@@ -10,6 +10,9 @@
 
 ## 📊 전체 성능 요약
 
+![Overall Statistics](charts/overall_statistics.png)
+*그림 1: SAC v1 전체 성능 지표*
+
 | 지표 | SAC v1 | 평가 |
 |------|--------|------|
 | **평균 Speedup** | **1.891x** | ✅ **89.1% 성능 향상** |
@@ -33,6 +36,21 @@
 ---
 
 ## 🏆 Top 5 최고 성능 쿼리
+
+![Speedup by Query](charts/speedup_by_query.png)
+*그림 2: Query별 평균 Speedup*
+
+![Top 5 Best Queries](charts/top_5_best_queries.png)
+*그림 3: Top 5 최고 성능 쿼리*
+
+![Speedup Distribution](charts/speedup_distribution.png)
+*그림 4: Speedup 분포 히스토그램 (900 executions)*
+
+![Speedup Over Episodes](charts/speedup_over_episodes.png)
+*그림 5: Episode별 평균 Speedup 추이*
+
+![Action Rate by Query](charts/action_rate_by_query.png)
+*그림 6: Query별 Action 적용률*
 
 | 순위 | Query | 쿼리 이름 | Avg Speedup | Max Speedup | 개선율 | 적용 액션 패턴 |
 |-----|-------|----------|-------------|-------------|-------|--------------|

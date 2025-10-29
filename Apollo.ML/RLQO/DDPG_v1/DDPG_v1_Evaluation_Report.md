@@ -11,6 +11,9 @@
 
 ## 📊 전체 성능 요약
 
+![Model Comparison](charts/model_comparison.png)
+*그림 1: DDPG v1 Sim vs RealDB 주요 성능 지표 및 분포 비교*
+
 | 지표 | Simulation | Real DB | 평가 |
 |------|-----------|---------|------|
 | **평균 Speedup** | **1.928x** | **1.875x** | ✅ **88~93% 성능 향상** |
@@ -32,6 +35,12 @@
 ---
 
 ## 🏆 Top 5 최고 성능 쿼리
+
+![Query Speedup Comparison](charts/speedup_by_query.png)
+*그림 2: 전체 30개 쿼리별 Speedup 비교 (Sim vs RealDB)*
+
+![Top 5 Best Queries](charts/top_5_best_queries.png)
+*그림 3: DDPG v1 RealDB - 최고 성능 5개 쿼리*
 
 ### Simulation 모델
 
@@ -96,6 +105,15 @@
 - 공백: 중립 (0.9~1.2x) 또는 NO_ACTION
 
 ### 성능 분포
+
+![Speedup Distribution](charts/speedup_distribution.png)
+*그림 4: Speedup 분포 히스토그램*
+
+![Performance Categories](charts/performance_categories.png)
+*그림 5: 성능 카테고리 분포*
+
+![Action Frequency](charts/action_frequency.png)
+*그림 6: Action 적용 빈도*
 
 **Excellent (Speedup ≥ 2.0x) - 12개 실행 (13.3%)**
 ```

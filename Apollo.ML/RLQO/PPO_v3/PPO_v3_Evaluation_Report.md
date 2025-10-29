@@ -10,6 +10,9 @@
 
 ## 📊 전체 성능 요약
 
+![Speedup by Query Type](charts/speedup_by_query_type.png)
+*그림 1: 쿼리 타입별 평균 Speedup*
+
 | 지표 | 값 | 평가 |
 |------|-----|------|
 | **평균 Speedup** | **1.199x** | ✅ **19.9% 성능 향상** |
@@ -46,6 +49,21 @@
 ---
 
 ## 🌟 쿼리별 상세 성능
+
+![Speedup by Query](charts/speedup_by_query.png)
+*그림 2: Query별 평균 Speedup (30개 쿼리)*
+
+![Top 10 Best Queries](charts/top_10_best_queries.png)
+*그림 3: Top 10 최고 성능 쿼리*
+
+![Speedup Distribution](charts/speedup_distribution.png)
+*그림 4: Speedup 분포 히스토그램 (900 executions)*
+
+![Speedup BoxPlot](charts/speedup_boxplot_by_type.png)
+*그림 5: 쿼리 타입별 Speedup 분포 (Box Plot)*
+
+![Action Frequency](charts/action_frequency.png)
+*그림 6: Top 15 Action 빈도*
 
 ### Top 10 최고 성능 쿼리
 
