@@ -31,13 +31,25 @@ def majority_vote(predictions: Dict[str, int]) -> int:
     return most_common[0]
 
 
-def weighted_vote(predictions: Dict[str, int], confidences: Dict[str, float]) -> int:
+def weighted_vote(
+    predictions: Dict[str, int], 
+    confidences: Dict[str, float],
+    performance_weights: Dict[str, float] = None,
+    query_type_weights: Dict[str, float] = None,
+    no_action_penalty: float = 1.0
+) -> int:
     """
-    Weighted Voting: Confidence로 가중치를 준 투표
+    개선된 Weighted Voting (v2 개선):
+    1. Confidence + Performance + Query Type 가중치 통합
+    2. NO_ACTION 페널티 적용
+    3. 전문가 모델 우선 선택
     
     Args:
         predictions: {model_name: action}
         confidences: {model_name: confidence}
+        performance_weights: {model_name: performance_score} (모델 전체 성능)
+        query_type_weights: {model_name: weight} (쿼리 타입별 전문성)
+        no_action_penalty: NO_ACTION(18번)에 적용할 페널티 (0.5 = 절반)
     
     Returns:
         weighted_action: 가중 투표 결과
@@ -49,12 +61,26 @@ def weighted_vote(predictions: Dict[str, int], confidences: Dict[str, float]) ->
     action_weights = {}
     
     for model_name, action in predictions.items():
-        confidence = confidences.get(model_name, 1.0)
+        # 1. Base confidence
+        confidence = confidences.get(model_name, 0.5)
+        
+        # 2. Performance weight (모델 전체 성능)
+        perf_weight = performance_weights.get(model_name, 1.0) if performance_weights else 1.0
+        
+        # 3. Query type weight (쿼리 타입별 전문성)
+        type_weight = query_type_weights.get(model_name, 1.0) if query_type_weights else 1.0
+        
+        # 4. Combined weight
+        combined_weight = confidence * perf_weight * type_weight
+        
+        # 5. NO_ACTION 페널티 적용
+        if action == 18:  # NO_ACTION
+            combined_weight *= no_action_penalty
         
         if action not in action_weights:
             action_weights[action] = 0.0
         
-        action_weights[action] += confidence
+        action_weights[action] += combined_weight
     
     # 최고 가중치 액션 선택
     best_action = max(action_weights.items(), key=lambda x: x[1])[0]

@@ -46,68 +46,68 @@ VOTING_STRATEGIES = {
     'safety_first': 'safety_first',     # 안전성 우선 (v2 신규)
 }
 
-# 모델별 기본 성능 가중치 (평가 보고서 기반)
-# DQN v4: Mean Speedup ~1.30x (30 queries)
-# PPO v3: Mean Speedup ~1.20x
-# DDPG v1: Mean Speedup ~1.88x
-# SAC v1: Mean Speedup ~1.89x
+# 모델별 기본 성능 가중치 (개선 쿼리 수 기반)
+# DQN v4: 15개 쿼리 개선 (최다)
+# PPO v3: 9개 쿼리 개선 (2위)
+# DDPG v1: 4개 쿼리 개선 (극적 개선)
+# SAC v1: 7개 쿼리 개선
 PERFORMANCE_WEIGHTS = {
-    'dqn_v4': 1.30,
-    'ppo_v3': 1.20,
-    'ddpg_v1': 1.88,
-    'sac_v1': 1.89,
+    'dqn_v4': 2.0,   # 15개 쿼리 개선 (최다)
+    'ppo_v3': 1.8,   # 9개 쿼리 개선 (2위)
+    'ddpg_v1': 1.5,  # 4개 쿼리 개선 (극적)
+    'sac_v1': 1.6,   # 7개 쿼리 개선
 }
 
-# 쿼리 타입별 모델 가중치
-# v2: DDPG/SAC의 가중치 상향 조정 (변환 로직 개선으로 활용 가능)
+# 쿼리 타입별 모델 가중치 (분석 보고서 기반 전문성 반영)
+# v2 개선: 각 모델의 실제 강점 쿼리 타입에 가중치 집중
 QUERY_TYPE_WEIGHTS = {
     'CTE': {
-        'dqn_v4': 0.15,
-        'ppo_v3': 0.35,  # PPO가 CTE에 강함
-        'ddpg_v1': 0.25,
-        'sac_v1': 0.25,
+        'dqn_v4': 0.20,
+        'ppo_v3': 0.50,  # PPO가 CTE에 강함 (1.7x 개선)
+        'ddpg_v1': 0.15,
+        'sac_v1': 0.15,
     },
     'JOIN_HEAVY': {
-        'dqn_v4': 0.10,
-        'ppo_v3': 0.10,
-        'ddpg_v1': 0.40,  # DDPG가 복잡한 JOIN에 강함
-        'sac_v1': 0.40,   # SAC도 JOIN에 강함
+        'dqn_v4': 0.15,
+        'ppo_v3': 0.25,  # 복잡한 쿼리 강함
+        'ddpg_v1': 0.30,  # DDPG가 복잡한 JOIN에 강함
+        'sac_v1': 0.30,   # SAC도 JOIN에 강함
     },
     'AGGREGATE': {
-        'dqn_v4': 0.20,
-        'ppo_v3': 0.25,
-        'ddpg_v1': 0.25,
-        'sac_v1': 0.30,   # SAC가 집계 쿼리에 강함
+        'dqn_v4': 0.25,
+        'ppo_v3': 0.30,
+        'ddpg_v1': 0.20,
+        'sac_v1': 0.25,
     },
     'SIMPLE': {
-        'dqn_v4': 0.30,   # 단순 쿼리는 DQN으로 충분
-        'ppo_v3': 0.30,
+        'dqn_v4': 0.10,
+        'ppo_v3': 0.10,
+        'ddpg_v1': 0.40,  # 대용량 쿼리 전문 (17x 개선)
+        'sac_v1': 0.40,   # 대용량 쿼리 전문 (18x 개선)
+    },
+    'SUBQUERY': {
+        'dqn_v4': 0.25,
+        'ppo_v3': 0.35,
         'ddpg_v1': 0.20,
         'sac_v1': 0.20,
     },
-    'SUBQUERY': {
+    'TOP': {
+        'dqn_v4': 0.25,
+        'ppo_v3': 0.35,
+        'ddpg_v1': 0.20,
+        'sac_v1': 0.20,
+    },
+    'WINDOW': {
         'dqn_v4': 0.20,
         'ppo_v3': 0.30,
         'ddpg_v1': 0.25,
         'sac_v1': 0.25,
     },
-    'TOP': {
-        'dqn_v4': 0.20,
-        'ppo_v3': 0.30,
-        'ddpg_v1': 0.25,  # v2: TOP 쿼리 개선 목표
-        'sac_v1': 0.25,
-    },
-    'WINDOW': {
-        'dqn_v4': 0.15,
-        'ppo_v3': 0.25,
-        'ddpg_v1': 0.30,
-        'sac_v1': 0.30,
-    },
     'DEFAULT': {
-        'dqn_v4': 0.20,
-        'ppo_v3': 0.25,
-        'ddpg_v1': 0.27,
-        'sac_v1': 0.28,
+        'dqn_v4': 0.25,
+        'ppo_v3': 0.30,
+        'ddpg_v1': 0.22,
+        'sac_v1': 0.23,
     }
 }
 
@@ -115,12 +115,16 @@ QUERY_TYPE_WEIGHTS = {
 # v2: Safety-first 전략에 따라 threshold 상향
 CONFIDENCE_THRESHOLD = 0.15  # v1: 0.1 → v2: 0.15 (더 보수적)
 
-# Safety-First 설정 (v2 신규)
+# NO_ACTION 페널티 (v2 개선)
+# NO_ACTION(18번)의 투표 가중치를 낮춰서 실제 개선 액션을 우선 선택
+NO_ACTION_PENALTY = 0.5  # NO_ACTION의 가중치를 절반으로
+
+# Safety-First 설정 (v2 개선: Conservative threshold 완화)
 SAFETY_CONFIG = {
-    'avg_confidence_threshold': 0.4,  # 평균 confidence < 0.4 → NO_ACTION
-    'disagreement_threshold': 0.5,    # 동의율 < 50% → NO_ACTION
-    'use_action_validator': True,     # Action validator 사용
-    'use_query_router': True,         # Query type router 사용
+    'avg_confidence_threshold': 0.15,  # 0.4 → 0.15 (완화)
+    'disagreement_threshold': 0.25,    # 0.5 → 0.25 (완화)
+    'use_action_validator': True,      # Action validator 사용
+    'use_query_router': True,          # Query type router 사용
 }
 
 # TOP 쿼리 특별 설정 (v2 신규)

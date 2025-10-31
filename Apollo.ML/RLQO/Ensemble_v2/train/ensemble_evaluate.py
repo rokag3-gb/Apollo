@@ -46,7 +46,7 @@ from sb3_contrib.common.wrappers import ActionMasker
 def evaluate_ensemble_v2(
     n_queries: int = 30,
     n_episodes: int = 10,
-    voting_strategy: str = 'safety_first',
+    voting_strategy: str = 'weighted',
     output_json: str = None
 ):
     """
@@ -339,9 +339,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ensemble v2 Evaluation')
     parser.add_argument('--queries', type=int, default=30, help='Number of queries to evaluate')
     parser.add_argument('--episodes', type=int, default=10, help='Episodes per query')
-    parser.add_argument('--strategy', type=str, default='safety_first', 
+    parser.add_argument('--strategy', type=str, default='weighted', 
                        choices=['majority', 'weighted', 'safety_first', 'performance', 'query_type'],
-                       help='Voting strategy')
+                       help='Voting strategy (v2 개선: weighted 권장)')
     parser.add_argument('--output', type=str, default=None, help='Output JSON file path')
     
     args = parser.parse_args()

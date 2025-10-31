@@ -56,7 +56,7 @@ class VotingEnsembleV2:
     def __init__(
         self,
         model_paths: Dict[str, str] = None,
-        voting_strategy: str = 'safety_first',
+        voting_strategy: str = 'weighted',
         confidence_threshold: float = CONFIDENCE_THRESHOLD,
         use_action_validator: bool = True,
         use_query_router: bool = True,
@@ -65,7 +65,7 @@ class VotingEnsembleV2:
         """
         Args:
             model_paths: 모델 경로 딕셔너리
-            voting_strategy: 투표 전략 ('safety_first' 권장)
+            voting_strategy: 투표 전략 ('weighted' 권장, v2 개선)
             confidence_threshold: Confidence threshold
             use_action_validator: Action validator 사용 여부
             use_query_router: Query type router 사용 여부
@@ -488,7 +488,21 @@ class VotingEnsembleV2:
             return majority_vote(predictions)
         
         elif self.voting_strategy == 'weighted':
-            return weighted_vote(predictions, confidences)
+            # v2 개선: Performance + Query Type + NO_ACTION 페널티 적용
+            from RLQO.Ensemble_v2.config.ensemble_config import (
+                PERFORMANCE_WEIGHTS, QUERY_TYPE_WEIGHTS, NO_ACTION_PENALTY
+            )
+            
+            type_weights = QUERY_TYPE_WEIGHTS.get(query_type, QUERY_TYPE_WEIGHTS['DEFAULT'])
+            model_type_weights = {k: type_weights.get(k, 0.25) for k in predictions.keys()}
+            
+            return weighted_vote(
+                predictions, 
+                confidences,
+                performance_weights=PERFORMANCE_WEIGHTS,
+                query_type_weights=model_type_weights,
+                no_action_penalty=NO_ACTION_PENALTY
+            )
         
         elif self.voting_strategy == 'equal':
             return equal_weighted_vote(predictions)
