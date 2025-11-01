@@ -115,9 +115,9 @@ QUERY_TYPE_WEIGHTS = {
 # v2: Safety-first 전략에 따라 threshold 상향
 CONFIDENCE_THRESHOLD = 0.15  # v1: 0.1 → v2: 0.15 (더 보수적)
 
-# NO_ACTION 페널티 (v2 개선)
+# NO_ACTION 페널티 (v2 개선 - 강화)
 # NO_ACTION(18번)의 투표 가중치를 낮춰서 실제 개선 액션을 우선 선택
-NO_ACTION_PENALTY = 0.5  # NO_ACTION의 가중치를 절반으로
+NO_ACTION_PENALTY = 0.2  # NO_ACTION의 가중치를 1/5로 (0.5 → 0.2 강화)
 
 # Safety-First 설정 (v2 개선: Conservative threshold 완화)
 SAFETY_CONFIG = {
