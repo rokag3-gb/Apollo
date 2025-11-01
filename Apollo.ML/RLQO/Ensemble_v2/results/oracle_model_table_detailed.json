@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-11-01T15:43:49.349629",
+  "description": "Query별 최적 모델 매핑 (Oracle Ensemble, Detailed)",
+  "model_table": {
+    "0": "ppo_v3",
+    "1": "ppo_v3",
+    "2": "ddpg_v1",
+    "3": "ddpg_v1",
+    "4": "dqn_v4",
+    "5": "ddpg_v1",
+    "6": "ppo_v3",
+    "7": "ppo_v3",
+    "8": "dqn_v4",
+    "9": "ppo_v3",
+    "10": "ppo_v3",
+    "11": "ddpg_v1",
+    "12": "ddpg_v1",
+    "13": "ppo_v3",
+    "14": "ppo_v3",
+    "15": "dqn_v4",
+    "16": "dqn_v4",
+    "17": "dqn_v4",
+    "18": "dqn_v4",
+    "19": "ppo_v3",
+    "20": "ppo_v3",
+    "21": "ppo_v3",
+    "22": "dqn_v4",
+    "23": "dqn_v4",
+    "24": "ppo_v3",
+    "25": "ppo_v3",
+    "26": "dqn_v4",
+    "27": "dqn_v4",
+    "28": "ddpg_v1",
+    "29": "ppo_v3"
+  },
+  "model_selection_counts": {
+    "ppo_v3": 14,
+    "ddpg_v1": 6,
+    "dqn_v4": 10
+  }
+}
