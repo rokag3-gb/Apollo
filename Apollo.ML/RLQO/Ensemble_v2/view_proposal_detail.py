@@ -105,17 +105,42 @@ def view_proposal(proposal_id=None):
     print(f"  비고:           {notes}")
     print()
     
-    print("[ 성능 비교 ]")
-    print(f"  {'메트릭':<20s} | {'Baseline':>15s} | {'Optimized':>15s} | {'개선율':>10s}")
-    print("-" * 70)
-    print(f"  {'Elapsed Time (ms)':<20s} | {baseline_elapsed:>15.2f} | {optimized_elapsed:>15.2f} | {speedup:>9.4f}x")
-    print(f"  {'CPU Time (ms)':<20s} | {baseline_cpu:>15.2f} | {optimized_cpu:>15.2f} | {cpu_improvement:>9.4f}x")
-    print(f"  {'Logical Reads':<20s} | {baseline_reads:>15,} | {optimized_reads:>15,} | {reads_improvement:>9.4f}x")
+    print("[ 성능 비교 상세 ]")
+    print()
+    print("=" * 100)
+    print(f"{'메트릭':<25s} | {'Before (Baseline)':>20s} | {'After (Optimized)':>20s} | {'개선':>15s} | {'개선율':>10s}")
+    print("=" * 100)
+    
+    # Elapsed Time
+    elapsed_saved = baseline_elapsed - optimized_elapsed
+    elapsed_pct = (elapsed_saved / baseline_elapsed * 100) if baseline_elapsed > 0 else 0
+    elapsed_status = "✓ 개선" if speedup > 1.05 else "✗ 악화" if speedup < 0.95 else "- 유지"
+    print(f"{'Elapsed Time':<25s} | {baseline_elapsed:>17.2f} ms | {optimized_elapsed:>17.2f} ms | {elapsed_saved:>12.2f} ms | {elapsed_pct:>9.1f}%  {elapsed_status}")
+    
+    # CPU Time
+    cpu_saved = baseline_cpu - optimized_cpu
+    cpu_pct = (cpu_saved / baseline_cpu * 100) if baseline_cpu > 0 else 0
+    cpu_status = "✓ 개선" if cpu_improvement > 1.05 else "✗ 악화" if cpu_improvement < 0.95 else "- 유지"
+    print(f"{'CPU Time':<25s} | {baseline_cpu:>17.2f} ms | {optimized_cpu:>17.2f} ms | {cpu_saved:>12.2f} ms | {cpu_pct:>9.1f}%  {cpu_status}")
+    
+    # Logical Reads
+    reads_saved = baseline_reads - optimized_reads
+    reads_pct = (reads_saved / baseline_reads * 100) if baseline_reads > 0 else 0
+    reads_status = "✓ 개선" if reads_improvement > 1.05 else "✗ 악화" if reads_improvement < 0.95 else "- 유지"
+    print(f"{'Logical Reads':<25s} | {baseline_reads:>20,} | {optimized_reads:>20,} | {reads_saved:>15,} | {reads_pct:>9.1f}%  {reads_status}")
+    
+    print("=" * 100)
     print()
     
-    saved_time = baseline_elapsed - optimized_elapsed
-    saved_pct = (saved_time / baseline_elapsed * 100) if baseline_elapsed > 0 else 0
-    print(f"  ▶ 시간 절약: {saved_time:.2f}ms ({saved_pct:.1f}% 개선)")
+    # 요약
+    print("[ 성능 개선 요약 ]")
+    print(f"  ⏱️  실행 시간:     {baseline_elapsed:.2f}ms → {optimized_elapsed:.2f}ms  (절약: {elapsed_saved:.2f}ms, {elapsed_pct:.1f}%)")
+    print(f"  🔥 CPU 시간:      {baseline_cpu:.2f}ms → {optimized_cpu:.2f}ms  (절약: {cpu_saved:.2f}ms, {cpu_pct:.1f}%)")
+    print(f"  📖 Logical Reads: {baseline_reads:,} → {optimized_reads:,}  (절약: {reads_saved:,}, {reads_pct:.1f}%)")
+    print(f"  🚀 전체 Speedup:  {speedup:.4f}x")
+    
+    overall_status = "✓ 권장 (승인 검토)" if speedup > 1.05 else "✗ 권장하지 않음" if speedup < 0.95 else "△ 성능 차이 미미"
+    print(f"  📊 평가:          {overall_status}")
     print()
     
     print("=" * 100)

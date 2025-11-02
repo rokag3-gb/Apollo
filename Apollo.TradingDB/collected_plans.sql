@@ -178,11 +178,11 @@ SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_ac
 
 select  original_query_text
 from    rlqo_optimization_proposals
-where   proposal_id = 122
+where   proposal_id = 123
 
 select  optimized_query_text
 from    rlqo_optimization_proposals
-where   proposal_id = 122
+where   proposal_id = 123
 
 
 select  *
