@@ -486,6 +486,18 @@ ORDER BY Qty desc;
 
 ## 모델 선택 분석
 
+### 모델별 쿼리 성능 히트맵
+
+4개 모델이 30개 쿼리에서 달성한 성능 개선율을 한눈에 보여주는 히트맵입니다. 초록색은 개선, 빨간색은 악화를 의미합니다.
+
+![Model Performance Heatmap](results/charts/model_performance_heatmap.png)
+
+**히트맵 인사이트**:
+- **PPO v3**: 가장 균형잡힌 성능 (Win Rate 40%, 평균 +15.8% 개선)
+- **DQN v4**: 안정적이고 일관성 있는 개선 (Win Rate 75%, 평균 +29.9% 개선)
+- **DDPG v1**: 극단적 성능 - 일부 쿼리에서 2305% 개선, 일부는 -99% 악화
+- **SAC v1**: DDPG v1과 거의 동일한 패턴
+
 ### 모델 선택 분포
 
 ![Model Selection Distribution](results/charts/model_selection_distribution.png)
