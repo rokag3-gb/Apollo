@@ -157,7 +157,7 @@ usp_s_Admin_GetOrphanedExecutions_097
 usp_s_CheckAllTableFragmentation_100
 usp_t_Batch_GenerateRiskSnapshots_066
 
----
+------------------------------------------------------------------
 
 SET STATISTICS IO ON; SET STATISTICS TIME ON; SET STATISTICS XML ON;
 SELECT TOP 100 execution_id FROM dbo.exe_execution e;
@@ -174,62 +174,111 @@ SELECT OBJECT_NAME(ips.object_id) AS TableName, si.name AS IndexName, ips.index_
 
 SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_account WHERE closed_at IS NULL;
 
+------------------------------------------------------------------
+
+select  original_query_text
+from    rlqo_optimization_proposals
+where   proposal_id = 122
+
+select  optimized_query_text
+from    rlqo_optimization_proposals
+where   proposal_id = 122
 
 
+select  *
+from    rlqo_optimization_proposals
+where   approval_status = 'PENDING';
+
+update  a
+set     proposal_datetime = dateadd(day, -5, proposal_datetime)
+from    rlqo_optimization_proposals a
 
 
-SELECT execution_id FROM dbo.exe_execution e;
-SELECT AccountID=o.account_id, SecID=o.security_id, Side=o.side, Qty=e.exec_qty, Price=e.exec_price, Fee=e.fee, Tax=e.tax FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id;
+------------------------------------------------------------------
 
-SELECT TOP 3000 * FROM dbo.risk_exposure_snapshot /*WHERE CAST(ts AS DATE) = cast(getdate() as date)*/;
+-- =============================================
+-- RLQO 쿼리 최적화 제안 테이블
+-- Ensemble v2 모델이 제안한 쿼리 개선 사항 저장
+-- =============================================
 
-SELECT e.execution_id, o.account_id, s.symbol, o.side, e.exec_qty, e.exec_price, e.exec_time FROM dbo.exe_execution e JOIN dbo.ord_order o ON e.order_id=o.order_id JOIN dbo.ref_security s ON o.security_id=s.security_id ORDER BY e.exec_time DESC;
-SELECT e.* FROM dbo.exe_execution e WHERE NOT EXISTS (SELECT 1 FROM dbo.ord_order o WHERE o.order_id = e.order_id);
-SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_account WHERE closed_at IS NULL;
+USE TradingDB;
+GO
 
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
-SET TRANSACTION ISOLATION LEVEL READ SNAPSHOT
+IF OBJECT_ID('dbo.rlqo_optimization_proposals', 'U') IS NOT NULL
+    DROP TABLE dbo.rlqo_optimization_proposals;
+GO
 
----
+CREATE TABLE dbo.rlqo_optimization_proposals
+(
+    -- 기본 정보
+    proposal_id             BIGINT IDENTITY(1,1) PRIMARY KEY,
+    proposal_datetime       DATETIME2(3) NOT NULL DEFAULT SYSDATETIME(),
+    model_name              NVARCHAR(100) NOT NULL,         -- 예: 'Ensemble_v2', 'PPO_v3', 'DDPG_v1'
+    
+    -- 쿼리 텍스트
+    original_query_text     NVARCHAR(MAX) NOT NULL,         -- 기존 쿼리
+    optimized_query_text    NVARCHAR(MAX) NOT NULL,         -- 수정된 쿼리 (힌트 포함)
+    query_hash              VARBINARY(8) NULL,              -- 쿼리 식별용 해시
+    
+    -- 성능 메트릭: Baseline (기존 쿼리)
+    baseline_elapsed_time_ms    DECIMAL(18,3) NOT NULL,
+    baseline_cpu_time_ms        DECIMAL(18,3) NOT NULL,
+    baseline_logical_reads      BIGINT NOT NULL,
+    baseline_physical_reads     BIGINT NULL,
+    baseline_writes             BIGINT NULL,
+    
+    -- 성능 메트릭: Optimized (수정된 쿼리)
+    optimized_elapsed_time_ms   DECIMAL(18,3) NOT NULL,
+    optimized_cpu_time_ms       DECIMAL(18,3) NOT NULL,
+    optimized_logical_reads     BIGINT NOT NULL,
+    optimized_physical_reads    BIGINT NULL,
+    optimized_writes            BIGINT NULL,
+    
+    -- 성능 개선율
+    speedup_ratio               DECIMAL(10,4) NOT NULL,     -- elapsed_time 기준 개선율
+    cpu_improvement_ratio       DECIMAL(10,4) NULL,         -- CPU time 개선율
+    reads_improvement_ratio     DECIMAL(10,4) NULL,         -- Logical reads 개선율
+    
+    -- 추가 정보
+    query_type                  NVARCHAR(50) NULL,          -- 예: 'SIMPLE', 'CTE', 'JOIN_HEAVY'
+    episode_count               INT NULL,                   -- 실행 횟수 (평균값인 경우)
+    confidence_score            DECIMAL(5,4) NULL,          -- 모델 신뢰도 (있는 경우)
+    
+    -- 승인 및 적용 관리
+    approval_status             NVARCHAR(20) NOT NULL DEFAULT 'PENDING',  -- 'PENDING', 'APPROVED', 'REJECTED', 'APPLIED'
+    reviewed_by                 NVARCHAR(100) NULL,         -- DB 엔지니어 이름
+    reviewed_datetime           DATETIME2(3) NULL,
+    applied_datetime            DATETIME2(3) NULL,
+    rollback_datetime           DATETIME2(3) NULL,
+    
+    -- 비고
+    notes                       NVARCHAR(MAX) NULL,         -- 리뷰 의견, 적용 결과 등
+    
+    -- 인덱스
+    INDEX IX_proposal_datetime (proposal_datetime DESC),
+    INDEX IX_model_name (model_name),
+    INDEX IX_approval_status (approval_status),
+    INDEX IX_speedup_ratio (speedup_ratio DESC)
+);
+GO
 
-select  top 1 *
-from    collected_plans
-where   sql_text like '%usp_t_Batch_SettleAllTrades_061%'
+-- =============================================
+-- 설명용 Extended Properties
+-- =============================================
+EXEC sys.sp_addextendedproperty 
+    @name=N'MS_Description', 
+    @value=N'RLQO(Reinforcement Learning Query Optimizer) 모델이 제안한 쿼리 최적화 내역을 저장하는 테이블. DB 엔지니어가 검토하고 승인/적용 여부를 관리함.',
+    @level0type=N'SCHEMA', @level0name=N'dbo',
+    @level1type=N'TABLE',  @level1name=N'rlqo_optimization_proposals';
+GO
 
-DBA_All_Sessions @SessionStatus = '(All)'
-
-
-KB 1,385,051
-1,447,896
-
-select 480000 + 636719 + 331177
-
-select 11000000.0 / 36
-월 원리금 305,556
-
-select 14087820.0 / 36
-월 원리금 391,329
-
-select datediff(day, '2025-07-14', '2025-12-31') / 365.0
-select 136496 - 134448
-
-
-SELECT  TOP 200 account_id,
-        ts,
-        gross,
-        net,
-        var_1d,
-        margin_required,
-        (gross - net) AS long_short_imbalance
-FROM    dbo.risk_exposure_snapshot
-WHERE   ts >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) - 7, 0)
-AND     ts < DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()) + 1, 0)
-ORDER BY ts DESC, gross DESC
-OPTION (RECOMPILE, LOOP JOIN)
-;
-
-create nonclustered index idx_risk_exposure_snapshot_ts on dbo.risk_exposure_snapshot (ts);
+EXEC sys.sp_addextendedproperty 
+    @name=N'MS_Description', 
+    @value=N'기존 쿼리 대비 실행 시간(elapsed_time) 개선율. 2.172는 2.172배 빨라졌음을 의미.',
+    @level0type=N'SCHEMA', @level0name=N'dbo',
+    @level1type=N'TABLE',  @level1name=N'rlqo_optimization_proposals',
+    @level2type=N'COLUMN', @level2name=N'speedup_ratio';
+GO
 
 ------------------------------------------------------------------
 

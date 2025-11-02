@@ -32,10 +32,15 @@ sys.path.append(ensemble_dir)
 from RLQO.constants2 import SAMPLE_QUERIES
 from RLQO.PPO_v3.config.query_action_mapping_v3 import QUERY_TYPES
 from RLQO.Ensemble_v2.config.ensemble_config import MODEL_PATHS
+from RLQO.DQN_v4.env.v4_db_env import apply_action_to_sql
 
 from stable_baselines3 import DQN, DDPG, SAC
 from sb3_contrib import MaskablePPO
 from sb3_contrib.common.wrappers import ActionMasker
+
+from db import connect
+from config import load_config
+from collections import Counter
 
 
 def extract_query_name(query_str: str) -> str:
@@ -375,8 +380,142 @@ def oracle_ensemble_evaluate_detailed():
     overall_stats['model_selection_counts'] = dict(model_counts)
     overall_stats['model_selection_rates'] = {k: float(v / n_queries) for k, v in model_counts.items()}
     
-    # 5. 결과 저장
-    print("\n[5/5] Saving detailed results...")
+    # 5. DB에 결과 INSERT
+    print("\n[5/6] Inserting results to database...")
+    
+    try:
+        # DB 연결
+        config_path = os.path.join(apollo_ml_dir, 'config.yaml')
+        config = load_config(config_path)
+        conn = connect(config.db)
+        cursor = conn.cursor()
+        
+        # Action space 로드
+        action_space_file = os.path.join(apollo_ml_dir, 'artifacts', 'RLQO', 'configs', 'v4_action_space.json')
+        with open(action_space_file, 'r', encoding='utf-8') as f:
+            action_space = json.load(f)
+            actions_dict = {action['id']: action for action in action_space}
+        
+        # 기존 데이터 삭제
+        delete_sql = "DELETE FROM dbo.rlqo_optimization_proposals WHERE model_name = 'Ensemble_v2_Oracle'"
+        cursor.execute(delete_sql)
+        print(f"  [OK] 기존 데이터 {cursor.rowcount}건 삭제")
+        
+        # 각 쿼리별 가장 빈번한 action 추출
+        query_actions = {}
+        for result in all_results:
+            q_idx = result['query_idx']
+            oracle_model = result['oracle_model']
+            
+            if q_idx not in query_actions:
+                query_actions[q_idx] = {'best_model': oracle_model, 'actions': []}
+            
+            model_metrics = result.get('all_model_metrics', {}).get(oracle_model, {})
+            action = model_metrics.get('action', None)
+            
+            if action is not None:
+                query_actions[q_idx]['actions'].append(int(action))
+        
+        # INSERT 문 준비
+        insert_sql = """
+        INSERT INTO dbo.rlqo_optimization_proposals (
+            proposal_datetime, model_name, original_query_text, optimized_query_text,
+            baseline_elapsed_time_ms, baseline_cpu_time_ms, baseline_logical_reads,
+            optimized_elapsed_time_ms, optimized_cpu_time_ms, optimized_logical_reads,
+            speedup_ratio, cpu_improvement_ratio, reads_improvement_ratio,
+            query_type, episode_count, confidence_score, approval_status, notes
+        ) VALUES (
+            SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+        """
+        
+        inserted_count = 0
+        
+        for summary in query_summaries:
+            q_idx = summary['query_idx']
+            query_type = summary['query_type']
+            best_model = summary['best_model']
+            
+            baseline = summary['baseline_metrics']
+            optimized = summary['oracle_optimized_metrics']
+            speedup = summary['oracle_mean_speedup']
+            win_rate = summary['oracle_win_rate']
+            
+            # CPU, Reads 개선율
+            cpu_improvement = baseline['cpu_time_ms'] / optimized['cpu_time_ms'] if optimized['cpu_time_ms'] > 0 else 0
+            reads_improvement = baseline['logical_reads'] / optimized['logical_reads'] if optimized['logical_reads'] > 0 else 0
+            
+            # 원본 쿼리 (공백 정리)
+            original_query = SAMPLE_QUERIES[q_idx].strip()
+            lines = [line.strip() for line in original_query.split('\n') if line.strip()]
+            original_query_clean = '\n'.join(lines)
+            
+            # 가장 빈번한 action
+            if q_idx in query_actions and query_actions[q_idx]['actions']:
+                action_counter = Counter(query_actions[q_idx]['actions'])
+                best_action_id = action_counter.most_common(1)[0][0]
+            else:
+                best_action_id = 18  # NO_ACTION
+            
+            # 최적화된 쿼리 = 원본 + Action 적용
+            action_info = actions_dict.get(best_action_id, {})
+            action_name = action_info.get('name', 'NO_ACTION')
+            
+            # action_value에서 힌트만 추출 (OPTION (...) 제거)
+            action_value = action_info.get('value', '')
+            if action_value.startswith('OPTION ('):
+                action_value = action_value.replace('OPTION (', '').rstrip(')')
+            
+            # apply_action_to_sql에 맞는 형식으로 변환
+            action_for_sql = {
+                'type': action_info.get('type', 'BASELINE'),
+                'value': action_value
+            }
+            
+            optimized_query = apply_action_to_sql(original_query_clean, action_for_sql)
+            
+            # 승인 상태
+            approval_status = 'PENDING' if speedup > 1.05 else 'REJECTED'
+            
+            notes = f'Best Model: {best_model}, Query Index: {q_idx}, Action: {action_name} (ID: {best_action_id})'
+            
+            try:
+                cursor.execute(insert_sql, (
+                    'Ensemble_v2_Oracle',
+                    original_query_clean,
+                    optimized_query,
+                    baseline['elapsed_time_ms'],
+                    baseline['cpu_time_ms'],
+                    int(baseline['logical_reads']),
+                    optimized['elapsed_time_ms'],
+                    optimized['cpu_time_ms'],
+                    int(optimized['logical_reads']),
+                    speedup,
+                    cpu_improvement,
+                    reads_improvement,
+                    query_type,
+                    n_episodes,
+                    win_rate,
+                    approval_status,
+                    notes
+                ))
+                inserted_count += 1
+            except Exception as e:
+                print(f"  [ERROR] Query {q_idx} insert failed: {e}")
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        print(f"  [OK] {inserted_count}개 쿼리 결과를 DB에 저장했습니다.")
+        
+    except Exception as e:
+        print(f"  [ERROR] DB 저장 실패: {e}")
+        import traceback
+        traceback.print_exc()
+    
+    # 6. 결과 파일 저장
+    print("\n[6/6] Saving detailed results to files...")
     
     results_dir = os.path.join(ensemble_dir, 'results')
     os.makedirs(results_dir, exist_ok=True)
