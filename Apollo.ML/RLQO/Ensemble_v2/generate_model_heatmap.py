@@ -34,6 +34,9 @@ for query_summary in data['query_summaries']:
 # numpy 배열로 변환
 heatmap_array = np.array(heatmap_data)
 
+# speedup 0.0은 실패/측정안됨을 의미 -> NaN 처리 후 회색으로 표시
+heatmap_array = np.where(heatmap_array == 0.0, np.nan, heatmap_array)
+
 # 개선율로 변환 (speedup → improvement %)
 # speedup 1.0 = 0% 개선, 2.0 = 100% 개선, 0.5 = -100% 악화
 improvement_array = (heatmap_array - 1.0) * 100
@@ -50,6 +53,7 @@ vmax = 200  # 더 큰 개선도 표시 가능하도록
 
 # diverging colormap 사용
 cmap = sns.diverging_palette(10, 130, s=80, l=55, as_cmap=True)
+cmap.set_bad(color='lightgray')  # NaN을 회색으로 표시
 
 # 히트맵 그리기
 ax = sns.heatmap(
@@ -64,7 +68,8 @@ ax = sns.heatmap(
     yticklabels=models,  # Y축: 모델
     cbar_kws={'label': 'Improvement (%)'},
     linewidths=0.5,
-    linecolor='gray'
+    linecolor='gray',
+    mask=False  # NaN도 표시
 )
 
 # 제목 및 라벨
@@ -90,10 +95,16 @@ plt.close()
 # 통계 출력
 print("\n[STATS] Model Performance Statistics:")
 for i, model in enumerate(models):
-    improvements = improvement_array[:, i]
-    improvements_valid = improvements[improvements != -100]  # speedup=0 제외
+    # Transpose 후: improvement_array[i, :]가 i번째 모델의 모든 쿼리
+    improvements = improvement_array[i, :]
+    improvements_valid = improvements[~np.isnan(improvements)]  # NaN 제외
+    
+    if len(improvements_valid) == 0:
+        print(f"\n{model}: No valid data")
+        continue
     
     print(f"\n{model}:")
+    print(f"  Valid Queries: {len(improvements_valid)}/30")
     print(f"  Mean Improvement: {np.mean(improvements_valid):.1f}%")
     print(f"  Median Improvement: {np.median(improvements_valid):.1f}%")
     print(f"  Best Improvement: {np.max(improvements_valid):.1f}%")
