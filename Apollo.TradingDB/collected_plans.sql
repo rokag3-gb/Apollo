@@ -178,21 +178,45 @@ SELECT account_id, GETDATE(), RAND()*100000, RAND()*50000, 0, 0 FROM dbo.cust_ac
 
 select  original_query_text
 from    rlqo_optimization_proposals
-where   proposal_id = 123
+where   proposal_id = 124
 
 select  optimized_query_text
 from    rlqo_optimization_proposals
-where   proposal_id = 123
+where   proposal_id = 124
 
 
-select  *
+select  proposal_id
+        , proposal_datetime
+        , model_name
+        , query_type
+        , original_query_text
+        , optimized_query_text
+        , improvement_elapsed_time = case when baseline_elapsed_time_ms = optimized_elapsed_time_ms then
+                                        concat(baseline_elapsed_time_ms, ' (개선없음)')
+                                else
+                                        concat(baseline_elapsed_time_ms, ' -> ', optimized_elapsed_time_ms, ' (', speedup_ratio, '%)')
+                                end
+        , improvement_cpu_time = case when baseline_cpu_time_ms = optimized_cpu_time_ms then
+                                        concat(baseline_cpu_time_ms, ' (개선없음)')
+                                else
+                                        concat(baseline_cpu_time_ms, ' -> ', optimized_cpu_time_ms, ' (', cpu_improvement_ratio, '%)')
+                                end
+        , improvement_reads = case when baseline_logical_reads = optimized_logical_reads then
+                                        concat(baseline_logical_reads, ' (개선없음)')
+                                else
+                                        concat(baseline_logical_reads, ' -> ', optimized_logical_reads, ' (', reads_improvement_ratio, '%)')
+                                end
+        --, confidence_score
+        , best_model = replace(upper(replace(substring(notes, 1, charindex(', ', notes) - 1), 'Best Model: ', '')), '_V', '_v')
+        , approval_status
 from    rlqo_optimization_proposals
 where   approval_status = 'PENDING';
 
+/*
 update  a
-set     proposal_datetime = dateadd(day, -5, proposal_datetime)
+set     proposal_datetime = dateadd(day, -7, proposal_datetime)
 from    rlqo_optimization_proposals a
-
+*/
 
 ------------------------------------------------------------------
 
